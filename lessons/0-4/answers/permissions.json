@@ -29,7 +29,7 @@
     },
     {
       "id": "p3",
-      "title": "agent 想跑「rm -rf ../」",
+      "title": "agent 想跑「rm -rf ../ledger」",
       "accept": [
         "拒絕",
         "不允許",
@@ -38,8 +38,48 @@
         "deny",
         "no"
       ],
-      "hint": "../ 是上一層。rm -rf 刪掉的東西會進垃圾桶嗎？",
-      "explain": "../ 是帳本的上一層，rm -rf 會把整層都刪掉，而且不進垃圾桶。一定拒絕。"
+      "hint": "你現在就在 ledger 裡。.. 是上一層，再接 ledger，指到的是哪裡？",
+      "explain": "../ledger 是從帳本走到上一層、再指回帳本自己，rm -rf 會把整個帳本連同裡面的東西刪掉，而且不進垃圾桶。一定拒絕。"
+    },
+    {
+      "id": "p4",
+      "title": "agent 想跑「pwd」",
+      "accept": [
+        "允許",
+        "可以",
+        "同意",
+        "allow",
+        "yes"
+      ],
+      "hint": "pwd 會改到任何東西嗎？",
+      "explain": "pwd 只是印出現在在哪個資料夾，不會改任何東西。"
+    },
+    {
+      "id": "p5",
+      "title": "agent 想跑「touch notes/ideas.txt」",
+      "accept": [
+        "允許",
+        "可以",
+        "同意",
+        "allow",
+        "yes"
+      ],
+      "hint": "touch 會建出什麼？會刪掉東西嗎？",
+      "explain": "touch 只是在 notes 裡建一個空檔案，不會刪東西，也不會動到原本的檔案。"
+    },
+    {
+      "id": "p6",
+      "title": "agent 想跑「rm -rf ~/code」",
+      "accept": [
+        "拒絕",
+        "不允許",
+        "不可以",
+        "不同意",
+        "deny",
+        "no"
+      ],
+      "hint": "~ 是家目錄。~/code 裡面有什麼？",
+      "explain": "~/code 是家目錄裡的 code 資料夾，帳本也在裡面，rm -rf 會整個刪掉，而且不進垃圾桶。一定拒絕。"
     }
   ],
   "how": "「允許」或「拒絕」"

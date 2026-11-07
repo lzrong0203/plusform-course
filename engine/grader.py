@@ -424,7 +424,7 @@ DEFAULT_GROUP = {
     "uv_python": "官方測試",
     "run": "官方測試",
     "call": "官方測試",
-    "chaff": "第③圈",
+    "chaff": "第三圈",  # 終端機輸出不用圈號字元：③ 在 xterm.js、Terminal.app 會跟下一個字疊在一起
     "script_match": "官方測試",
     "git_commits": "官方測試",
 }
@@ -1198,9 +1198,9 @@ class ChaffCheck(Check):
             if not slipped:
                 self.ctx.summaries.append(f"你的檢查把 {len(self.mutants)} 個壞版本全部抓到了。")
             elif reveal:
-                self.ctx.summaries.append(
-                    f"你的檢查抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去：{'、'.join(slipped)}"
-                )
+                # 每行壓在 68 欄內（VHS 錄影 70 欄、Terminal.app 預設 80 欄都不折行）：提示一條一行
+                self.ctx.summaries.append(f"你的檢查抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去：")
+                self.ctx.summaries.extend(f"  ・{h}" for h in slipped)
             else:
                 self.ctx.summaries.append(
                     f"你的檢查抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去（先寫滿 {self.min} 條檢查，再告訴你是哪幾種）。"

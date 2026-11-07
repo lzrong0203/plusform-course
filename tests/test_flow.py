@@ -97,18 +97,18 @@ class FullFlow(unittest.TestCase):
             self.assertTrue((work / "agent_setup.txt").is_file())
             self.assertFalse((work / "agent_setup.sh").exists(), "會刪東西的腳本不該存成 .sh 發給學員")
             self.assertIn(f"open -e {ledger}/lessons/0-4/permissions.txt", r.stdout)
-            fill_answers(work / "permissions.txt", ["允許", "允許", "拒絕"])
+            fill_answers(work / "permissions.txt", ["允許", "允許", "拒絕", "允許", "允許", "拒絕"])
             write(work / "checks.txt", "budget/2026-11/food.txt\nbudget/2026-11/bus.txt\nbudget/todo_copy.txt\nnotes/todo.txt\n")
             r = check(["0-4", "--predict", "8"], at(1, "09:05"))
             self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
-            self.assertIn("全部 9 題都過了", r.stdout)
+            self.assertIn("全部 12 題都過了", r.stdout)
             self.assertIn("你的檢查把 3 個壞版本全部抓到了", r.stdout)
 
         with self.subTest("0-4 第③圈漏掉 rm -rf"):
             write(ledger / "lessons" / "0-4" / "checks.txt", "budget/2026-11/food.txt\nbudget/todo_copy.txt\nbudget/2026-11/bus.txt\n")
             r = check(["0-4", "--predict", "9"], at(1, "09:06"))
             self.assertEqual(r.returncode, 1)
-            self.assertIn("還有 1 個溜過去：藏起來的 rm -rf", r.stdout)
+            self.assertIn("還有 1 個溜過去：\n    ・藏起來的 rm -rf", r.stdout)
             write(ledger / "lessons" / "0-4" / "checks.txt", "budget/2026-11/food.txt\nbudget/2026-11/bus.txt\nbudget/todo_copy.txt\nnotes/todo.txt\n")
 
         # ---------- 0-5 ----------
@@ -160,7 +160,7 @@ class FullFlow(unittest.TestCase):
             self.assertIn("✓ 官方測試  4／4", r.stdout)
             self.assertIn("✓ 對答  4／4", r.stdout)
             self.assertIn("✓ 第②圈  6／6", r.stdout)
-            self.assertIn("你的檢查抓到 2 個壞版本，還有 1 個溜過去：邊界 24", r.stdout)
+            self.assertIn("你的檢查抓到 2 個壞版本，還有 1 個溜過去：\n    ・邊界 24", r.stdout)
 
         with self.subTest("特殊作答：已知會當掉真的拿正確版跑；需求有問題照規則"):
             extra = ['assert bmi_level("23") == "正常"  # 已知會當掉', "assert bmi_level(-5) == '錯誤'  # 需求有問題",
@@ -313,9 +313,9 @@ class FullFlow(unittest.TestCase):
 
         with self.subTest("環境變數給預測（測試用）"):
             env = make_env(home, at(3, "20:12"))
-            env["PLUSFORM_PREDICT"] = "9"
+            env["PLUSFORM_PREDICT"] = "12"
             r = run_check(["0-4", "--no-review"], env)
-            self.assertIn("你猜 9 題，實際過了 9 題：完全猜中", r.stdout)
+            self.assertIn("你猜 12 題，實際過了 12 題：完全猜中", r.stdout)
 
         with self.subTest("note 和 status"):
             r = check(["note", "下次我會先看邊界再猜"], at(3, "20:15"))

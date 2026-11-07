@@ -514,7 +514,7 @@ def cmd_lesson(raw: str, opts: dict) -> int:
             if gate:
                 print("  如果剛剛有用 AI：關卡要關掉 AI 自己做，請關掉 AI 再做一次。")
             else:
-                print("  如果是 AI 幫你寫的：第①圈的目的是讓你自己練，請關掉 AI 再寫一次。")
+                print("  如果是 AI 幫你寫的：第一圈的目的是讓你自己練，請關掉 AI 再寫一次。")
             print("  （這只是提醒，不扣分，也不擋你往下走。）")
     elif all_ok and info.get("first_pass"):
         print(f"（你在 {mmdd(info['first_pass'])} 就第一次全過了，這次是複習。）")

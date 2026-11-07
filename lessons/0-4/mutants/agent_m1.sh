@@ -1,4 +1,4 @@
-# 0-4 壞版本 1（就是 start/agent_setup.sh 那一版）
+# 0-4 壞版本 1（就是 start/agent_setup.txt 那一版）
 mkdir -p budget/2026-11
 touch budget/2026-11/food.txt
 touch budget/2026-11/bus.txt
