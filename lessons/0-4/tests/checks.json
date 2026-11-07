@@ -1,0 +1,16 @@
+{
+  "note": "0-4 的檢查。0-4 當下還沒有 check.py，這些在 0-5 裝好以後補驗。",
+  "checks": [
+    {"type": "tree", "id": "tree", "group": "對答", "root": ".", "spec": "answers/tree.txt",
+     "desc": "帳本資料夾的結構（對照 ls -R 的標準答案）",
+     "hint": "標準答案在課程資料夾的 lessons/0-4/answers/ls_R.txt；在帳本資料夾裡打 ls -R 對照看看。"},
+    {"type": "answers", "id": "perm", "file": "lessons/0-4/permissions.txt", "key": "answers/permissions.json"},
+    {"type": "chaff", "id": "r3", "mode": "path_checks",
+     "student_file": "lessons/0-4/checks.txt",
+     "reference": "reference/agent_setup.sh",
+     "mutants": "mutants/mutants.json",
+     "scenario": "tests/scenario.json",
+     "teacher_file": "answers/checks.txt",
+     "min_checks": 3}
+  ]
+}

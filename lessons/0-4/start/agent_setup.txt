@@ -1,0 +1,8 @@
+# agent 說：「我幫你建好 11 月的預算資料夾。」它想在帳本資料夾裡跑下面 6 行。
+# 這個檔案故意存成 .txt，不是讓你跑的：只要讀。check.py 會在假的資料夾裡模擬，不會動到你的電腦。
+mkdir -p budget/2026-11
+touch budget/2026-11/food.txt
+touch budget/2026-11/bus.txt
+cp notes/todo.txt budget/todo_copy.txt
+rm -rf notes
+echo "預算資料夾建好了"

@@ -1,0 +1,65 @@
+{
+  "note": "0-5 的檢查（也可以打 uv run check.py env）。順便補驗 0-4 的資料夾結構。",
+  "checks": [
+    {
+      "type": "uv_project",
+      "id": "uv-project",
+      "desc": "帳本是 uv 專案（有 pyproject.toml）"
+    },
+    {
+      "type": "python_pin",
+      "id": "pin",
+      "version": "3.13",
+      "desc": "帳本把 Python 釘在 3.13（.python-version）"
+    },
+    {
+      "type": "run",
+      "id": "main",
+      "file": "main.py",
+      "desc": "uv run main.py 跑得起來（印出 Hello from ledger!）",
+      "expect_regex": [
+        "^(Hello from .+!|PyPy 熊的帳本.*)$"
+      ],
+      "hint": "main.py 是 uv init 幫你建的，內容先不要改。改壞了的話：刪掉 main.py 和 pyproject.toml，再打一次 uv init --no-package --vcs none --python 3.13。",
+      "missing_hint": "main.py 是 uv init 建的：在帳本資料夾裡打 uv init --no-package --vcs none --python 3.13（如果它說已經有 pyproject.toml，先刪掉 pyproject.toml 再打一次）。",
+      "package_hint": true
+    },
+    {
+      "type": "uv_python",
+      "id": "uv-python",
+      "version": "3.13",
+      "desc": "用的是帳本 .venv 裡的 Python 3.13，不是系統 Python"
+    },
+    {
+      "type": "tree",
+      "id": "tree-0-4",
+      "root": ".",
+      "spec": "../0-4/answers/tree.txt",
+      "desc": "補驗 0-4：帳本資料夾的結構還在",
+      "hint": "對照課程資料夾的 lessons/0-4/answers/ls_R.txt。"
+    },
+    {
+      "type": "answers",
+      "id": "err",
+      "file": "lessons/0-5/error_match.txt",
+      "key": "answers/error_match.json"
+    },
+    {
+      "type": "chaff",
+      "id": "r3",
+      "mode": "expected_output",
+      "student_file": "lessons/0-5/doctor_expected.txt",
+      "reference": "reference/doctor.py",
+      "mutants": "mutants/mutants.json",
+      "teacher_file": "answers/doctor_expected.txt",
+      "needs_ledger": true,
+      "min_checks": 3,
+      "line_format": "label_value",
+      "value_hints": {
+        "Python 版本": "版本寫兩段數字，像 3.12（不用寫第三段）。這門課釘的是哪一版？",
+        "在帳本的環境裡": "只寫「是」或「否」。用 uv run 跑的時候，用的是哪裡的 Python？",
+        "用的是系統 Python": "只寫「是」或「否」。這門課用的是 uv 裝的 Python，還是電腦內建的？"
+      }
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "note": "Lv0 關卡（uv run check.py lv0）。三關都過、練習滿 3 天才升級。",
+  "checks": [
+    {
+      "type": "tree",
+      "id": "rebuild",
+      "stage": "第一關",
+      "root": "lessons/0-C/rebuild",
+      "spec": "../0-4/answers/tree.txt",
+      "desc": "不看筆記，在 lessons/0-C/rebuild/ 重建 0-4 的資料夾結構",
+      "hint": "先 mkdir -p lessons/0-C/rebuild，cd 進去，再照 0-4 的步驟重做一次。",
+      "time_it": true
+    },
+    {
+      "type": "answers",
+      "id": "pwd",
+      "stage": "第一關",
+      "file": "lessons/0-C/pwd.txt",
+      "key": "answers/pwd.json"
+    },
+    {
+      "type": "run",
+      "id": "main",
+      "stage": "第一關",
+      "file": "main.py",
+      "desc": "帳本最上層的 main.py 是帳本 v0：印出寫死的三筆花費",
+      "expect_exact": [
+        "PyPy 熊的帳本 v0",
+        "11/01 早餐 65 元",
+        "11/01 午餐 120 元",
+        "11/02 公車 15 元"
+      ],
+      "hint": "先修好 lessons/0-C/main.py（從錯誤訊息最下面一行看起：它說哪一行、哪一類錯？），再在帳本資料夾裡打 cp lessons/0-C/main.py main.py，把帳本的 main.py 換成 v0。",
+      "missing_hint": "main.py 應該在帳本最上層（uv init 建的那支）。把修好的版本複製過去：在帳本資料夾裡打 cp lessons/0-C/main.py main.py"
+    },
+    {
+      "type": "git_commits",
+      "id": "saved",
+      "stage": "第一關",
+      "min": 2,
+      "committed": [
+        "main.py"
+      ],
+      "desc": "帳本有至少兩個存檔點，而且 v0 的 main.py 已經存起來"
+    },
+    {
+      "type": "answers",
+      "id": "ai",
+      "stage": "第二關",
+      "file": "lessons/0-C/ai_explain.txt",
+      "key": "answers/ai_explain.json"
+    },
+    {
+      "type": "script_match",
+      "id": "safe",
+      "stage": "第三關",
+      "student_file": "lessons/0-C/make_v0.sh",
+      "reference": "reference/make_v0.sh",
+      "scenario": "tests/scenario.json",
+      "desc": "你改過的 make_v0.sh 跑起來是安全的（在假的資料夾裡模擬）"
+    },
+    {
+      "type": "tree",
+      "id": "ran",
+      "stage": "第三關",
+      "root": "lessons/0-C",
+      "spec": "answers/after_v0.txt",
+      "desc": "安全版真的跑過了，而且隔壁的 lessons/0-C-保險箱 還在",
+      "hint": "在 lessons/0-C 裡打 bash make_v0.sh。如果是 ../0-C-保險箱/ 不見了：危險那一行被跑過了。重新打 uv run check.py start lv0 會把保險箱補回來，刪掉危險那一行再跑一次。"
+    },
+    {
+      "type": "chaff",
+      "id": "r3",
+      "stage": "第三關",
+      "mode": "path_checks",
+      "student_file": "lessons/0-C/checks.txt",
+      "reference": "reference/make_v0.sh",
+      "mutants": "mutants/mutants.json",
+      "scenario": "tests/scenario.json",
+      "teacher_file": "answers/checks.txt",
+      "min_checks": 3
+    }
+  ]
+}

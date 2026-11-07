@@ -1,0 +1,27 @@
+{
+  "questions": [
+    {
+      "id": "r1",
+      "q": "你在 /Users/bear/code/ledger/lessons/0-C，打 cd ../.. 之後再打 pwd，會印出什麼？",
+      "accept": [
+        "/Users/bear/code/ledger"
+      ],
+      "normalize": "path",
+      "home": "/Users/bear",
+      "hint": "往上兩層。",
+      "explain": "0-C → lessons → ledger。"
+    },
+    {
+      "id": "r2",
+      "q": "AI 說「加 sudo 就好了」。你該怎麼做？\nA. 照做\nB. 先問清楚為什麼需要管理員權限，通常是別的原因\n（寫 A 或 B）",
+      "accept": [
+        "B"
+      ],
+      "explain": "找不到檔案、打錯字這類問題，加 sudo 都不會好，只會多一個風險。",
+      "choices": {
+        "A": "照做",
+        "B": "先問清楚為什麼需要管理員權限，通常是別的原因"
+      }
+    }
+  ]
+}

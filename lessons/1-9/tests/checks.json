@@ -1,0 +1,89 @@
+{
+  "note": "1-9 的檢查：第①圈預算燈號（官方測試）和追蹤題（對答）、第②圈 AI 意見判讀（對答）、第③圈替課程的 bmi_level() 寫 assert。學員只呼叫 bmi_level()，不定義它（def 到 1-18 才教）。",
+  "checks": [
+    {
+      "type": "run",
+      "id": "light-1",
+      "file": "lessons/1-9/budget_light.py",
+      "stdin": "500\n1000\n",
+      "desc": "預算燈號：花 500、預算 1000（50%）→ 綠燈",
+      "expect_contains": [
+        "綠燈"
+      ],
+      "expect_not_contains": [
+        "黃燈",
+        "紅燈"
+      ]
+    },
+    {
+      "type": "run",
+      "id": "light-2",
+      "file": "lessons/1-9/budget_light.py",
+      "stdin": "800\n1000\n",
+      "desc": "預算燈號：花 800、預算 1000（剛好 80%）→ 黃燈",
+      "expect_contains": [
+        "黃燈"
+      ],
+      "expect_not_contains": [
+        "綠燈",
+        "紅燈"
+      ],
+      "hint": "剛好 80% 不算「低於 80%」。另外，ratio 是 0.8 這種小數，比較的時候要寫 0.8，不是 80。"
+    },
+    {
+      "type": "run",
+      "id": "light-3",
+      "file": "lessons/1-9/budget_light.py",
+      "stdin": "1000\n1000\n",
+      "desc": "預算燈號：花 1000、預算 1000（剛好 100%）→ 黃燈",
+      "expect_contains": [
+        "黃燈"
+      ],
+      "expect_not_contains": [
+        "綠燈",
+        "紅燈"
+      ],
+      "hint": "剛好用完預算還不算超過。ratio 是小數：剛好 100% 的時候，ratio 是 1，不是 100。"
+    },
+    {
+      "type": "run",
+      "id": "light-4",
+      "file": "lessons/1-9/budget_light.py",
+      "stdin": "1001\n1000\n",
+      "desc": "預算燈號：花 1001、預算 1000（超過）→ 紅燈",
+      "expect_contains": [
+        "紅燈"
+      ],
+      "expect_not_contains": [
+        "綠燈",
+        "黃燈"
+      ],
+      "hint": "ratio 是小數：超過預算的時候，ratio 比 1 大（不是比 100 大）。"
+    },
+    {
+      "type": "answers",
+      "id": "trace",
+      "file": "lessons/1-9/trace.txt",
+      "key": "answers/trace.json"
+    },
+    {
+      "type": "answers",
+      "id": "ai",
+      "group": "第②圈",
+      "file": "lessons/1-9/ai_review.txt",
+      "key": "answers/ai_review.json"
+    },
+    {
+      "type": "chaff",
+      "id": "r3",
+      "mode": "assert",
+      "student_file": "lessons/1-9/checks_bmi.py",
+      "module": "bmi",
+      "reference": "reference/bmi.py",
+      "mutants": "mutants/mutants.json",
+      "teacher_file": "answers/checks_bmi.py",
+      "special": "answers/special.json",
+      "min_checks": 6
+    }
+  ]
+}

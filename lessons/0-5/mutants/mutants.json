@@ -1,0 +1,23 @@
+{
+  "target": "doctor.py",
+  "mutants": [
+    {
+      "id": "m1",
+      "file": "doctor_m1.py",
+      "hint": "版本號（只取前 3 個字，3.13 變成 3.1）",
+      "what": "sys.version[:3]"
+    },
+    {
+      "id": "m2",
+      "file": "doctor_m2.py",
+      "hint": "在不在帳本的環境裡（少算了 .venv 那一層）",
+      "what": "比對時忘了 .venv"
+    },
+    {
+      "id": "m3",
+      "file": "doctor_m3.py",
+      "hint": "是不是系統 Python（把「用的是帳本 .venv 裡的專用 Python」當成「系統 Python」）",
+      "what": "prefix != base_prefix 被當成系統 Python"
+    }
+  ]
+}

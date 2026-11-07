@@ -1,0 +1,7 @@
+{
+  "id": "0-5",
+  "title": "裝 uv，跑起第一支 Python",
+  "minutes": 45,
+  "fast_minutes": 0,
+  "after_start": "接下來有兩個作答檔（用「文字編輯」打開來改，改完按 ⌘S 存檔；Windows 用記事本）：\n  1. error_match.txt：在每題的「答：」後面寫 A、B 或 C\n       open -e {ledger}/lessons/0-5/error_match.txt\n  2. doctor_expected.txt：把三個「？」換成你的電腦應該印出的答案（先不要跑 doctor.py；冒號前面的字不要改）\n       open -e {ledger}/lessons/0-5/doctor_expected.txt\n  3. 回到課程資料夾打：uv run check.py 0-5"
+}

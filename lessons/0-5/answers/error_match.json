@@ -1,0 +1,36 @@
+{
+  "note": "0-5 的對答題：錯誤訊息與原因配對（說明欄也會放）。title 是畫面上顯示的題目。",
+  "normalize": "text",
+  "questions": [
+    {
+      "id": "e1",
+      "title": "錯誤訊息「zsh: command not found: uv」",
+      "accept": [
+        "B"
+      ],
+      "explain": "剛裝好 uv，終端機還不知道它在哪裡（PATH 還沒更新）。開一個新的終端機視窗再試。"
+    },
+    {
+      "id": "e2",
+      "title": "錯誤訊息「xcode-select: note: install requested for command line developer tools」",
+      "accept": [
+        "A"
+      ],
+      "explain": "電腦在幫你裝 Command Line Tools，照跳出來的視窗按安裝，等它跑完。"
+    },
+    {
+      "id": "e3",
+      "title": "錯誤訊息「Permission denied」（在你幫某個指令加了 sudo 之後開始出現）",
+      "accept": [
+        "C"
+      ],
+      "explain": "用 sudo 建出來的檔案屬於管理員，之後一般身分就改不動。這門課裝東西都不用 sudo。"
+    }
+  ],
+  "choices": {
+    "A": "正在安裝 Command Line Tools",
+    "B": "PATH 還沒更新，終端機找不到剛裝好的指令",
+    "C": "之前亂加 sudo，檔案變成管理員的"
+  },
+  "how": "A、B 或 C"
+}

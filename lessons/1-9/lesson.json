@@ -1,0 +1,7 @@
+{
+  "id": "1-9",
+  "title": "if／elif／else：預算燈號與 BMI",
+  "minutes": 45,
+  "fast_minutes": 10,
+  "after_start": "接下來（作答檔用「文字編輯」或 VS Code 打開來改，改完存檔）：\n  1. 第①圈：在 lessons/1-9/budget_light.py 寫 if／elif／else；在 lessons/1-9/trace.txt 寫 4 題追蹤題\n  2. 第②圈：讀 lessons/1-9/ai_review.txt，6 則 AI 意見各判成採用、不採用或要查證；再填 judgment_card.md（自評）\n  3. 第③圈：在 lessons/1-9/checks_bmi.py 寫 6 條 assert（bmi.py 是課程版本，不用改）\n  4. 回到課程資料夾打：uv run check.py 1-9"
+}

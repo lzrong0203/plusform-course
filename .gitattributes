@@ -1,0 +1,8 @@
+# 課程裡的文字檔一律用 LF 換行。
+# Windows 的 Git 預設會把換行改成 CRLF，bash 跑 .sh 時會建出名字最後多一個 \r 的資料夾。
+* text=auto eol=lf
+*.sh text eol=lf
+*.txt text eol=lf
+*.py text eol=lf
+*.json text eol=lf
+*.md text eol=lf

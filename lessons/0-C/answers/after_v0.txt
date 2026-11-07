@@ -1,0 +1,6 @@
+# 0-C 第三關：真的跑過安全版之後，lessons/0-C 底下應該有這些
+v0/data/
+v0/notes/
+v0/notes/budget.txt
+v0/main_backup.py
+../0-C-保險箱/收據.txt

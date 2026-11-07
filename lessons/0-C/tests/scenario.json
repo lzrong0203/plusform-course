@@ -1,0 +1,16 @@
+{
+  "note": "第三關的假資料夾：熊的帳本，現在在 lessons/0-C 裡面。",
+  "home": "/Users/bear",
+  "cwd": "/Users/bear/code/ledger/lessons/0-C",
+  "start": [
+    "../../main.py",
+    "../../pyproject.toml",
+    "../../data/receipts/",
+    "../../notes/todo.txt",
+    "../0-C-保險箱/收據.txt",
+    "../0-4/permissions.txt",
+    "make_v0.sh",
+    "main.py",
+    "pwd.txt"
+  ]
+}

@@ -1,0 +1,12 @@
+# 0-4 第①圈做完，帳本資料夾裡應該要有這些（從帳本資料夾算起，資料夾結尾有 /）
+# 「沒有 」開頭的，代表應該已經刪掉或改名了
+data/
+data/receipts/
+notes/
+notes/todo.txt
+notes/hello_copy.txt
+practice/
+practice/hello.txt
+practice/final.txt
+沒有 practice/draft.txt
+沒有 practice/trash.txt

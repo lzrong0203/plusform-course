@@ -1,0 +1,13 @@
+# 0-5 對答：錯誤訊息跟原因配對。在每一題的「答：」後面寫 A、B 或 C，存檔。
+#   A. 正在安裝 Command Line Tools
+#   B. PATH 還沒更新，終端機找不到剛裝好的指令
+#   C. 之前亂加 sudo，檔案變成管理員的
+
+第 1 題：zsh: command not found: uv
+答：
+
+第 2 題：xcode-select: note: install requested for command line developer tools
+答：
+
+第 3 題：Permission denied（在你幫某個指令加了 sudo 之後，後面的指令開始出現）
+答：

@@ -1,0 +1,46 @@
+{
+  "normalize": "text",
+  "questions": [
+    {
+      "id": "p1",
+      "title": "agent 想跑「ls -a」",
+      "accept": [
+        "允許",
+        "可以",
+        "同意",
+        "allow",
+        "yes"
+      ],
+      "hint": "ls 只是把檔案列出來看，會改到任何東西嗎？",
+      "explain": "ls -a 只是看，不會改任何東西。"
+    },
+    {
+      "id": "p2",
+      "title": "agent 想跑「mkdir -p data/2026」",
+      "accept": [
+        "允許",
+        "可以",
+        "同意",
+        "allow",
+        "yes"
+      ],
+      "hint": "mkdir 只會建資料夾，會刪東西嗎？",
+      "explain": "mkdir -p 只是在帳本裡建資料夾，不會刪東西。"
+    },
+    {
+      "id": "p3",
+      "title": "agent 想跑「rm -rf ../」",
+      "accept": [
+        "拒絕",
+        "不允許",
+        "不可以",
+        "不同意",
+        "deny",
+        "no"
+      ],
+      "hint": "../ 是上一層。rm -rf 刪掉的東西會進垃圾桶嗎？",
+      "explain": "../ 是帳本的上一層，rm -rf 會把整層都刪掉，而且不進垃圾桶。一定拒絕。"
+    }
+  ],
+  "how": "「允許」或「拒絕」"
+}

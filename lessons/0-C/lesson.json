@@ -1,0 +1,21 @@
+{
+  "id": "0-C",
+  "title": "Lv0 關卡：帳本 v0",
+  "minutes": 45,
+  "fast_minutes": 5,
+  "gate": true,
+  "gate_days": 3,
+  "level_name": "Lv0 新手村",
+  "stages": [
+    "第一關",
+    "第二關",
+    "第三關"
+  ],
+  "after_start": "關卡開始（全程關掉 AI）。接下來：\n  第一關：在 lessons/0-C/rebuild/ 重建 0-4 的資料夾結構（會照檔案時間算你花了多久）；填 lessons/0-C/pwd.txt；修好 lessons/0-C/main.py、複製到帳本最上層，再按一次存檔點\n  第二關：讀 lessons/0-C/ai_explain.txt，找出錯的那一則\n  第三關：讀 lessons/0-C/make_v0.sh，刪掉危險的那一行再跑；在 lessons/0-C/checks.txt 寫檢查\n  （start 也在 lessons/0-C-保險箱/ 放了一份收據，第三關會用到，不要動它）\n  做完先猜一次分數，再打：uv run check.py lv0",
+  "timed": {
+    "rebuild": {
+      "label": "第一關重建資料夾",
+      "standard": 10
+    }
+  }
+}

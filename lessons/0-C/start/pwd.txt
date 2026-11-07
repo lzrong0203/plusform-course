@@ -1,0 +1,18 @@
+# 0-C 第一關：預測 5 組 cd 之後，pwd 會印出什麼。
+# 這是熊的電腦：家目錄是 /Users/bear，一開始在 /Users/bear/code。
+# 每一題接著上一題繼續走。在「答：」後面寫完整的路徑（從 / 開始）。
+
+第 1 題：cd ledger
+答：
+
+第 2 題：cd data/receipts
+答：
+
+第 3 題：cd ../..
+答：
+
+第 4 題：cd ../ledger/notes
+答：
+
+第 5 題：cd ~
+答：

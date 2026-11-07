@@ -1,0 +1,37 @@
+{
+  "questions": [
+    {
+      "id": "r1",
+      "q": "你在 /Users/bear/code/ledger，打 cd .. 之後再打 pwd，會印出什麼？",
+      "accept": [
+        "/Users/bear/code"
+      ],
+      "normalize": "path",
+      "home": "/Users/bear",
+      "hint": "cd .. 是往上一層。",
+      "explain": "從 ledger 往上一層，就是 /Users/bear/code。"
+    },
+    {
+      "id": "r2",
+      "q": "用 rm 刪掉的檔案，會進垃圾桶嗎？（寫「會」或「不會」）",
+      "accept": [
+        "不會"
+      ],
+      "hint": "0-4 在練習資料夾示範過。",
+      "explain": "rm 刪掉就沒了，不會進垃圾桶，所以刪之前要看清楚。"
+    },
+    {
+      "id": "r3",
+      "q": "agent 要你在指令前面加 sudo，你該怎麼做？\nA. 直接允許，比較快\nB. 先停下來，問清楚為什麼要管理員權限\nC. 每個指令都加 sudo 比較保險\n（寫 A、B 或 C）",
+      "accept": [
+        "B"
+      ],
+      "explain": "sudo 是用管理員身分跑，出錯會弄壞系統。這門課裝東西都不需要 sudo。",
+      "choices": {
+        "A": "直接允許，比較快",
+        "B": "先停下來，問清楚為什麼要管理員權限",
+        "C": "每個指令都加 sudo 比較保險"
+      }
+    }
+  ]
+}

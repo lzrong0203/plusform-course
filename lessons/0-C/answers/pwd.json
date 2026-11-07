@@ -1,0 +1,47 @@
+{
+  "normalize": "path",
+  "home": "/Users/bear",
+  "questions": [
+    {
+      "id": "q1",
+      "title": "cd ledger 之後的 pwd",
+      "accept": [
+        "/Users/bear/code/ledger"
+      ],
+      "hint": "一開始在 /Users/bear/code，cd ledger 是往下一層。"
+    },
+    {
+      "id": "q2",
+      "title": "cd data/receipts 之後的 pwd",
+      "accept": [
+        "/Users/bear/code/ledger/data/receipts"
+      ],
+      "hint": "接著上一題，再往下兩層。"
+    },
+    {
+      "id": "q3",
+      "title": "cd ../.. 之後的 pwd",
+      "accept": [
+        "/Users/bear/code/ledger"
+      ],
+      "hint": "../.. 是往上兩層。"
+    },
+    {
+      "id": "q4",
+      "title": "cd ../ledger/notes 之後的 pwd",
+      "accept": [
+        "/Users/bear/code/ledger/notes"
+      ],
+      "hint": "先往上一層到 /Users/bear/code，再往下走 ledger/notes。"
+    },
+    {
+      "id": "q5",
+      "title": "cd ~ 之後的 pwd",
+      "accept": [
+        "/Users/bear"
+      ],
+      "hint": "~ 是家目錄。"
+    }
+  ],
+  "how": "完整的路徑（從 / 開始）"
+}

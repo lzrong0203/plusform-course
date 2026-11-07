@@ -1,0 +1,23 @@
+{
+  "target": "make_v0.sh",
+  "mutants": [
+    {
+      "id": "m1",
+      "file": "make_m1.sh",
+      "hint": "刪到隔壁的保險箱（../ 是上一層：跑完之後，原本就在的東西還在嗎？）",
+      "what": "rm -rf ../0-C-保險箱"
+    },
+    {
+      "id": "m2",
+      "file": "make_m2.sh",
+      "hint": "用 mv 把帳本的 main.py 搬走了（原本的 main.py 還在嗎？）",
+      "what": "mv 取代 cp"
+    },
+    {
+      "id": "m3",
+      "file": "make_m3.sh",
+      "hint": "路徑打錯一個字（note 少了 s）",
+      "what": "touch 的路徑打錯"
+    }
+  ]
+}

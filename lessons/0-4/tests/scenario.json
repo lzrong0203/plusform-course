@@ -1,0 +1,12 @@
+{
+  "note": "第③圈的假資料夾：熊的電腦，帳本已經做完第①圈。",
+  "home": "/Users/bear",
+  "cwd": "/Users/bear/code/ledger",
+  "start": [
+    "data/receipts/",
+    "notes/todo.txt",
+    "notes/hello_copy.txt",
+    "practice/hello.txt",
+    "practice/final.txt"
+  ]
+}

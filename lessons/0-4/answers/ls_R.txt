@@ -1,0 +1,18 @@
+在帳本資料夾裡打 ls -R，應該看到這些名字（排版可能是橫的或直的，名字一樣就對了）：
+
+data		notes		practice
+
+./data:
+receipts
+
+./data/receipts:
+
+./notes:
+hello_copy.txt	todo.txt
+
+./practice:
+final.txt	hello.txt
+
+Windows 的 Git Bash 會在最前面多一行「.:」，這是正常的。
+
+（0-5 做完以後，帳本裡還會多出 main.py、pyproject.toml、README.md 這些，那是 uv 建的，不影響這題。）
