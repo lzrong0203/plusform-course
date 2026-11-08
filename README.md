@@ -22,7 +22,7 @@
 |---|---|
 | `check.py` | 檢查作業的程式。只用 Python 內建的功能，不會連上網、也不會呼叫任何 AI |
 | `showcase/` | 課程準備的「agent 版帳本」示範（情境重現）：一支記帳程式，0-1 會看到它輸入「一百元」就當掉 |
-| `concept_map.py` | 「看得懂進度條」：算出 showcase 那支程式你看得懂幾成 |
+| `concept_map.py` | 「看得懂進度條」：算出 showcase 那支程式你看得懂百分之幾 |
 | `lessons/<課號>/` | 每一課一個資料夾，例如 `lessons/1-9/` |
 | `course.json` | 整門課的課表順序 |
 | `engine/` | check.py 用的零件，不用打開 |
