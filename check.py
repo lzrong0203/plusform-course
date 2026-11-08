@@ -848,7 +848,9 @@ def cmd_status() -> int:
     print()
     if rows:
         print("校準曲線（你猜的 − 實際；右邊是高估，左邊是低估）：")
-        print("              低估 ◀────────┼────────▶ 高估")
+        # 刻度的 ┼ 要跟 curve_line 的 │ 同一欄（第 23 欄：前面 2＋5＋1＋4＋1＝13 欄，再加左半 10 欄）；
+        # ◀ ▶ 是寬度不明確的字，有些終端機畫成兩欄，改用 < >
+        print("       低估 <" + "─" * 10 + "┼" + "─" * 10 + "> 高估")
         for a in rows[-10:]:
             print(curve_line(a))
         print(recent_summary(rows[-5:]))
@@ -861,8 +863,9 @@ def cmd_status() -> int:
     passed = {lid for lid, info in lessons.items() if info.get("first_pass")}
     prog_bar = concept_map.progress(concept_map.SHOWCASE.read_text(encoding="utf-8"), passed)
     print()
-    print(f"看得懂進度條：[{concept_map.bar(prog_bar.percent)}] {prog_bar.percent}%"
-          f"（showcase 帳本 {prog_bar.total} 行，你看得懂 {prog_bar.understood} 行）")
+    # 分兩行印：合在一起約 76 欄，VHS 錄影 70 欄、Git Bash 預設 80 欄都會折行
+    print(f"看得懂進度條：[{concept_map.bar(prog_bar.percent)}] {prog_bar.percent}%")
+    print(f"  showcase 帳本 {prog_bar.total} 行，你看得懂 {prog_bar.understood} 行")
     unreleased = [lid for lid in order[: max(prog.get("frontier", -1), 0) + 1] if lid not in ready]
     if unreleased and prog_bar.percent < 100:
         print("  有些課還沒上架；上架後通過了，進度條才會算進去。")

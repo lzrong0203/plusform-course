@@ -1202,9 +1202,9 @@ class ChaffCheck(Check):
                 self.ctx.summaries.append(f"你的檢查抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去：")
                 self.ctx.summaries.extend(f"  ・{h}" for h in slipped)
             else:
-                self.ctx.summaries.append(
-                    f"你的檢查抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去（先寫滿 {self.min} 條檢查，再告訴你是哪幾種）。"
-                )
+                # 分兩行（每行 ≤68 欄，同上）
+                self.ctx.summaries.append(f"你的檢查抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去。")
+                self.ctx.summaries.append(f"  先寫滿 {self.min} 條檢查，再告訴你是哪幾種。")
         else:
             wheat_r.detail = "還沒有任何檢查。" + (f"（有 {unfinished} 行的「？」還沒填）" if unfinished else "")
             for r in mutant_rs:
