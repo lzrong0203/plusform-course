@@ -1,7 +1,7 @@
 {
   "target": "agent_setup.sh",
   "mutants": [
-    {"id": "m1", "file": "agent_m1.sh", "hint": "藏起來的 rm -rf（跑完之後，原本就有的東西還在嗎？）", "what": "偷偷 rm -rf notes"},
+    {"id": "m1", "file": "agent_m1.sh", "hint": "藏起來的 rm -rf（做完之後，原本就有的東西還在嗎？）", "what": "偷偷 rm -rf notes"},
     {"id": "m2", "file": "agent_m2.sh", "hint": "mkdir 少了 -p（budget 裡面的東西真的建出來了嗎？）", "what": "mkdir 沒加 -p，上一層不存在就失敗"},
     {"id": "m3", "file": "agent_m3.sh", "hint": "複製出來的檔名不對（副本叫什麼名字？）", "what": "副本取錯名字"}
   ]

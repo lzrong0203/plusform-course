@@ -3,7 +3,7 @@
   "questions": [
     {
       "id": "p1",
-      "title": "agent 想跑「ls -a」",
+      "title": "agent 想用「ls -a」",
       "accept": [
         "允許",
         "可以",
@@ -16,7 +16,7 @@
     },
     {
       "id": "p2",
-      "title": "agent 想跑「mkdir -p data/2026」",
+      "title": "agent 想用「mkdir -p data/2026」",
       "accept": [
         "允許",
         "可以",
@@ -29,7 +29,7 @@
     },
     {
       "id": "p3",
-      "title": "agent 想跑「rm -rf ../ledger」",
+      "title": "agent 想用「rm -rf ../ledger」",
       "accept": [
         "拒絕",
         "不允許",
@@ -43,7 +43,7 @@
     },
     {
       "id": "p4",
-      "title": "agent 想跑「pwd」",
+      "title": "agent 想用「pwd」",
       "accept": [
         "允許",
         "可以",
@@ -56,7 +56,7 @@
     },
     {
       "id": "p5",
-      "title": "agent 想跑「touch notes/ideas.txt」",
+      "title": "agent 想用「touch notes/ideas.txt」",
       "accept": [
         "允許",
         "可以",
@@ -69,7 +69,7 @@
     },
     {
       "id": "p6",
-      "title": "agent 想跑「rm -rf ~/code」",
+      "title": "agent 想用「rm -rf ~/code」",
       "accept": [
         "拒絕",
         "不允許",

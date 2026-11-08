@@ -1,9 +1,9 @@
 {
   "id": "0-4",
-  "title": "終端機不可怕，順便看懂 agent 要跑的指令",
+  "title": "終端機不可怕，順便看懂 agent 要下的指令",
   "windows": "Windows：先看 0-W 第 1 章（裝好 Git for Windows、打開 Git Bash），這一課的指令都一樣。",
   "minutes": 40,
   "fast_minutes": 0,
   "missing_hint": "0-4 的時候你還沒有課程資料夾，這很正常。0-5 裝好 uv 以後，打 uv run check.py start 0-4 拿到作答檔，再打 uv run check.py 0-4。",
-  "after_start": "接下來（作答檔用「文字編輯」打開來改，改完按 ⌘S 存檔；Windows 用記事本）：\n  1. 打開 permissions.txt，在每題的「答：」後面寫「允許」或「拒絕」：\n       open -e {ledger}/lessons/0-4/permissions.txt\n  2. 讀 agent_setup.txt（只讀，它故意存成 .txt，不是讓你跑的），照 README 的需求卡在 checks.txt 寫檢查：\n       open -e {ledger}/lessons/0-4/checks.txt\n  3. 回到課程資料夾打：uv run check.py 0-4"
+  "after_start": "接下來（作答檔用「文字編輯」打開來改，改完按 ⌘S 存檔；Windows 用記事本）：\n  1. 打開 permissions.txt，在每題的「答：」後面寫「允許」或「拒絕」：\n       open -e {ledger}/lessons/0-4/permissions.txt\n  2. 讀 agent_setup.txt（只讀，它故意存成 .txt，不是要你照著打的），照 README 的需求卡在 checks.txt 寫檢查：\n       open -e {ledger}/lessons/0-4/checks.txt\n  3. 回到課程資料夾打：uv run check.py 0-4"
 }
