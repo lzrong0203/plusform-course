@@ -9,7 +9,7 @@
 - uv 是幫你安裝和管理 Python 的工具。這門課不用電腦內建的「系統 Python」，也不加 `sudo`。
 - PATH 是電腦找指令的地方：你打 `uv`，電腦會照 PATH 裡的資料夾一個一個找。
 
-**對答：** 錯誤訊息跟原因配對 3 題。
+**對答：** 錯誤訊息跟原因配對 3 題。題目是 Mac 的寫法；Windows 的 Git Bash 會寫成 `bash: uv: command not found`，意思一樣。
 
 **第③圈：** 課程有一支 `doctor.py`，會印出三行「現在用的是哪一個 Python」。先不要跑它，寫下「在你的帳本裡，它應該印出什麼」。課程藏了 3 個寫錯的 doctor.py，其中一個會說你用的是系統 Python。你寫的預期要把壞的抓出來。
 
@@ -23,6 +23,8 @@
 - 卡住的時候，把「我打的指令＋完整的錯誤訊息＋我試過什麼」一起貼給白海豹（你的 AI 家教），不要只說「不能跑」。
 
 ## 3. 開始前要打的指令
+
+> Windows：先看 0-W 第 2 章（裝 uv），再照這一節最後的「Windows」小節改，其他指令在 Git Bash 照打。
 
 **Mac 先裝 Command Line Tools。** 這是蘋果提供的一組開發工具，裡面有 git。打：
 
@@ -80,6 +82,21 @@ open -e ~/code/ledger/lessons/0-5/doctor_expected.txt
 
 Windows 用記事本：`notepad ~/code/ledger/lessons/0-5/error_match.txt`。
 
+### Windows
+
+用 Windows 的同學，上面的步驟照下面改，其他指令都在 Git Bash 照打：
+
+- **不用裝 Command Line Tools。** `xcode-select` 只有 Mac 有。git 已經跟著 Git for Windows 裝好了，直接打 `git --version` 確認。
+- **裝 uv。** 實際操作在 0-W 第 2 章。uv 官方網站給 Windows 的是這一行 PowerShell 指令，一樣先對照網址是不是 `astral.sh`：
+
+  ```powershell
+  powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+  ```
+
+  貼在 PowerShell 或 Git Bash 都可以（貼在 Git Bash：要實測）。裝好以後一樣要**關掉視窗、開一個新的 Git Bash**，再打 `uv --version`。
+- **解壓縮。** 在檔案總管對 ZIP 按右鍵「解壓縮全部」，可能會多包一層：`plusform-course-main` 裡面還有一個 `plusform-course-main`（要實測）。搬之前先點進去看，打開來直接看到 `check.py`、`lessons` 的那一層才是要搬的。
+- **搬資料夾。** 上面那行 `mv ~/Downloads/plusform-course-main ~/code/plusform-course` 在 Git Bash 照打。如果多了一層，改打 `mv ~/Downloads/plusform-course-main/plusform-course-main ~/code/plusform-course`（要實測）。
+
 ## 4. 成品示範
 
 ```
@@ -119,6 +136,8 @@ Hello from ledger!
 | 你看到 | 意思 | 怎麼辦 |
 |---|---|---|
 | `zsh: command not found: uv` | 終端機還找不到 uv（PATH 還沒更新） | 關掉終端機、開新視窗再打一次 |
+| `bash: uv: command not found` | Windows 的 Git Bash 版，意思跟上一列一樣：還找不到 uv（PATH 還沒更新） | 關掉 Git Bash、開新視窗再打一次 |
+| 打 `python` 跳出 Microsoft Store | Windows 內建的 `python` 只是一個捷徑，會打開商店叫你裝 Python | 不用裝，這門課一律打 `uv run`（例如 `uv run main.py`） |
 | `error: Failed to spawn: check.py` | 你不在課程資料夾裡 | 先打 `cd ~/code/plusform-course`；或在任何地方打完整路徑 `uv run ~/code/plusform-course/check.py 0-5` |
 | `cd: no such file or directory: /Users/…/code/plusform-course` | 課程資料夾還沒搬好（可能還叫 `plusform-course-main`、還在「下載項目」裡） | 照上面的 `mv` 那一行搬過去 |
 | `check.py 要用 Python 3.13 跑` | 你打了 `python3 check.py` | 改打 `uv run check.py ……` |

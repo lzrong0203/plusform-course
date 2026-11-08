@@ -1,6 +1,7 @@
 {
   "id": "0-4",
   "title": "終端機不可怕，順便看懂 agent 要跑的指令",
+  "windows": "Windows：先看 0-W 第 1 章（裝好 Git for Windows、打開 Git Bash），這一課的指令都一樣。",
   "minutes": 40,
   "fast_minutes": 0,
   "missing_hint": "0-4 的時候你還沒有課程資料夾，這很正常。0-5 裝好 uv 以後，打 uv run check.py start 0-4 拿到作答檔，再打 uv run check.py 0-4。",

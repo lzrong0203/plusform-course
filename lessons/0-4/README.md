@@ -1,5 +1,7 @@
 # 0-4　終端機不可怕，順便看懂 agent 要跑的指令
 
+> Windows：先看 0-W 第 1 章（裝好 Git for Windows、打開 Git Bash），這一課的指令都一樣。
+
 這課大約 40 分鐘。三圈比例 75／20／5。
 
 ## 1. 題目
@@ -62,7 +64,8 @@ pwd
 
 ```bash
 mkdir -p data/receipts notes practice
-touch notes/todo.txt practice/hello.txt practice/draft.txt practice/trash.txt
+touch notes/todo.txt practice/hello.txt
+touch practice/draft.txt practice/trash.txt
 cp practice/hello.txt notes/hello_copy.txt
 mv practice/draft.txt practice/final.txt
 rm practice/trash.txt
