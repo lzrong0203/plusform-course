@@ -120,6 +120,11 @@ uv run check.py review      # 作答今天到期的回顧題
 
 課程資料夾裡什麼都不寫。
 
+## 費用
+
+這門課免費：每一課都放在 YouTube，這個資料夾公開，不用註冊。
+會花錢的只有工具：新手村到第三級用到的 VS Code、uv、Git、GitHub 都免費；0-8 起的 AI 聊天帳號用免費版就可以；第四級的 agent 工具（Claude Code、Codex）要付費方案，價格寫在那幾課的說明欄。這些錢是付給工具的公司，不是付給我們，課程裡也沒有推廣連結。
+
 ## Windows
 
 Windows 一律用 Git Bash（裝 Git for Windows 就有）。指令跟 Mac 一樣。check.py 會自己把輸入餵給你的程式，所以 Mac 和 Windows 跑起來一樣。
