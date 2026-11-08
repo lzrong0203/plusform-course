@@ -93,9 +93,9 @@ Windows 用記事本：`notepad ~/code/ledger/lessons/0-5/error_match.txt`。
   powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
   ```
 
-  貼在 PowerShell 或 Git Bash 都可以（貼在 Git Bash：要實測）。裝好以後一樣要**關掉視窗、開一個新的 Git Bash**，再打 `uv --version`。
-- **解壓縮。** 在檔案總管對 ZIP 按右鍵「解壓縮全部」，可能會多包一層：`plusform-course-main` 裡面還有一個 `plusform-course-main`（要實測）。搬之前先點進去看，打開來直接看到 `check.py`、`lessons` 的那一層才是要搬的。
-- **搬資料夾。** 上面那行 `mv ~/Downloads/plusform-course-main ~/code/plusform-course` 在 Git Bash 照打。如果多了一層，改打 `mv ~/Downloads/plusform-course-main/plusform-course-main ~/code/plusform-course`（要實測）。
+  建議貼在 PowerShell 跑（開始選單搜尋 PowerShell）。裝好以後一樣要**關掉視窗、開一個新的 Git Bash**，再打 `uv --version`。
+- **解壓縮。** 在檔案總管對 ZIP 按右鍵「解壓縮全部」，有時候會多包一層：`plusform-course-main` 裡面還有一個 `plusform-course-main`。搬之前先點進去看，打開來直接看到 `check.py`、`lessons` 的那一層才是要搬的。
+- **搬資料夾。** 上面那行 `mv ~/Downloads/plusform-course-main ~/code/plusform-course` 在 Git Bash 照打。如果多了一層，改打 `mv ~/Downloads/plusform-course-main/plusform-course-main ~/code/plusform-course`。
 
 ## 4. 成品示範
 
