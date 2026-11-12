@@ -1,7 +1,7 @@
 # /// script
 # requires-python = ">=3.13"
 # ///
-"""新時代程式課的檢查程式。
+"""AI 時代的 Python 零基礎課的檢查程式。
 
 在課程資料夾裡打：
     uv run check.py setup ~/code/ledger   記住你的帳本在哪裡（只要做一次）

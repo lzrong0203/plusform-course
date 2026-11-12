@@ -1,5 +1,5 @@
 {
-  "name": "新時代程式課",
+  "name": "AI 時代的 Python 零基礎課",
   "version": "0.1.0",
   "note": "lessons 是整門課的順序（回顧題的「2 課前、5 課前」照這個順序算）。lessons/ 底下有資料夾的才是已經做好的課。",
   "aliases": {
