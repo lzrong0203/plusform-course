@@ -49,7 +49,18 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 ```bash
 uv --version
-mkdir -p ~/code/ledger
+```
+
+還沒做 0-4 的，先補上一課的帳本（check.py 會順便檢查這些資料夾和檔案；做過 0-4 的跳過這兩行）：
+
+```bash
+mkdir -p ~/code/ledger/data/receipts ~/code/ledger/notes ~/code/ledger/practice
+touch ~/code/ledger/notes/todo.txt ~/code/ledger/notes/hello_copy.txt ~/code/ledger/practice/hello.txt ~/code/ledger/practice/final.txt
+```
+
+接著：
+
+```bash
 cd ~/code/ledger
 uv init --no-package --vcs none --python 3.13
 uv python pin 3.13
@@ -112,7 +123,7 @@ Hello from ledger!
 結果：過了 13／13 題
   ✓ 官方測試  5／5
   ✓ 對答  3／3
-  ✓ 第③圈  5／5
+  ✓ 第三圈  5／5
   你的檢查把 3 個壞版本全部抓到了。
 
 ✓ 全部 13 題都過了！
