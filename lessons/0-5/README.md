@@ -17,7 +17,7 @@
 
 - 判斷一行安裝指令能不能信：網址是不是官方網域、是不是 `https://`。uv 的官方網站是 `https://docs.astral.sh/uv/`，安裝指令裡的網址是 `astral.sh`，兩個都是 astral 這家公司的網域。
 - 剛裝好 uv，打 `uv --version` 說找不到指令？先關掉終端機、開一個新的視窗再試。這就是 PATH 還沒更新。
-- `uv init --no-package --vcs none --python 3.13`：`--no-package` 是用最簡單的專案結構；`--vcs none` 是先不要建 git（0-7 才自己建）。`--python 3.13` 是指定用 3.13：電腦上如果已經有更新的 Python，不寫的話 uv 會挑最新那一版，下一行的 pin 3.13 就會被拒絕。
+- `uv init --no-package --vcs none --python 3.13`：`--no-package` 是用最簡單的專案結構；`--vcs none` 是先不要建 git（0-7 才自己建）。`--python 3.13` 是指定用 3.13：不寫的話 uv 會用它在電腦上先找到的那一版（新 Mac 是內建的 3.9；另外裝過 3.14 的話可能是 3.14），找到比 3.13 新的版本時，下一行的 pin 3.13 會被拒絕。
 - uv init 會在帳本裡建出幾個檔案：`main.py` 是你的第一支程式；`pyproject.toml` 是這個專案的設定檔（專案叫什麼名字、要用哪一版 Python）。第一次 `uv run` 還會多出一個 `.venv` 資料夾：那是 uv 在帳本裡幫你放的一份專用 Python（叫做「虛擬環境」），`uv run` 會用它，不會去用電腦內建的。
 - 網路上的教學叫你加 `sudo`，這門課都不要加。
 - 卡住的時候，把「我打的指令＋完整的錯誤訊息＋我試過什麼」一起貼給白海豹（你的 AI 家教），不要只說「不能跑」。
@@ -141,7 +141,7 @@ Hello from ledger!
 | `error: Failed to spawn: check.py` | 你不在課程資料夾裡 | 先打 `cd ~/code/plusform-course`；或在任何地方打完整路徑 `uv run ~/code/plusform-course/check.py 0-5` |
 | `cd: no such file or directory: /Users/…/code/plusform-course` | 課程資料夾還沒搬好（可能還叫 `plusform-course-main`、還在「下載項目」裡） | 照上面的 `mv` 那一行搬過去 |
 | `check.py 要用 Python 3.13 跑` | 你打了 `python3 check.py` | 改打 `uv run check.py ……` |
-| `Project is already initialized` | 帳本裡已經有 `pyproject.toml` 了 | 不用再 `uv init`，直接往下做 |
+| `error: Cannot initialize a project in … because pyproject.toml already exists` | 帳本裡已經有 `pyproject.toml` 了（已經 init 過） | 不用再 `uv init`，直接往下做 |
 
 ## 6. 怎麼交
 
