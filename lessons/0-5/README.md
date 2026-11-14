@@ -6,7 +6,7 @@
 
 **第①圈：** 在自己的電腦用 uv 把帳本變成一個 Python 專案，跑起 `main.py`，然後下載課程資料夾、讓 check.py 記住你的帳本在哪裡。
 
-- uv 是幫你安裝和管理 Python 的工具。這門課不用電腦上本來就有的「系統 Python」（Mac 上是跟著開發工具來的那一份），也不加 `sudo`。
+- uv 是幫你安裝和管理 Python 的工具。這門課不用「系統 Python」（Mac 上是跟著開發工具安裝的那一份），也不加 `sudo`。
 - PATH 是電腦找指令的地方：你打 `uv`，電腦會照 PATH 裡的資料夾一個一個找。
 
 **對答：** 錯誤訊息跟原因配對 3 題。題目是 Mac 的寫法；Windows 的 Git Bash 會寫成 `bash: uv: command not found`，意思一樣。
