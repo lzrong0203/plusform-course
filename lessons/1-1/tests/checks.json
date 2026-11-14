@@ -5,7 +5,8 @@
       "type": "answers",
       "id": "guess",
       "file": "lessons/1-1/guess.txt",
-      "key": "answers/guess.json"
+      "key": "answers/guess.json",
+      "group": "第一圈"
     },
     {
       "type": "run",
@@ -18,7 +19,8 @@
         "收據：第 1 張"
       ],
       "hint": "照 README 第 1 節：第二行用一個 print 加 sep=\"/\"；第三行用兩個 print，第一個加 end=\"：\"。改完記得存檔再跑。",
-      "missing_hint": "receipt.py 應該在帳本的 lessons/1-1/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-1。"
+      "missing_hint": "receipt.py 應該在帳本的 lessons/1-1/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-1。",
+      "group": "第一圈"
     },
     {
       "type": "answers",
