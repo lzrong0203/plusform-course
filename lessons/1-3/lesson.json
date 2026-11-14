@@ -3,5 +3,5 @@
   "title": "資料型別：int、float、str、bool、None",
   "minutes": 40,
   "fast_minutes": 8,
-  "after_start": "接下來，用 VS Code 打開帳本的 lessons/1-3：\n  1. 第一圈：types.txt 猜 4 題、entry.py 寫一筆帳\n  2. 第二圈：my_words.md 用自己的話寫，請家教挑錯\n  3. 第三圈：cases.txt 替轉換機寫 5 組案例\n做完回到課程資料夾打：uv run check.py 1-3"
+  "after_start": "接下來，用 VS Code 打開帳本，再點開 lessons/1-3：\n  1. 第一圈：types.txt 猜 4 題、entry.py 寫一筆帳\n  2. 第二圈：my_words.md 用自己的話寫，請家教挑錯\n  3. 第三圈：cases.txt 替轉換機寫 5 組案例\n做完回到課程資料夾打：uv run check.py 1-3"
 }
