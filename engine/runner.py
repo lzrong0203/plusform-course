@@ -5,7 +5,7 @@ check.py 把要做的事用 JSON 從 stdin 傳進來（裡面有一個每次都�
 學員程式自己 print 的東西會被丟掉，不會混進結果，也不會把記憶體吃光。
 
 做這幾件事：
-- call：載入一個 .py 檔，呼叫裡面的函式，比對回傳值（strict_type：連型別一起比，1-3 的案例表用）
+- call：載入一個 .py 檔，呼叫裡面的函式，比對回傳值（strict_type：連型別一起比，1-3 的案例表用；seq_as_list：tuple 當 list 比、每個值的型別也比，1-4 用）
 - load：只載入一個 .py 檔，看會不會一載入就出錯（老師端驗證壞版本用）
 - asserts：把學員寫的 assert 一條一條拿去跑「一個」版本（正確版或某一個壞版本）。
   每個版本各開一個程序跑，版本之間不會互相影響；一個版本卡住，也不會拖累別的版本。
@@ -127,6 +127,18 @@ def _jsonable(value) -> bool:
         return False
 
 
+def _as_list(value):
+    """tuple／list 一律換成 list（裡面的也換），其他照舊（1-4 的 seq_as_list 用）。"""
+    return [_as_list(x) for x in value] if isinstance(value, (list, tuple)) else value
+
+
+def _same_types(a, b) -> bool:
+    """連裡面每一個值的型別都一樣（334 和 334.0 不一樣、True 也不算 1）。"""
+    if isinstance(a, list) and isinstance(b, list):
+        return len(a) == len(b) and all(_same_types(x, y) for x, y in zip(a, b))
+    return type(a) is type(b)
+
+
 def op_call(req: dict) -> dict:
     path = req["file"]
     _add_path(path)
@@ -145,9 +157,11 @@ def op_call(req: dict) -> dict:
         try:
             with quiet():
                 got = func(*case.get("args", []))
+            if req.get("seq_as_list"):   # 1-4 的 cases：交回 (334, 333, 333)；JSON 傳來的預期值是 list，兩邊都換成 list 比
+                got = _as_list(got)
             ok = got == case["expect"]
             if req.get("strict_type"):   # 1-3 的 cases：型別也要一樣（120、120.0、"120" 都不同；True 也不算 1）
-                ok = ok and type(got) is type(case["expect"])
+                ok = ok and (_same_types(got, case["expect"]) if req.get("seq_as_list") else type(got) is type(case["expect"]))
             out["cases"].append({"ok": ok, "got": got if _jsonable(got) else repr(got), "type": type(got).__name__})
         except BaseException as exc:  # noqa: BLE001
             out["cases"].append({"ok": False, "error": short_error(exc), "line": error_line(exc, path)})

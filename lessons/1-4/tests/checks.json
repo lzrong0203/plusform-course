@@ -1,0 +1,16 @@
+{
+  "note": "1-4 的檢查：第①圈先猜輸出（對答 7 題）和果凍兔四人唱歌的分帳 split.py（官方測試）；第②圈判斷 AI 列的分帳情況（對答 4 題）；第③圈替課程的 split3() 寫案例表（chaff 的 cases 模式：左邊是整數金額、右邊是三個人各付多少，連型別一起比）。my_list.md 是自評，不檢查。",
+  "checks": [
+    {"type": "answers", "id": "guess", "file": "lessons/1-4/guess.txt", "key": "answers/guess.json", "group": "第一圈"},
+    {"type": "run", "id": "split", "file": "lessons/1-4/split.py", "group": "第一圈",
+     "desc": "split.py 印出每人、零頭、驗算三行",
+     "expect_exact": ["每人 362 元", "零頭 2 元", "驗算 1450"],
+     "hint": "each 用 //（除完只留整數）、left 用 %（除完剩多少），兩個都用 total 和 people 算；驗算是 each 乘上 people 再加 left。改完記得存檔再跑。",
+     "missing_hint": "split.py 應該在帳本的 lessons/1-4/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-4。"},
+    {"type": "answers", "id": "ai", "file": "lessons/1-4/ai_list.txt", "key": "answers/ai_list.json", "group": "第二圈"},
+    {"type": "chaff", "id": "r3", "mode": "cases", "student_file": "lessons/1-4/cases.txt",
+     "module": "split3", "func": "split3", "input_type": "int", "expect_ints": 3,
+     "reference": "reference/split3.py", "mutants": "mutants/mutants.json",
+     "teacher_file": "answers/cases.txt", "min_checks": 4}
+  ]
+}

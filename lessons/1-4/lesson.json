@@ -1,0 +1,7 @@
+{
+  "id": "1-4",
+  "title": "數字與運算：分帳的零頭",
+  "minutes": 40,
+  "fast_minutes": 8,
+  "after_start": "接下來，用 VS Code 打開帳本的 lessons/1-4：\n  1. 第一圈：guess.txt 先猜 7 題、split.py 四個人分 1450 元\n  2. 第二圈：ai_list.txt 判斷 AI 列的情況；my_list.md 請家教列（自評）\n  3. 第三圈：cases.txt 替分帳機寫至少 4 組案例\n做完回到課程資料夾打：uv run check.py 1-4"
+}

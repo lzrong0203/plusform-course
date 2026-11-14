@@ -1121,15 +1121,33 @@ class ChaffCheck(Check):
             if want == "str" and not isinstance(inp, str):
                 return checks, marks, unfinished, (f"第 {i} 行左邊的 {left.strip()} 沒有引號，是數字。"
                                                   f"轉換機收的是文字：寫成 \"{left.strip()}\"。")
+            if want == "int" and (isinstance(inp, bool) or not isinstance(inp, int)):   # 1-4：左邊是整數金額
+                why = ("有引號，是文字。分帳機收的是整數：把引號拿掉" if isinstance(inp, str) else
+                       "有小數點。帳本只記整數元：寫整數" if isinstance(inp, float) else "不是整數。左邊寫一個整數金額")
+                return checks, marks, unfinished, f"第 {i} 行左邊的 {left.strip()} {why}，例如 1000。"
             if kind:
                 marks.append(Mark(i, kind, raw.strip(), None))
                 self._cases[i] = (inp, None)
                 continue
+            n_ints = int(self.spec.get("expect_ints", 0))   # 1-4：右邊是 n 個整數、用逗號隔開（三個人各付多少）
+            if n_ints:
+                right = right.replace("、", ",")
             try:
                 exp = ast.literal_eval(right.strip())
             except (ValueError, SyntaxError, MemoryError, RecursionError):
+                if n_ints:
+                    return checks, marks, unfinished, (f"第 {i} 行右邊「{right.strip()}」看不懂。"
+                                                      f"右邊寫 {n_ints} 個整數，中間用逗號隔開，例如 334, 333, 333（不要寫「元」）。")
                 return checks, marks, unfinished, (f"第 {i} 行右邊「{right.strip()}」看不懂。"
                                                   "整數直接寫數字（120）；文字才加引號（\"120\"）；不要寫單位「元」。")
+            if n_ints:
+                exp = tuple(exp) if isinstance(exp, (list, tuple)) else (exp,)
+                if len(exp) != n_ints:
+                    return checks, marks, unfinished, (f"第 {i} 行右邊寫了 {len(exp)} 個數字。"
+                                                      f"要寫 {n_ints} 個人各付多少，用逗號隔開，例如 334, 333, 333。")
+                if any(isinstance(x, bool) or not isinstance(x, int) for x in exp):
+                    return checks, marks, unfinished, (f"第 {i} 行右邊「{right.strip()}」：每個人付的都要是整數元，"
+                                                      "不加引號、不加小數點，例如 334, 333, 333。")
             checks.append(StudentCheck(i, raw.strip()))
             self._cases[i] = (inp, exp)
         return checks, marks, unfinished, None
@@ -1138,8 +1156,10 @@ class ChaffCheck(Check):
         """用一個程序跑一個版本：每一行的輸入丟進固定的函式，回傳 {行號: 結果}（連型別一起比）。"""
         cases = [{"args": [self._cases[ln][0]], "expect": self._cases[ln][1]} for ln in lines]
         timeout = self.version_timeout()
-        reply = self.ctx.env.runner_raw({"op": "call", "file": str(path), "module": self.spec["module"],
-                                         "func": self.spec["func"], "cases": cases, "strict_type": True}, timeout=timeout)
+        req = {"op": "call", "file": str(path), "module": self.spec["module"], "func": self.spec["func"], "cases": cases, "strict_type": True}
+        if self.spec.get("expect_ints"):
+            req["seq_as_list"] = True   # 1-4：函式交回 (334, 333, 333)，JSON 只有 list，兩邊都當 list 比、每個數字的型別也比
+        reply = self.ctx.env.runner_raw(req, timeout=timeout)
         data = reply.result
         if data is None or "runner_error" in (data or {}):
             why = (f"跑了 {timeout:.0f} 秒還沒結束" if reply.proc.timed_out else
@@ -1354,6 +1374,11 @@ class ChaffCheck(Check):
         if self.mode == "cases":
             inp, exp = self._cases[c.line]
             call = f"{self.spec['func']}({typed(inp, bare=True)})"
+            if self.spec.get("expect_ints") and st.get("status") not in ("error",) and not st.get("stuck"):   # 1-4：三個人各付多少
+                got = st.get("got")
+                shown = ", ".join(str(x) for x in got) if isinstance(got, (list, tuple)) else typed(got, st.get("got_type"))
+                return (f"第 {c.line} 行：{call} 正確版算出來是 {shown}，你寫的是 {', '.join(str(x) for x in exp)}。\n"
+                        "  再對一次需求：先用 // 算每人付多少、用 % 算零頭，零頭從第一個人開始，一人多 1 元。")
             if st.get("stuck"):
                 return f"第 {c.line} 行：{call} 在正確版上{st.get('error')}。先確定 0-5 的環境檢查都過了（uv run check.py env）。"
             if st.get("status") == "error":
