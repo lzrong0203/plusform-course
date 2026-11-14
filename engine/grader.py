@@ -1117,7 +1117,7 @@ class ChaffCheck(Check):
                 inp = ast.literal_eval(left.strip())
             except (ValueError, SyntaxError, MemoryError, RecursionError):
                 return checks, marks, unfinished, (f"第 {i} 行左邊「{left.strip()}」看不懂。"
-                                                  "左邊是要丟進轉換機的金額文字，前後要加引號，例如 \"120\"。")
+                                                  + self.spec.get("input_hint", "左邊是要丟進轉換機的金額文字，前後要加引號，例如 \"120\"。"))   # 1-5 寫自己的說法
             if want == "str" and not isinstance(inp, str):
                 return checks, marks, unfinished, (f"第 {i} 行左邊的 {left.strip()} 沒有引號，是數字。"
                                                   f"轉換機收的是文字：寫成 \"{left.strip()}\"。")
@@ -1132,6 +1132,14 @@ class ChaffCheck(Check):
             n_ints = int(self.spec.get("expect_ints", 0))   # 1-4：右邊是 n 個整數、用逗號隔開（三個人各付多少）
             if n_ints:
                 right = right.replace("、", ",")
+            tup = self.spec.get("expect_tuple")   # 1-5：右邊是幾個值用逗號隔開，每個值的型別照順序（品項文字、金額整數）
+            if tup:
+                exp, why = self.parse_tuple(right, tup)
+                if why:
+                    return checks, marks, unfinished, f"第 {i} 行{why}"
+                checks.append(StudentCheck(i, raw.strip()))
+                self._cases[i] = (inp, exp)
+                continue
             try:
                 exp = ast.literal_eval(right.strip())
             except (ValueError, SyntaxError, MemoryError, RecursionError):
@@ -1152,13 +1160,35 @@ class ChaffCheck(Check):
             self._cases[i] = (inp, exp)
         return checks, marks, unfinished, None
 
+    @staticmethod
+    def parse_tuple(right: str, tup: dict) -> tuple[tuple | None, str | None]:
+        """1-5 的 expect_tuple：右邊「"午餐", 120」→ ("午餐", 120)。tup＝{types: ["str", "int"], names: ["品項", "金額"], example: "\"午餐\", 120"}。
+        回傳（值, None）或（None, 白話的錯誤說明，接在「第 N 行」後面）。"""
+        types, names, ex = tup["types"], tup["names"], tup.get("example", "")
+        both = "和".join(names)
+        rule = "；".join(f"{n}是{'文字，要加引號' if t == 'str' else '整數，不加引號、不寫「元」'}" for n, t in zip(names, types))
+        try:
+            exp = ast.literal_eval(right.replace("、", ",").strip())
+        except (ValueError, SyntaxError, MemoryError, RecursionError):
+            return None, f"右邊「{right.strip()}」看不懂。右邊寫{both}，中間用逗號隔開（{rule}），例如 {ex}。"
+        exp = tuple(exp) if isinstance(exp, (list, tuple)) else (exp,)
+        if len(exp) != len(types):
+            return None, f"右邊寫了 {len(exp)} 個值。要寫{both}，一共 {len(types)} 個，用逗號隔開，例如 {ex}。"
+        for v, t, n in zip(exp, types, names):
+            if t == "str" and not isinstance(v, str):
+                return None, f"右邊的{n} {v!r} 不是文字。{n}要加引號，例如 {ex}。"
+            if t == "int" and (isinstance(v, bool) or not isinstance(v, int)):
+                kind = "有引號，是文字" if isinstance(v, str) else "有小數點" if isinstance(v, float) else "不是整數"
+                return None, f"右邊的{n} {typed(v, bare=True)} {kind}。{n}是整數：不加引號、不寫「元」，例如 {ex}。"
+        return exp, None
+
     def case_rows(self, path: Path, lines: list[int]) -> dict[int, dict]:
         """用一個程序跑一個版本：每一行的輸入丟進固定的函式，回傳 {行號: 結果}（連型別一起比）。"""
         cases = [{"args": [self._cases[ln][0]], "expect": self._cases[ln][1]} for ln in lines]
         timeout = self.version_timeout()
         req = {"op": "call", "file": str(path), "module": self.spec["module"], "func": self.spec["func"], "cases": cases, "strict_type": True}
-        if self.spec.get("expect_ints"):
-            req["seq_as_list"] = True   # 1-4：函式交回 (334, 333, 333)，JSON 只有 list，兩邊都當 list 比、每個數字的型別也比
+        if self.spec.get("expect_ints") or self.spec.get("expect_tuple"):
+            req["seq_as_list"] = True   # 1-4：函式交回 (334, 333, 333)，JSON 只有 list，兩邊都當 list 比、每個數字的型別也比（1-5 的 ("午餐", 120) 同樣）
         reply = self.ctx.env.runner_raw(req, timeout=timeout)
         data = reply.result
         if data is None or "runner_error" in (data or {}):
@@ -1379,11 +1409,18 @@ class ChaffCheck(Check):
                 shown = ", ".join(str(x) for x in got) if isinstance(got, (list, tuple)) else typed(got, st.get("got_type"))
                 return (f"第 {c.line} 行：{call} 正確版算出來是 {shown}，你寫的是 {', '.join(str(x) for x in exp)}。\n"
                         "  再對一次需求：先用 // 算每人付多少、用 % 算零頭，零頭從第一個人開始，一人多 1 元。")
+            tup = self.spec.get("expect_tuple")
+            if tup and st.get("status") not in ("error",) and not st.get("stuck"):   # 1-5：拆出品項和金額
+                got = st.get("got")
+                shown = ", ".join(typed(x, bare=True) for x in got) if isinstance(got, (list, tuple)) else typed(got, st.get("got_type"))
+                rule = "，".join(f"{n}是{'文字（加引號）' if t == 'str' else '整數（不加引號）'}" for n, t in zip(tup["names"], tup["types"]))
+                return (f"第 {c.line} 行：{call} 正確版拆出來是 {shown}，你寫的是 {', '.join(typed(x, bare=True) for x in exp)}。\n"
+                        f"  再對一次：{rule}，前後多的空白不算。")
             if st.get("stuck"):
                 return f"第 {c.line} 行：{call} 在正確版上{st.get('error')}。先確定 0-5 的環境檢查都過了（uv run check.py env）。"
             if st.get("status") == "error":
                 return (f"第 {c.line} 行：{call} 連正確版都會當掉（{st.get('error')}）。\n"
-                        "  如果你本來就是要找「正確版也會當掉」的金額，在這行最後加上「# 已知會當掉」。")
+                        f"  如果你本來就是要找「正確版也會當掉」的{self.spec.get('input_noun', '金額')}，在這行最後加上「# 已知會當掉」。")
             got = st.get("got")
             msg = f"第 {c.line} 行：{call} 正確版變成 {typed(got, st.get('got_type'))}，你寫的是 {typed(exp)}。"
             if got == exp or str(got) == str(exp):   # 120 對 120.0、120 對 "120"：數字一樣、型別不一樣

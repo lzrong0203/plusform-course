@@ -1,0 +1,18 @@
+{
+  "note": "1-5 的檢查：第①圈先猜輸出（對答 8 題）和收據的一行 receipt.py（官方測試）；第②圈判斷家教出的切片題和它的回答（對答 3 題）；第③圈替課程的 split_item() 寫案例表（chaff 的 cases 模式＋expect_tuple：左邊是一行文字、右邊是品項（文字）和金額（整數），連型別一起比）。my_quiz.md 是自評，不檢查。",
+  "checks": [
+    {"type": "answers", "id": "guess", "file": "lessons/1-5/guess.txt", "key": "answers/guess.json", "group": "第一圈"},
+    {"type": "run", "id": "receipt", "file": "lessons/1-5/receipt.py", "group": "第一圈",
+     "desc": "receipt.py 印出收據的一行",
+     "expect_exact": ["12月25日 聖誕大餐 1,280元"],
+     "hint": "month 是日期索引 5 到 7 之前（[5:7]），day 是最後兩個字；print 用 f-string：引號前面加 f，變數放進大括號，金額寫成 {amount:,} 才有千分位逗號。改完記得存檔再跑。",
+     "missing_hint": "receipt.py 應該在帳本的 lessons/1-5/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-5。"},
+    {"type": "answers", "id": "ai", "file": "lessons/1-5/ai_quiz.txt", "key": "answers/ai_quiz.json", "group": "第二圈"},
+    {"type": "chaff", "id": "r3", "mode": "cases", "student_file": "lessons/1-5/cases.txt",
+     "module": "split_item", "func": "split_item", "input_type": "str",
+     "expect_tuple": {"types": ["str", "int"], "names": ["品項", "金額"], "example": "\"午餐\", 120"},
+     "input_hint": "左邊是要丟進拆帳機的那一行，前後要加引號，例如 \"午餐 120元\"。", "input_noun": "那一行",
+     "reference": "reference/split_item.py", "mutants": "mutants/mutants.json",
+     "teacher_file": "answers/cases.txt", "min_checks": 6}
+  ]
+}
