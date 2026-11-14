@@ -149,23 +149,22 @@ class FullFlow(unittest.TestCase):
 
         with self.subTest("1-9 第①②圈寫好、第③圈漏掉 24 的邊界"):
             write(work / "budget_light.py", (COURSE / "lessons/1-9/reference/budget_light.py").read_text(encoding="utf-8"))
-            fill_answers(work / "trace.txt", ["過輕", "正常", "過重", "「肥胖」"])
-            fill_answers(work / "ai_review.txt", ["不採用", "不採用", "採用", "不採用", "要查證", "採用"])
+            fill_answers(work / "trace.txt", ["體重過輕", "健康體重", "體重過重", "「肥胖」"])
+            fill_answers(work / "ai_review.txt", ["不採用", "採用", "採用", "要查證", "要查證", "不採用"])
             base = (work / "checks_bmi.py").read_text(encoding="utf-8")
-            asserts = ['assert bmi_level(22) == "正常"', 'assert bmi_level(25) == "過重"', 'assert bmi_level(30) == "肥胖"',
-                       'assert bmi_level(18.5) == "正常"', 'assert bmi_level(23) == "正常"']
+            asserts = ['assert bmi_level(22) == "健康體重"', 'assert bmi_level(25) == "體重過重"', 'assert bmi_level(30) == "肥胖"',
+                       'assert bmi_level(18.5) == "健康體重"', 'assert bmi_level(23) == "健康體重"']
             write(work / "checks_bmi.py", base + "\n".join(asserts) + "\n")
             r = check(["1-9", "--predict", "18"], at(1, "10:30"))
             self.assertEqual(r.returncode, 1)
-            self.assertIn("✓ 官方測試  4／4", r.stdout)
-            self.assertIn("✓ 對答  4／4", r.stdout)
-            self.assertIn("✓ 第②圈  6／6", r.stdout)
+            self.assertIn("✓ 第一圈  8／8", r.stdout)
+            self.assertIn("✓ 第二圈  6／6", r.stdout)
             self.assertIn("你的檢查抓到 2 個壞版本，還有 1 個溜過去：\n    ・邊界 24", r.stdout)
 
         with self.subTest("特殊作答：已知會當掉真的拿正確版跑；需求有問題照規則"):
-            extra = ['assert bmi_level("23") == "正常"  # 已知會當掉', "assert bmi_level(-5) == '錯誤'  # 需求有問題",
-                     'assert bmi_level() == "過輕"  # 已知會當掉',
-                     "assert bmi_level(25) == '過輕'  # 需求有問題", "assert bmi_level(25) == '過重'  # 已知會當掉"]
+            extra = ['assert bmi_level("23") == "健康體重"  # 已知會當掉', "assert bmi_level(-5) == '錯誤'  # 需求有問題",
+                     'assert bmi_level() == "體重過輕"  # 已知會當掉',
+                     "assert bmi_level(25) == '體重過輕'  # 需求有問題", "assert bmi_level(25) == '體重過重'  # 已知會當掉"]
             write(work / "checks_bmi.py", base + "\n".join(asserts + extra) + "\n")
             r = check(["1-9", "--predict", "17", "--all"], at(1, "10:35"))
             self.assertIn("標了「已知會當掉」（bmi_level('23')：正確版跑這一行真的會當掉", r.stdout)
@@ -176,12 +175,12 @@ class FullFlow(unittest.TestCase):
             self.assertIn("✓ 你的檢查在正確版上要全部成立", r.stdout)
 
         with self.subTest("寫錯的檢查：在正確版上就不成立"):
-            write(work / "checks_bmi.py", base + "\n".join(asserts + ["assert bmi_level(24) == '正常'"]) + "\n")
+            write(work / "checks_bmi.py", base + "\n".join(asserts + ["assert bmi_level(24) == '健康體重'"]) + "\n")
             r = check(["1-9", "--predict", "15"], at(1, "10:37"))
-            self.assertIn("在正確版上就不成立（正確版算出來是「過重」）", r.stdout)
+            self.assertIn("在正確版上就不成立（正確版算出來是「體重過重」）", r.stdout)
 
         with self.subTest("1-9 全過（40 分鐘，不跳警訊），回顧題最多兩題"):
-            final = asserts + ["assert bmi_level(24) == '過重'"] + extra[:2]
+            final = asserts + ["assert bmi_level(24) == '體重過重'"] + extra[:2]
             write(work / "checks_bmi.py", base + "\n".join(final) + "\n")
             r = check(["1-9", "--predict", "21"], at(1, "10:40"))
             self.assertEqual(r.returncode, 0, r.stdout + r.stderr)

@@ -311,7 +311,7 @@ class Processes(unittest.TestCase):
         # runner 裡（第③圈）學員的檢查狂印，也要停得下來
         work = start("1-9")
         write(work / "checks_bmi.py", "from bmi import bmi_level\nfor i in range(10**9):\n    print('x' * 100)\n"
-                                      + 'assert bmi_level(16) == "過輕"\n' * 6)
+                                      + 'assert bmi_level(16) == "體重過輕"\n' * 6)
         t0 = time.monotonic()
         wheat = part(ev("1-9", ids=["r3"]), "wheat")
         self.assertIn("印太多了", wheat.detail)
@@ -362,7 +362,7 @@ class SpecialMarks(unittest.TestCase):
         base = (COURSE / "lessons/1-9/answers/checks_bmi.py").read_text(encoding="utf-8")
         for call in ("bmi_level()", "bmi_level(None)", "bmi_level([20])"):
             with self.subTest(call=call):
-                write(work / "checks_bmi.py", base + f'assert {call} == "過輕"  # 已知會當掉\n')
+                write(work / "checks_bmi.py", base + f'assert {call} == "體重過輕"  # 已知會當掉\n')
                 marks = [r for r in ev("1-9", ids=["r3"]).results if r.special]
                 self.assertTrue(marks and marks[0].ok, marks[0].detail if marks else "沒有標記結果")
                 self.assertIn("正確版跑這一行真的會當掉", marks[0].note)
@@ -433,7 +433,7 @@ class Validator(unittest.TestCase):
             "一載入就當掉的壞版本": lambda d: (d / "mutants/bmi_m1.py").write_text('x = int("abc")\n\n\n' + ref, encoding="utf-8"),
             "永遠答錯的壞版本": lambda d: (d / "mutants/bmi_m1.py").write_text('def bmi_level(bmi):\n    return "不知道"\n', encoding="utf-8"),
             "起點檔的範例在正確版上不成立": lambda d: (d / "start/checks_bmi.py").write_text(
-                (d / "start/checks_bmi.py").read_text(encoding="utf-8").replace('bmi_level(16) == "過輕"', 'bmi_level(16) == "正常"'),
+                (d / "start/checks_bmi.py").read_text(encoding="utf-8").replace('bmi_level(16) == "體重過輕"', 'bmi_level(16) == "健康體重"'),
                 encoding="utf-8"),
             "起點程式一開始就全過": lambda d: shutil.copy(d / "reference/budget_light.py", d / "start/budget_light.py"),
             "checks.json 壞掉": lambda d: (d / "tests/checks.json").write_text('{"checks": [{"type": "chaff"}]}', encoding="utf-8"),
@@ -530,7 +530,7 @@ class PlanConformance(unittest.TestCase):
             self.assertTrue((COURSE / "lessons/1-9" / f).is_file(), f)
         self.assertIn("量表", (COURSE / "lessons/1-9/answers/judgment_card_example.md").read_text(encoding="utf-8"))
         work = start("1-9")
-        fill(work / "trace.txt", ["過輕", "正常", "過重", "肥胖"])
+        fill(work / "trace.txt", ["體重過輕", "健康體重", "體重過重", "肥胖"])
         fill(work / "ai_review.txt", [q["accept"][0] for q in key["questions"]])
         out = ev("1-9", ids=["trace", "ai"])
         self.assertTrue(all(r.ok for r in out.results), [r.detail for r in out.results if not r.ok])
@@ -662,7 +662,7 @@ class SmallFixes(unittest.TestCase):
     def test_assert_inside_a_loop_is_explained(self):
         work = start("1-9")
         teacher = (COURSE / "lessons/1-9/answers/checks_bmi.py").read_text(encoding="utf-8")
-        write(work / "checks_bmi.py", teacher + "for x in [16, 17]:\n    assert bmi_level(x) == '過輕'\n")
+        write(work / "checks_bmi.py", teacher + "for x in [16, 17]:\n    assert bmi_level(x) == '體重過輕'\n")
         les = lesson("1-9")
         ctx, checkers = grader.build(les, L, only=[c for c in les.checks if c["id"] == "r3"])
         stubs = checkers[0].plan()
@@ -677,7 +677,7 @@ class SmallFixes(unittest.TestCase):
 
     def test_missing_import_line_is_named(self):
         work = start("1-9")
-        write(work / "checks_bmi.py", 'assert bmi_level(16) == "過輕"\n' * 6)
+        write(work / "checks_bmi.py", 'assert bmi_level(16) == "體重過輕"\n' * 6)
         wheat = part(ev("1-9", ids=["r3"]), "wheat")
         self.assertIn("from bmi import", wheat.detail)
         self.assertNotIn("已知會當掉", wheat.detail)
@@ -689,7 +689,7 @@ class SmallFixes(unittest.TestCase):
         shutil.rmtree(L / ".check", ignore_errors=True)
         work = start("1-9")
         write(work / "budget_light.py", (COURSE / "lessons/1-9/reference/budget_light.py").read_text(encoding="utf-8"))
-        fill(work / "trace.txt", ["過輕", "正常", "過重", "肥胖"])
+        fill(work / "trace.txt", ["體重過輕", "健康體重", "體重過重", "肥胖"])
         key = json.loads((COURSE / "lessons/1-9/answers/ai_review.json").read_text(encoding="utf-8"))
         fill(work / "ai_review.txt", [q["accept"][0] for q in key["questions"]])
         write(work / "checks_bmi.py", (COURSE / "lessons/1-9/answers/checks_bmi.py").read_text(encoding="utf-8"))
