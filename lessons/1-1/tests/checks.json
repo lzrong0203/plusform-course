@@ -1,0 +1,41 @@
+{
+  "note": "1-1 的檢查：第①圈猜輸出（對答）與自己寫收據抬頭（官方測試）、第②圈判斷 AI 出的題目有沒有超出範圍（對答）、第③圈把預期輸出寫進 expected.txt，跟課程的正確版和 3 個壞版本一行一行比（chaff 的 expected_text 模式，連空行一起比）。",
+  "checks": [
+    {
+      "type": "answers",
+      "id": "guess",
+      "file": "lessons/1-1/guess.txt",
+      "key": "answers/guess.json"
+    },
+    {
+      "type": "run",
+      "id": "receipt",
+      "file": "lessons/1-1/receipt.py",
+      "desc": "receipt.py 印出收據抬頭三行",
+      "expect_exact": [
+        "PyPy 熊的帳本",
+        "2026/11/14",
+        "收據：第 1 張"
+      ],
+      "hint": "照 README 第 1 節：第二行用一個 print 加 sep=\"/\"；第三行用兩個 print，第一個加 end=\"：\"。改完記得存檔再跑。",
+      "missing_hint": "receipt.py 應該在帳本的 lessons/1-1/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-1。"
+    },
+    {
+      "type": "answers",
+      "id": "ai",
+      "group": "第二圈",
+      "file": "lessons/1-1/ai_quiz.txt",
+      "key": "answers/ai_quiz.json"
+    },
+    {
+      "type": "chaff",
+      "id": "r3",
+      "mode": "expected_text",
+      "student_file": "lessons/1-1/expected.txt",
+      "reference": "reference/print_receipt.py",
+      "mutants": "mutants/mutants.json",
+      "teacher_file": "answers/expected.txt",
+      "min_checks": 6
+    }
+  ]
+}

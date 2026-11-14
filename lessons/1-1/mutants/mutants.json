@@ -1,0 +1,9 @@
+{
+  "target": "print_receipt.py",
+  "note": "1-1 第③圈：AI 交出的三個版本（課程準備的，各藏一個小問題）。hint 是學員的預期輸出沒抓到這個版本時，畫面上顯示的提示。",
+  "mutants": [
+    {"id": "m1", "file": "print_receipt_m1.py", "hint": "抬頭和第一筆中間多了一行空白（空白的一行也算一行）", "what": "多一個 print()，多印一行空白"},
+    {"id": "m2", "file": "print_receipt_m2.py", "hint": "「收據：」後面多了一個空格（逗號隔開的兩樣，中間會空一格）", "what": "用逗號把兩樣東西放進同一個 print，中間多一個空格"},
+    {"id": "m3", "file": "print_receipt_m3.py", "hint": "少印了最後一筆（變成註解的那一行不會跑）", "what": "最後一筆被變成註解，少印一行"}
+  ]
+}

@@ -954,6 +954,8 @@ class ChaffCheck(Check):
                             marks.append(Mark(stmt.lineno, kind, text, stmt))
                         else:
                             checks.append(StudentCheck(stmt.lineno, text, stmt=stmt))
+            elif self.mode == "expected_text":
+                checks, unfinished = self.parse_expected_text(lines)
             else:
                 for i, raw in enumerate(lines, start=1):
                     line = raw.strip()
@@ -972,8 +974,67 @@ class ChaffCheck(Check):
         self._parsed = Parsed(checks, marks, problem, unfinished, notes)
         return self._parsed
 
+    # ----- expected_text（2026-11-14，1-1 第③圈）：整段預期輸出一行一行比，連空行一起 -----
+    @staticmethod
+    def norm_out(text: str) -> str:
+        """一行輸出的比法：NFKC（全形冒號＝半形）、去掉行尾空白；行內的空格要一模一樣（不像 norm_line 會併掉空白）。"""
+        return unicodedata.normalize("NFKC", text).rstrip()
+
+    @classmethod
+    def out_rows(cls, text: str) -> list[str]:
+        """程式印出來的字 → 一行一行（換行統一成 \n；頭尾的空行拿掉，中間的空行留著）。"""
+        rows = [cls.norm_out(x) for x in _text(text).replace("\r\n", "\n").replace("\r", "\n").split("\n")]
+        while rows and not rows[-1]:
+            rows.pop()
+        while rows and not rows[0]:
+            rows.pop(0)
+        return rows
+
+    def parse_expected_text(self, lines: list[str]) -> tuple[list[StudentCheck], int]:
+        """學員寫的預期輸出：# 開頭是說明行（不比）、有「？」的行算還沒寫完；頭尾空行拿掉、中間空行留著。
+        第 k 行就是一條檢查（text 存原本的字，比的時候才 norm_out）；最後多一條「總行數一樣」（line＝0、must＝False 當記號）。"""
+        body: list[tuple[int, str]] = []
+        unfinished = 0
+        for i, raw in enumerate(lines, start=1):
+            if raw.strip().startswith("#"):
+                continue
+            if "？" in raw or "?" in raw:
+                unfinished += 1
+                continue
+            body.append((i, raw.rstrip("\r\n")))
+        while body and not body[-1][1].strip():
+            body.pop()
+        while body and not body[0][1].strip():
+            body.pop(0)
+        checks = [StudentCheck(i, text) for i, text in body]
+        if checks:
+            checks.append(StudentCheck(0, f"（一共 {len(checks)} 行）", must=False))
+        return checks, unfinished
+
+    def expected_rows(self, checks: list[StudentCheck], printed: list[str], crashed: bool) -> list[dict]:
+        """每一條檢查在這個版本上成不成立。當掉的版本照「當掉前印出來的」比，缺的行算不一樣（不整版算 error）。"""
+        body = [c for c in checks if c.line]
+        rows = []
+        for k, c in enumerate(checks):
+            if not c.line:   # 總行數
+                ok = len(printed) == len(body)
+                rows.append({"status": "pass" if ok else "fail", "why": "count", "got_n": len(printed), "crashed": crashed})
+                continue
+            got = printed[k] if k < len(printed) else None
+            ok = got is not None and got == self.norm_out(c.text)
+            rows.append({"status": "pass" if ok else "fail", "why": "missing" if got is None else "line", "row": k + 1, "crashed": crashed})
+        return rows
+
     def plan(self):
         parsed = self.parse()
+        if self.mode == "expected_text":
+            out = [
+                self.stub("count", f"預期輸出至少寫 {self.min} 行"),
+                self.stub("wheat", "你寫的預期輸出，跟正確版印出來的一模一樣"),
+            ]
+            for i, _m in enumerate(self.mutants, start=1):
+                out.append(self.stub(f"m{i}", f"抓到第 {i} 個壞版本"))
+            return out
         out = [
             self.stub("count", f"至少寫 {self.min} 條檢查"),
             self.stub("wheat", "你的檢查在正確版上要全部成立"),
@@ -1082,6 +1143,14 @@ class ChaffCheck(Check):
                     else:
                         rows.append({"status": "pass" if norm_line(c.text) in printed else "fail"})
                 out[name] = rows
+        elif self.mode == "expected_text":
+            for name, path in impls.items():
+                p = self.ctx.env.run_file(path, timeout=self.version_timeout())
+                crashed = p.returncode != 0 or p.stopped
+                if name == "reference" and crashed:
+                    out[name] = [{"status": "error", "error": "正確版跑不起來"} for _c in checks]
+                    continue
+                out[name] = self.expected_rows(checks, self.out_rows(p.stdout), crashed)
         elif self.mode == "path_checks":
             sc = json.loads(self.ctx.course(self.spec["scenario"]).read_text(encoding="utf-8"))
             for name, path in impls.items():
@@ -1128,6 +1197,20 @@ class ChaffCheck(Check):
             if st.get("got") is not None:
                 msg += f"（正確版算出來是{show(st['got'])}）"
             return msg + "。\n  正確版不會錯，所以是這條檢查要改；如果你覺得是需求沒講清楚，在行尾加上「# 需求有問題」。"
+        if self.mode == "expected_text":
+            if st.get("status") == "error":
+                return "正確版在你的帳本裡跑不起來，先確定 0-5 的環境檢查都過了（uv run check.py env）。"
+            if not c.line:
+                n = st.get("got_n", 0)
+                body_n = int(re.sub(r"\D", "", c.text) or 0)
+                more = "多" if body_n > n else "少"
+                return (f"正確版一共印出 {n} 行，你寫了 {body_n} 行（{more}了 {abs(body_n - n)} 行）。\n"
+                        "  看看是不是多了或少了一行：空白的一行也算一行。")
+            shown = c.text if c.text.strip() else "（空白的一行）"
+            if st.get("why") == "missing":
+                return f"第 {c.line} 行「{shown}」：正確版沒有印到這一行，你寫的比它多。"
+            return (f"第 {c.line} 行「{shown}」跟正確版印出來的不一樣。\n"
+                    "  一個字一個字對：空格、標點、空白的一行都要一樣（全形、半形的冒號都可以）。")
         if self.mode == "expected_output":
             if st.get("status") == "error":
                 return f"第 {c.line} 行「{c.text}」：正確版在你的帳本裡跑不起來，先確定 0-5 前面幾題都過了。"
@@ -1161,11 +1244,15 @@ class ChaffCheck(Check):
         self.ctx.summaries.extend(parsed.notes)
 
         n = len(checks)
-        count_r.ok = n >= self.min
+        n_count = len([c for c in checks if c.line]) if self.mode == "expected_text" else n   # expected_text：總行數那一條不算
+        count_r.ok = n_count >= self.min
         if not count_r.ok:
             extra = f"（還有 {unfinished} 行有「？」沒填完）" if unfinished else ""
             marked = "；行尾標了特殊作答的不算在裡面" if marks else ""
-            count_r.detail = f"你寫了 {n} 條檢查，這課要至少 {self.min} 條{extra}{marked}。"
+            if self.mode == "expected_text":
+                count_r.detail = f"你的預期輸出寫了 {n_count} 行，這課要至少 {self.min} 行{extra}。"
+            else:
+                count_r.detail = f"你寫了 {n} 條檢查，這課要至少 {self.min} 條{extra}{marked}。"
         reveal = count_r.ok  # 寫滿最少條數以前，先不講溜過去的是哪一種錯
 
         mark_status: dict[int, dict] = {}
@@ -1185,30 +1272,38 @@ class ChaffCheck(Check):
                 r.ok = bool(catchers)
                 if r.ok:
                     first = catchers[0]
-                    r.note = f"被第 {checks[first].line} 行抓到"
+                    if self.mode == "expected_text":
+                        r.note = f"被第 {checks[first].line} 行抓到" if checks[first].line else "被「總行數」抓到（印出來的行數不一樣）"
+                        if rows[first].get("crashed"):
+                            r.note += "（這個版本跑到一半當掉了）"
+                    else:
+                        r.note = f"被第 {checks[first].line} 行抓到"
                     if rows[first].get("stuck"):
                         r.note += "（這個壞版本卡住了、跑不完，你的檢查抓到它）"
                 elif not valid:
                     r.detail = "你的檢查在正確版上還沒有一條成立，先修好正確版那一題。"
                     slipped.append(m["hint"])
                 else:
-                    r.detail = f"溜過去了：{m['hint']}" if reveal else f"溜過去了。（先寫滿 {self.min} 條檢查，再告訴你溜過去的是哪一種錯）"
+                    unit = "行" if self.mode == "expected_text" else "條檢查"
+                    r.detail = f"溜過去了：{m['hint']}" if reveal else f"溜過去了。（先寫滿 {self.min} {unit}，再告訴你溜過去的是哪一種錯）"
                     slipped.append(m["hint"])
             caught = len(self.mutants) - len(slipped)
             if not slipped:
-                self.ctx.summaries.append(f"你的檢查把 {len(self.mutants)} 個壞版本全部抓到了。")
+                self.ctx.summaries.append(f"你的{'預期輸出' if self.mode == 'expected_text' else '檢查'}把 {len(self.mutants)} 個壞版本全部抓到了。")
             elif reveal:
                 # 每行壓在 68 欄內（VHS 錄影 70 欄、Terminal.app 預設 80 欄都不折行）：提示一條一行
-                self.ctx.summaries.append(f"你的檢查抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去：")
+                self.ctx.summaries.append(f"你的{'預期輸出' if self.mode == 'expected_text' else '檢查'}抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去：")
                 self.ctx.summaries.extend(f"  ・{h}" for h in slipped)
             else:
                 # 分兩行（每行 ≤68 欄，同上）
-                self.ctx.summaries.append(f"你的檢查抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去。")
-                self.ctx.summaries.append(f"  先寫滿 {self.min} 條檢查，再告訴你是哪幾種。")
+                noun, unit = ("預期輸出", "行") if self.mode == "expected_text" else ("檢查", "條檢查")
+                self.ctx.summaries.append(f"你的{noun}抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去。")
+                self.ctx.summaries.append(f"  先寫滿 {self.min} {unit}，再告訴你是哪幾種。")
         else:
-            wheat_r.detail = "還沒有任何檢查。" + (f"（有 {unfinished} 行的「？」還沒填）" if unfinished else "")
+            none = "還沒寫預期輸出" if self.mode == "expected_text" else "還沒有任何檢查"
+            wheat_r.detail = f"{none}。" + (f"（有 {unfinished} 行的「？」還沒填）" if unfinished else "")
             for r in mutant_rs:
-                r.detail = "還沒有任何檢查，所以壞版本都溜過去了。"
+                r.detail = f"{none}，所以壞版本都溜過去了。"
 
         if marks:
             key = json.loads(self.ctx.course(self.spec["special"]).read_text(encoding="utf-8")) if self.spec.get("special") else {"rules": []}

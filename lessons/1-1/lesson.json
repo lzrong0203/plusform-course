@@ -1,0 +1,7 @@
+{
+  "id": "1-1",
+  "title": "print、註解、程式一行一行跑",
+  "minutes": 40,
+  "fast_minutes": 8,
+  "after_start": "接下來，用 VS Code 打開帳本的 lessons/1-1：\n  1. 第一圈：guess.txt 猜 4 題、receipt.py 寫收據抬頭\n  2. 第二圈：ai_quiz.txt 判斷 3 題有沒有超出範圍\n  3. 第三圈：expected.txt 寫下收據應該印出的樣子\n做完回到課程資料夾打：uv run check.py 1-1"
+}
