@@ -158,7 +158,7 @@ class OtherChecks(unittest.TestCase):
         self.assertIn("each 用 //", r.detail)
 
     def test_guess_answers_accept_fullwidth_and_unicode_minus(self):
-        answer("guess.txt", ["3", "2", "－4", "3", "81", "4", "−9"])
+        answer("guess.txt", ["3", "2", "－4", "3", "81", "4", "−25"])
         out = ev(["guess"])
         self.assertEqual([r.ok for r in out.results], [True] * 7, [r.detail for r in out.results])
         answer("guess.txt", ["3.4", "2", "-3", "-2", "12", "24", "9"])
@@ -182,7 +182,7 @@ class OtherChecks(unittest.TestCase):
         work = L / "lessons" / LID
         shutil.copy(D / "reference" / "split.py", work / "split.py")
         write(work / "cases.txt", TEACHER)
-        answer("guess.txt", ["3", "2", "-4", "3", "81", "4", "-9"])
+        answer("guess.txt", ["3", "2", "-4", "3", "81", "4", "-25"])
         answer("ai_list.txt", ["A", "B", "A", "C"])
         r = run_check(["1-04", "--predict", "16", "--no-review"], env)
         self.assertIn("17／17", r.stdout, r.stdout + r.stderr)
