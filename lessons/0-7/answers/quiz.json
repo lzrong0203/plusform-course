@@ -1,0 +1,20 @@
+{
+  "note": "0-7 的對答題：改壞了怎麼回去（隨片測驗）。title 是畫面上顯示的題目；選項寫在作答檔 start/quiz.txt。",
+  "normalize": "text",
+  "questions": [
+    {"id": "q1", "title": "改壞了、還沒按存檔點，按哪一個回去", "accept": ["B"],
+     "hint": "影片第①圈第五步：滑到清單裡的 main.py，右邊那幾個小圖示。",
+     "explain": "Discard Changes 會丟掉還沒存進存檔點的改動，回到上一個存檔點的樣子。Commit 是按存檔點，Publish Branch 是放上網路。"},
+    {"id": "q2", "title": "⌘S 存檔算不算存檔點", "accept": ["B"],
+     "hint": "按了 ⌘S 以後，原始碼控制的清單裡出現了什麼？",
+     "explain": "⌘S 只是把檔案存起來；VS Code 官方說明：Saving writes the file to disk. It does not create a Git commit."},
+    {"id": "q3", "title": "Discard 以後找不找得回來", "accept": ["C"],
+     "hint": "所以 VS Code 才會再問你一次「確定要丟掉嗎」。",
+     "explain": "VS Code 官方說明：丟掉的改動不會進垃圾桶（Discarded edits to tracked files are not moved to the Recycle Bin or Trash）。不確定就先別按 Discard。"},
+    {"id": "q4", "title": "讓 AI 動手之前先做什麼", "accept": ["A"],
+     "hint": "AI 改壞了，你想退回到哪一個樣子？那個樣子存起來了嗎？",
+     "explain": "先按存檔點，AI 改壞了才回得到它動手之前的樣子。"}
+  ],
+  "choices": {"A": "A", "B": "B", "C": "C"},
+  "how": "A、B 或 C"
+}

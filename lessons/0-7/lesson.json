@@ -1,0 +1,7 @@
+{
+  "id": "0-7",
+  "title": "存檔點：讓 AI 改壞了也不怕",
+  "minutes": 30,
+  "fast_minutes": 0,
+  "after_start": "接下來有一個作答檔（用 VS Code 打開來改，改完按 ⌘S 存檔；Windows 按 Ctrl+S）：\n  1. quiz.txt：在每題的「答：」後面寫 A、B 或 C\n       code {ledger}/lessons/0-7/quiz.txt\n  2. 寫好以後，在 VS Code 的原始碼控制寫一句說明、按 Commit，這是你的第二個存檔點\n  3. 回到課程資料夾打：uv run check.py 0-7"
+}

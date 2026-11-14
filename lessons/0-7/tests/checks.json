@@ -1,0 +1,18 @@
+{
+  "note": "0-7 的檢查：帳本是 git 存放庫、至少 2 個存檔點、作答檔也存進存檔點；對答 4 題（改壞了怎麼回去）。",
+  "checks": [
+    {
+      "type": "git_commits",
+      "id": "git",
+      "min": 2,
+      "committed": ["lessons/0-7/quiz.txt"],
+      "desc": "帳本是 git 存放庫，至少有 2 個存檔點，作答檔也存進去了"
+    },
+    {
+      "type": "answers",
+      "id": "quiz",
+      "file": "lessons/0-7/quiz.txt",
+      "key": "answers/quiz.json"
+    }
+  ]
+}

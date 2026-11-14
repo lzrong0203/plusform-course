@@ -1,0 +1,23 @@
+{
+  "questions": [
+    {
+      "id": "r1",
+      "q": "在 VS Code 改壞了 main.py、還沒按存檔點，要按哪一個回到上一個存檔點？\nA. Commit\nB. Discard Changes\nC. Publish Branch\n（寫 A、B 或 C）",
+      "accept": ["B"],
+      "explain": "Discard Changes 會丟掉還沒存進存檔點的改動。丟掉以後找不回來，所以 VS Code 會再問一次。",
+      "choices": {"A": "Commit", "B": "Discard Changes", "C": "Publish Branch"}
+    },
+    {
+      "id": "r2",
+      "q": "設定 git 名字的那一行是 git config --global user.name 加上你的名字。設定信箱的那一行，要把 user.name 換成什麼？",
+      "accept": ["user.email"],
+      "explain": "git config --global user.email 你的信箱。信箱會寫進每一個存檔點，先填不介意公開的，2-1 開 GitHub 帳號後換成 noreply 信箱。"
+    },
+    {
+      "id": "r3",
+      "q": "課程資料夾是用 git clone 下載的。課程更新以後，要在課程資料夾裡打哪一行？",
+      "accept": ["git pull"],
+      "explain": "git pull 會把網路上新的存檔點拿下來；已經是最新版時會說 Already up to date."
+    }
+  ]
+}
