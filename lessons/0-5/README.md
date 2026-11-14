@@ -1,12 +1,12 @@
 # 0-5　裝 uv，跑起第一支 Python
 
-這課大約 45 分鐘。三圈比例 75／20／5。
+這課大約 45 分鐘。三圈比例 75／20／5。每個指令在做什麼、畫面跟影片不一樣怎麼辦、Windows 的做法、名詞小抄和官方來源，寫在 [補充.md](補充.md)。
 
 ## 1. 題目
 
 **第①圈：** 在自己的電腦用 uv 把帳本變成一個 Python 專案，跑起 `main.py`，然後下載課程資料夾、讓 check.py 記住你的帳本在哪裡。
 
-- uv 是幫你安裝和管理 Python 的工具。這門課不用電腦內建的「系統 Python」，也不加 `sudo`。
+- uv 是幫你安裝和管理 Python 的工具。這門課不用電腦上本來就有的「系統 Python」（Mac 上是跟著開發工具來的那一份），也不加 `sudo`。
 - PATH 是電腦找指令的地方：你打 `uv`，電腦會照 PATH 裡的資料夾一個一個找。
 
 **對答：** 錯誤訊息跟原因配對 3 題。題目是 Mac 的寫法；Windows 的 Git Bash 會寫成 `bash: uv: command not found`，意思一樣。
@@ -17,7 +17,7 @@
 
 - 判斷一行安裝指令能不能信：網址是不是官方網域、是不是 `https://`。uv 的官方網站是 `https://docs.astral.sh/uv/`，安裝指令裡的網址是 `astral.sh`，兩個都是 astral 這家公司的網域。
 - 剛裝好 uv，打 `uv --version` 說找不到指令？先關掉終端機、開一個新的視窗再試。這就是 PATH 還沒更新。
-- `uv init --no-package --vcs none --python 3.13`：`--no-package` 是用最簡單的專案結構；`--vcs none` 是先不要建 git（0-7 才自己建）。`--python 3.13` 是指定用 3.13：不寫的話 uv 會用它在電腦上先找到的那一版（新 Mac 是內建的 3.9；另外裝過 3.14 的話可能是 3.14），找到比 3.13 新的版本時，下一行的 pin 3.13 會被拒絕。
+- `uv init --no-package --vcs none --python 3.13`：`--no-package` 是用比較簡單的專案結構；`--vcs none` 是先不要建 git（0-7 才自己建）。`--python 3.13` 是指定用 3.13：不寫的話 uv 會用它在電腦上先找到的那一版（新 Mac 是跟著開發工具來的 3.9；另外裝過 3.14 的話可能是 3.14），找到比 3.13 新的版本時，下一行的 pin 3.13 會被拒絕。
 - uv init 會在帳本裡建出幾個檔案：`main.py` 是你的第一支程式；`pyproject.toml` 是這個專案的設定檔（專案叫什麼名字、要用哪一版 Python）。第一次 `uv run` 還會多出一個 `.venv` 資料夾：那是 uv 在帳本裡幫你放的一份專用 Python（叫做「虛擬環境」），`uv run` 會用它，不會去用電腦內建的。
 - 網路上的教學叫你加 `sudo`，這門課都不要加。
 - 卡住的時候，把「我打的指令＋完整的錯誤訊息＋我試過什麼」一起貼給白海豹（你的 AI 家教），不要只說「不能跑」。
@@ -137,7 +137,7 @@ Hello from ledger!
 - 帳本是 uv 專案（有 `pyproject.toml`）
 - Python 釘在 3.13（`.python-version`）
 - `uv run main.py` 印得出 `Hello from ledger!`
-- 用的是帳本自己 `.venv` 裡的 Python 3.13，不是電腦內建的系統 Python
+- 用的是帳本自己 `.venv` 裡的 Python 3.13，不是跟著開發工具來的系統 Python
 - 順便補驗 0-4 的資料夾結構還在
 - 對答 3 題（答案在 `answers/error_match.json`）
 - 第③圈：你寫的三行預期，在正確版的 doctor.py 上全部對，在 3 個壞版本上至少錯一行。沒對上的時候，check.py 只會告訴你是哪一行、該寫成什麼格式，不會直接給答案。
