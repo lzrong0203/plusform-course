@@ -62,7 +62,7 @@ class FullFlow(unittest.TestCase):
         # ---------- 0-4 第①圈＋ 0-5 第①圈：學員自己做的部分 ----------
         build_0_4_tree(ledger)
         env = make_env(home, DAY1)
-        subprocess.run([UV, "init", "--no-package", "--vcs", "none", "--quiet"], cwd=ledger, env=env, check=True)
+        subprocess.run([UV, "init", "--no-package", "--vcs", "none", "--python", "3.13", "--quiet"], cwd=ledger, env=env, check=True)
         subprocess.run([UV, "python", "pin", "3.13", "--quiet"], cwd=ledger, env=env, check=True)
         self.assertFalse((ledger / ".git").exists(), "--vcs none 不該建 git")
 

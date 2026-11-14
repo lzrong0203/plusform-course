@@ -17,7 +17,7 @@ sys.dont_write_bytecode = True
 
 COURSE = Path(__file__).resolve().parent.parent
 _ws = os.environ.get("PLUSFORM_TEST_WS")
-WS = Path(_ws) if _ws else Path(tempfile.mkdtemp(prefix="plusform-test-"))
+WS = (Path(_ws) if _ws else Path(tempfile.mkdtemp(prefix="plusform-test-"))).resolve()   # Mac 的 /var 是 /private/var 的捷徑；check.py 印的是解析後的路徑
 WS.mkdir(parents=True, exist_ok=True)
 
 if str(COURSE) not in sys.path:
@@ -71,7 +71,8 @@ def make_env(home: Path, now: str | None = None) -> dict:
     env["UV_CACHE_DIR"] = UV_CACHE
     env["UV_PYTHON_INSTALL_DIR"] = UV_PYTHON
     env["UV_PYTHON_BIN_DIR"] = UV_PYTHON_BIN
-    env["UV_NO_CONFIG"] = "1"
+    # 不設 UV_NO_CONFIG（2026-11-14）：它也會讓 uv 不讀 .python-version（uv 0.11.9 實測），電腦上裝了 3.14 時
+    # 帳本的 pin 3.13 不生效、跑成 3.14。HOME 已經換成假的，使用者的 uv 設定本來就讀不到
     env["TMPDIR"] = str(WS / "tmp")
     (WS / "tmp").mkdir(exist_ok=True)
     if now:
@@ -101,7 +102,7 @@ def uv_ledger(path: Path, package: bool = False) -> Path:
     path.mkdir(parents=True)
     env = grader.child_env()
     layout = "--package" if package else "--no-package"
-    subprocess.run([UV, "init", layout, "--vcs", "none", "--name", "ledger", "--quiet"], cwd=path, env=env, check=True)
+    subprocess.run([UV, "init", layout, "--vcs", "none", "--python", "3.13", "--name", "ledger", "--quiet"], cwd=path, env=env, check=True)
     subprocess.run([UV, "python", "pin", "3.13", "--quiet"], cwd=path, env=env, check=True)
     if not package:
         subprocess.run([UV, "run", "--quiet", "main.py"], cwd=path, env=env, check=True, capture_output=True)

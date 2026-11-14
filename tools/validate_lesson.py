@@ -108,7 +108,7 @@ def make_temp_ledger() -> tuple[Path, Path]:
     ledger = top / "ledger"
     ledger.mkdir()
     env = grader.child_env()
-    subprocess.run([uv, "init", "--no-package", "--vcs", "none", "--name", "ledger", "--quiet"],
+    subprocess.run([uv, "init", "--no-package", "--vcs", "none", "--python", "3.13", "--name", "ledger", "--quiet"],
                    cwd=ledger, check=True, env=env, capture_output=True)
     subprocess.run([uv, "python", "pin", "3.13", "--quiet"], cwd=ledger, check=True, env=env, capture_output=True)
     return top, ledger
