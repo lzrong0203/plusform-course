@@ -1352,7 +1352,8 @@ class GitCheck(Check):
         for rel in self.spec.get("committed", []):
             p = procs.run([git, "status", "--porcelain", "--", rel], cwd=ledger, env=env, timeout=30)
             if p.returncode == 0 and p.stdout.strip():
-                r.detail = f"{rel} 改過之後還沒按存檔點。在「原始碼控制」面板把它存起來（commit）。"
+                # 一行寫得完（終端機 70 欄、Git Bash 80 欄不折行；0-C 影片錄到這一行）
+                r.detail = f"{rel} 改過之後還沒按存檔點。到原始碼控制面板按存檔點（commit）。"
                 return
         r.ok = True
         r.note = f"帳本有 {count} 個存檔點"

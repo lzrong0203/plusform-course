@@ -30,7 +30,7 @@
         "11/01 午餐 120 元",
         "11/02 公車 15 元"
       ],
-      "hint": "先修好 lessons/0-C/main.py（從錯誤訊息最下面一行看起：它說哪一行、哪一類錯？），再在帳本資料夾裡打 cp lessons/0-C/main.py main.py，把帳本的 main.py 換成 v0。",
+      "hint": "先修好 lessons/0-C/main.py：跑 uv run lessons/0-C/main.py，錯誤訊息從最下面一行看起（哪一種錯、第幾行，0-7 看過）；跑得起來以後，跟 README 第 4 節的四行一行一行比。都對了，在帳本資料夾裡打 cp lessons/0-C/main.py main.py，換掉帳本的 main.py。",
       "missing_hint": "main.py 應該在帳本最上層（uv init 建的那支）。把修好的版本複製過去：在帳本資料夾裡打 cp lessons/0-C/main.py main.py"
     },
     {
@@ -66,7 +66,7 @@
       "root": "lessons/0-C",
       "spec": "answers/after_v0.txt",
       "desc": "安全版真的跑過了，而且隔壁的 lessons/0-C-保險箱 還在",
-      "hint": "在 lessons/0-C 裡打 bash make_v0.sh。如果是 ../0-C-保險箱/ 不見了：危險那一行被跑過了。重新打 uv run check.py start lv0 會把保險箱補回來，刪掉危險那一行再跑一次。"
+      "hint": "先刪掉危險那一行、存檔，再在 lessons/0-C 裡打 bash make_v0.sh。如果是原本就在的東西不見了：重新打 uv run check.py start lv0 會把練習用的檔案補回來（已經有的不會蓋掉），找出危險那一行、刪掉再跑一次。"
     },
     {
       "type": "chaff",

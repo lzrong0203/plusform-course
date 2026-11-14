@@ -240,7 +240,7 @@ class FullFlow(unittest.TestCase):
                                             "/Users/bear/code/ledger", "~/code/ledger/notes", "/Users/bear/"])
             write(work / "main.py", (COURSE / "lessons/0-C/reference/main.py").read_text(encoding="utf-8"))
             shutil.copyfile(ledger / "main.py", ledger / "hello_backup.py")
-            fill_answers(work / "ai_explain.txt", ["C"])
+            fill_answers(work / "ai_explain.txt", ["B"])
             script = (work / "make_v0.sh").read_text(encoding="utf-8")
             self.assertIn(f"rm -rf ../{DECOY}", script)
             self.assertNotIn("../0-4", script)
@@ -334,6 +334,9 @@ class FullFlow(unittest.TestCase):
             self.assertRegex(out, r"最近 5 次平均差 \d+%")
             self.assertIn("下次我會先看邊界再猜", out)
             self.assertIn("看得懂進度條：[", out)
+            # 關卡記下三關各自第一次全部通過的日期，以及第一次對答案時的兩次預測
+            self.assertIn("第一關✓11/11 第二關✓11/11 第三關✓11/11", out)
+            self.assertIn("0-C 關卡第一次對答案：開始前猜 10、做完猜 14、實際 ", out)
 
         with self.subTest("紀錄都在帳本的 .check，課程資料夾什麼都沒寫"):
             prog = json.loads((ledger / ".check" / "progress.json").read_text(encoding="utf-8"))

@@ -1,13 +1,16 @@
-# 0-C 第二關：熊打錯了一個資料夾名稱，終端機回了這行錯誤訊息：
+# 0-C 第二關：熊開了一個新的終端機視窗，打 uv run main.py，看到這段錯誤訊息：
 #
-#     cd: no such file or directory: ledgr
+#     bear@MacBook-Air ~ % uv run main.py
+#     error: Failed to spawn: main.py
+#       cause: No such file or directory (os error 2)
 #
 # 熊把它貼給四個 AI，得到四則解釋。其中一則是錯的，哪一則？
+# 每一則都回去錯誤訊息裡找證據：它說的事，錯誤訊息或你學過的東西，撐得住嗎？
 #
-#   A. 你打的資料夾名稱 ledgr 找不到，可能是拼錯了，應該是 ledger。
-#   B. 你現在的位置底下沒有叫 ledgr 的資料夾；可以先打 ls 看看有哪些。
-#   C. 這代表你的電腦權限不夠，要在前面加 sudo 再跑一次。
-#   D. 打資料夾名稱時按 Tab 自動補全，可以避免打錯字。
+#   A. 你現在的資料夾裡找不到 main.py。先打 pwd，看看自己在哪裡。
+#   B. 這代表 uv 沒有裝好。重新貼一次 uv 的安裝指令，再開新的視窗。
+#   C. 新開的終端機從家目錄開始，帳本不在這裡。先打 cd ~/code/ledger，再跑一次。
+#   D. 可以先打 ls，看看這一層有沒有 main.py。
 #
 # 在「答：」後面寫 A、B、C 或 D。
 

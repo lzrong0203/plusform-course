@@ -748,3 +748,45 @@ class VerifyRound2(unittest.TestCase):
         a5 = next(q for q in d["questions"] if q["id"] == "a5")
         self.assertIn("要查證", a5["accept"])
         self.assertIn("不採用", a5["accept"])
+
+
+# ====================================================================
+# 0-C 第一關、第二關只考 Lv0 教過的東西（2026-11-14 關卡定版）
+# ====================================================================
+
+class LevelZeroContent(unittest.TestCase):
+    def test_0c_main_py_is_the_0_7_error_then_an_expected_output_mismatch(self):
+        """壞掉的 main.py：先是 0-7 看過的「'(' was never closed」（第 4 行），補好右括號以後，印出來跟 README 的四行差一筆金額。"""
+        c = COURSE / "lessons/0-C"
+        work = fresh_dir("reg_0c_main")
+        src = (c / "start/main.py").read_text(encoding="utf-8")
+        (work / "main.py").write_text(src, encoding="utf-8")
+        p = subprocess.run([sys.executable, "-I", "main.py"], cwd=work, capture_output=True, text=True, encoding="utf-8", timeout=30)
+        self.assertNotEqual(p.returncode, 0)
+        self.assertIn("SyntaxError: '(' was never closed", p.stderr)
+        self.assertIn("line 4", p.stderr)
+        lines = src.splitlines()
+        lines[3] = lines[3] + ")"
+        (work / "main.py").write_text("\n".join(lines) + "\n", encoding="utf-8")
+        p = subprocess.run([sys.executable, "-I", "main.py"], cwd=work, capture_output=True, text=True, encoding="utf-8", timeout=30)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        want = next(ch for ch in json.loads((c / "tests/checks.json").read_text(encoding="utf-8"))["checks"] if ch["id"] == "main")["expect_exact"]
+        got = p.stdout.splitlines()
+        self.assertEqual(len(got), len(want))
+        diff = [(g, w) for g, w in zip(got, want) if g != w]
+        self.assertEqual(len(diff), 1, "補好括號以後，只差一行（要對照預期輸出才抓得到）")
+        self.assertEqual((c / "reference/main.py").read_text(encoding="utf-8").count("print("), 4)
+        readme = (c / "README.md").read_text(encoding="utf-8")
+        for w in want:
+            self.assertIn(w, readme, "README 的成品示範要寫出四行預期輸出")
+
+    def test_0c_ai_explain_wrong_one_contradicts_command_not_found(self):
+        d = json.loads((COURSE / "lessons/0-C/answers/ai_explain.json").read_text(encoding="utf-8"))
+        q = d["questions"][0]
+        wrong = d["choices"][q["accept"][0]]
+        self.assertIn("沒有裝好", wrong)
+        self.assertIn("command not found", q["explain"])
+        start = (COURSE / "lessons/0-C/start/ai_explain.txt").read_text(encoding="utf-8")
+        self.assertIn("No such file or directory", start)
+        for letter, text in d["choices"].items():
+            self.assertIn(f"{letter}. {text}", start, "作答檔和答案檔的四則要一字不差")

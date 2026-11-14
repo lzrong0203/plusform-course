@@ -532,6 +532,10 @@ def cmd_lesson(raw: str, opts: dict) -> int:
         pre = info.get("pre_prediction")
         if pre is not None and stages:
             print(f"（開始前你猜 {pre} 題，做完猜 {predicted} 題，實際 {passed} 題。）")
+            if "first_check" not in info:
+                # 關卡第一次對答案：開始前、做完的兩次預測和實際，留一份給 status 的校準曲線（之後的檢查照舊畫在曲線上）
+                info["first_check"] = {"time": now_iso, "pre": pre, "post": predicted, "passed": passed, "total": total}
+                records.save_progress(prog)
         if abs(pct) >= BIG_GAP:
             print("這次猜的跟實際差比較多。寫一句：下次我會怎麼估？")
             if interactive():
@@ -823,7 +827,8 @@ def cmd_status() -> int:
                     names = grader.load_lesson(lid, ROOT).meta.get("stages", [])
                 except grader.LessonNotFound:
                     names = list(stages)
-                extra += "；" + " ".join(f"{s}{'✓' if s in stages else '✗'}" for s in names)
+                # 關卡記下每一關第一次全部通過的日期（課表：「記錄三關與日期」）
+                extra += "；" + " ".join(f"{s}✓{mmdd(stages[s])}" if s in stages else f"{s}✗" for s in names)
                 if info.get("level_up"):
                     extra += "；已升級"
             for rid, minutes in info.get("timed", {}).items():
@@ -854,6 +859,11 @@ def cmd_status() -> int:
         for a in rows[-10:]:
             print(curve_line(a))
         print(recent_summary(rows[-5:]))
+        for lid, info in lessons.items():
+            fc = info.get("first_check")
+            if fc:
+                # 一行寫得完（VHS 錄影 70 欄）：日期另外在上面的曲線那一行
+                print(f"  {lid} 關卡第一次對答案：開始前猜 {fc['pre']}、做完猜 {fc['post']}、實際 {fc['passed']}／{fc['total']}")
         notes = records.read("notes")
         if notes:
             print(f"  你寫過的「下次我會怎麼估」：{notes[-1]['text']}")
