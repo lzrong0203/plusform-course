@@ -1,0 +1,16 @@
+{
+  "note": "0-6 的檢查：帳本還是 0-5 做好的 uv 專案、.venv 在、main.py 跑得起來（改成 Hello from PyPy! 也算）、用的是 .venv 裡的 Python 3.13；對答 2 題。VS Code 的設定存在 VS Code 裡，check.py 不檢查。",
+  "checks": [
+    {"type": "uv_project", "id": "uv-project", "desc": "帳本是 uv 專案（有 pyproject.toml）"},
+    {"type": "python_pin", "id": "pin", "version": "3.13", "desc": "帳本把 Python 釘在 3.13（.python-version）"},
+    {"type": "tree", "id": "venv", "root": ".", "spec": "answers/tree.txt", "desc": "帳本裡有 .venv 資料夾（帳本自己的那一份 Python）",
+     "hint": "在帳本資料夾裡打一次 uv run main.py，uv 會把 .venv 建回來。"},
+    {"type": "run", "id": "main", "file": "main.py", "desc": "uv run main.py 跑得起來（Hello from ledger! 或改過的 Hello from PyPy! 都算）",
+     "expect_regex": ["^(Hello from .+!|PyPy 熊的帳本.*)$"],
+     "hint": "影片裡只改了引號裡的一個字。改壞了的話，打開 main.py，把第二行改回 print(\"Hello from ledger!\")，前面的四個空格要留著，再存檔。",
+     "missing_hint": "main.py 是 0-5 用 uv init 建的：在帳本資料夾裡打 uv init --no-package --vcs none --python 3.13（如果它說已經有 pyproject.toml，先刪掉 pyproject.toml 再打一次）。",
+     "package_hint": true},
+    {"type": "uv_python", "id": "uv-python", "version": "3.13", "desc": "用的是帳本 .venv 裡的 Python 3.13，不是系統 Python"},
+    {"type": "answers", "id": "screen", "file": "lessons/0-6/screen_read.txt", "key": "answers/screen_read.json"}
+  ]
+}

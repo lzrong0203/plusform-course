@@ -1,0 +1,24 @@
+{
+  "questions": [
+    {
+      "id": "r1",
+      "q": "VS Code 右下角寫著 Python 3.9.6，代表什麼？\nA. 用的是帳本自己的 Python\nB. 用的是 Mac 內建的系統 Python\nC. 用的是最新版的 Python\n（寫 A、B 或 C）",
+      "accept": ["B"],
+      "explain": "3.9.6 是 Mac 內建的系統 Python（/usr/bin/python3）。帳本自己的 .venv 是 3.13，右下角會寫 ledger (3.13…)。",
+      "choices": {"A": "用的是帳本自己的 Python", "B": "用的是 Mac 內建的系統 Python", "C": "用的是最新版的 Python"}
+    },
+    {
+      "id": "r2",
+      "q": "在 Mac 的 VS Code 裡，存檔要按哪一組鍵？\nA. ⌘S\nB. ⌘C\nC. ⌘V\n（寫 A、B 或 C）",
+      "accept": ["A"],
+      "explain": "⌘S 是存檔（Save）。⌘C 是複製、⌘V 是貼上。",
+      "choices": {"A": "⌘S", "B": "⌘C", "C": "⌘V"}
+    },
+    {
+      "id": "r3",
+      "q": "第①圈自己寫、還有檢核的時候，VS Code 內建的 AI 要開著還是關掉？（寫「開著」或「關掉」）",
+      "accept": ["關掉", "關", "關閉"],
+      "explain": "這兩個時候要練、要看的是你自己寫得出來。AI 先幫你補完，就分不出哪些是自己會的。要跟 AI 學，是第②圈的事。"
+    }
+  ]
+}

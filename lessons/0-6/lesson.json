@@ -1,0 +1,7 @@
+{
+  "id": "0-6",
+  "title": "裝 VS Code，打開你的專案",
+  "minutes": 40,
+  "fast_minutes": 0,
+  "after_start": "接下來在 VS Code 裡做：\n  1. 左邊的檔案總管打開 lessons/0-6，按一下 screen_read.txt\n     （題目要看的截圖 q1_a.png、q1_b.png、q2.png 也在這個資料夾，按一下就看得到）\n  2. 兩題的「答：」後面各寫一個英文字母，存檔（⌘S；開了自動存檔會自己存）\n  3. 回到課程資料夾打：uv run check.py 0-6"
+}
