@@ -1,0 +1,11 @@
+{
+  "note": "0-8 的檢查：對答 4 題（四種問法、家教協定寫在哪、什麼不能貼、時間規則）。selfcheck.txt 是自評，check.py 不看。",
+  "checks": [
+    {
+      "type": "answers",
+      "id": "quiz",
+      "file": "lessons/0-8/quiz.txt",
+      "key": "answers/quiz.json"
+    }
+  ]
+}

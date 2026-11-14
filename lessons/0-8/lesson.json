@@ -1,0 +1,7 @@
+{
+  "id": "0-8",
+  "title": "跟 AI 學的正確姿勢：白海豹的家教協定",
+  "minutes": 40,
+  "fast_minutes": 0,
+  "after_start": "接下來有兩個作答檔（用 VS Code 打開來改，改完按 ⌘S 存檔；Windows 按 Ctrl+S）：\n  1. quiz.txt：在每題的「答：」後面寫 A、B、C 或 D\n       code {ledger}/lessons/0-8/quiz.txt\n  2. selfcheck.txt：貼上一段你跟家教的對話，用四格清單自評（這個檔不對答案，只給你自己看）\n       code {ledger}/lessons/0-8/selfcheck.txt\n  3. 寫好以後，在 VS Code 的原始碼控制按一個存檔點（0-7 教過）\n  4. 回到課程資料夾打：uv run check.py 0-8"
+}
