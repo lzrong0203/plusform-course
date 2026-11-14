@@ -855,7 +855,8 @@ class Parsed:
 
 
 NOT_RUN = {"status": "error", "error": "沒有跑到（前面卡住了）", "not_run": True}
-CHAFF_NOUN = {"expected_text": "預期輸出", "cases": "案例"}   # 總結那一行的名詞（assert／其他模式是「檢查」）
+CHAFF_NOUN = {"expected_text": "預期輸出", "inputs_text": "預期輸出", "cases": "案例"}   # 總結那一行的名詞（assert／其他模式是「檢查」）
+TEXT_MODES = ("expected_text", "inputs_text")   # 一行一行比整段輸出的模式（inputs_text 是 1-6 加的：先把 inputs.txt 餵給程式）
 
 CURLY_QUOTES = "“”‘’「」『』〝〞＂＇"
 ARROWS = ("->", "→", "=>")
@@ -1017,6 +1018,9 @@ class ChaffCheck(Check):
                             checks.append(StudentCheck(stmt.lineno, text, stmt=stmt))
             elif self.mode == "expected_text":
                 checks, unfinished = self.parse_expected_text(lines)
+            elif self.mode == "inputs_text":
+                checks, unfinished = self.parse_expected_text(lines)
+                problem = self.read_inputs()
             elif self.mode == "cases":
                 checks, marks, unfinished, problem = self.parse_cases(lines)
             else:
@@ -1074,8 +1078,10 @@ class ChaffCheck(Check):
             checks.append(StudentCheck(0, f"（一共 {len(checks)} 行）", must=False))
         return checks, unfinished
 
-    def expected_rows(self, checks: list[StudentCheck], printed: list[str], crashed: bool) -> list[dict]:
-        """每一條檢查在這個版本上成不成立。當掉的版本照「當掉前印出來的」比，缺的行算不一樣（不整版算 error）。"""
+    def expected_rows(self, checks: list[StudentCheck], printed: list[str], crashed: bool, norm=None) -> list[dict]:
+        """每一條檢查在這個版本上成不成立。當掉的版本照「當掉前印出來的」比，缺的行算不一樣（不整版算 error）。
+        norm：學員那一行怎麼正規化（預設 norm_out；1-6 的 inputs_text 另外拿掉開頭的提示字）。"""
+        norm = norm or self.norm_out
         body = [c for c in checks if c.line]
         rows = []
         for k, c in enumerate(checks):
@@ -1084,9 +1090,77 @@ class ChaffCheck(Check):
                 rows.append({"status": "pass" if ok else "fail", "why": "count", "got_n": len(printed), "crashed": crashed})
                 continue
             got = printed[k] if k < len(printed) else None
-            ok = got is not None and got == self.norm_out(c.text)
+            ok = got is not None and got == norm(c.text)
             rows.append({"status": "pass" if ok else "fail", "why": "missing" if got is None else "line", "row": k + 1, "crashed": crashed})
         return rows
+
+    # ----- inputs_text（2026-11-15，1-6 第③圈）：學員寫 inputs.txt（要打的字）和 expected.txt（預期輸出），
+    #       check 自己用 subprocess 把 inputs.txt 餵給正確版和 3 個壞版本（不靠 shell 的 <，Windows 的 PowerShell 也能跑），印出來的一行一行比 -----
+    def read_inputs(self) -> str | None:
+        """讀 inputs.txt：一行就是程式問一次時要打的字，原樣餵進去（跟 uv run 程式 < inputs.txt 一樣）；換行統一成 \n。
+        回傳 None 或一句白話的問題。# 開頭的行、「？」都不收：inputs.txt 的每一行都會被當成打進去的字。"""
+        rel = self.spec["inputs_file"]
+        name = Path(rel).name
+        try:
+            path = self.ctx.student(rel)
+        except NotReady as exc:
+            return str(exc)
+        if not path.is_file():
+            return self.ctx.missing(rel)
+        try:
+            text = read_student_text(path)
+        except NotReady as exc:
+            return str(exc)
+        text = text.replace("\r\n", "\n").replace("\r", "\n")
+        rows = text.split("\n")
+        if rows and rows[-1] == "":
+            rows = rows[:-1]
+        if not any(r.strip() for r in rows):
+            return f"{name} 是空的。一行寫一個要打的字，照程式問的順序（{or_list(self.spec.get('prompts', []))}）。"
+        for i, r in enumerate(rows, start=1):
+            if r.strip().startswith("#"):
+                return (f"{name} 第 {i} 行是 # 開頭的說明。{name} 的每一行都會被當成你打的字餵給程式，"
+                        "不能寫說明；說明寫在 expected.txt 的 # 那幾行。")
+            if "？" in r or "?" in r:
+                return f"{name} 第 {i} 行還是「？」：換成你要打的字。"
+        self._stdin = "\n".join(rows) + "\n"
+        self._n_inputs = len(rows)
+        return None
+
+    def strip_prompts(self, row: str) -> str:
+        """拿掉一行開頭的提示字（從檔案讀的時候，input() 的提示字後面不換行，會一個接一個黏在下一行印的字前面）。"""
+        prompts = [unicodedata.normalize("NFKC", x) for x in self.spec.get("prompts", []) if x]
+        again = True
+        while again:
+            again = False
+            for pr in prompts:
+                if row.startswith(pr):
+                    row, again = row[len(pr):], True
+        return row
+
+    def cmp_line(self, text: str) -> str:
+        return self.strip_prompts(self.norm_out(text))
+
+    def prompt_rows(self, stdout: str) -> list[str]:
+        rows = [self.strip_prompts(x) for x in self.out_rows(stdout)]
+        while rows and not rows[-1]:
+            rows.pop()
+        while rows and not rows[0]:
+            rows.pop(0)
+        return rows
+
+    def ref_crash_text(self, p: Proc) -> str:
+        """正確版吃了學員的 inputs.txt 就當掉：多半是 inputs.txt 的行數不夠，或寫了需求卡說不會有的字。"""
+        name = Path(self.spec["inputs_file"]).name
+        asks = self.spec.get("prompts", [])
+        if p.timed_out:
+            return f"正確版跑了 {self.version_timeout():.0f} 秒還沒結束。先確定 0-5 的環境檢查都過了（uv run check.py env）。"
+        if "EOFError" in p.stderr:
+            return (f"{name} 只有 {self._n_inputs} 行，程式要問 {len(asks)} 次（{or_list(asks)}），字不夠，正確版讀到檔案最後就當掉了（EOFError）。"
+                    f"\n  一行寫一個要打的字，照它問的順序。")
+        last = next((ln.strip() for ln in reversed(p.stderr.splitlines()) if ln.strip()), "")
+        return (f"你的 {name} 讓正確版也當掉了（最後一行：{last}）。\n"
+                f"  {self.spec.get('crash_hint', '看看是不是寫了需求卡說不會出現的字。')}")
 
     # ----- cases（2026-11-14，1-3 第③圈）：案例表「輸入 -> 應該變成」，check.py 把輸入丟給各版本的固定函式，連型別一起比 -----
     def parse_cases(self, lines: list[str]) -> tuple[list[StudentCheck], list[Mark], int, str | None]:
@@ -1224,10 +1298,11 @@ class ChaffCheck(Check):
             if need and len([m for m in parsed.marks if m.kind == "已知會當掉"]) < need:
                 out.append(self.stub("smin", f"至少 {need} 組標「已知會當掉」"))
             return out
-        if self.mode == "expected_text":
+        if self.mode in TEXT_MODES:
             out = [
                 self.stub("count", f"預期輸出至少寫 {self.min} 行"),
-                self.stub("wheat", "你寫的預期輸出，跟正確版印出來的一模一樣"),
+                self.stub("wheat", "你寫的預期輸出，跟正確版印出來的一模一樣" if self.mode == "expected_text"
+                          else "inputs.txt 餵給正確版，印出來的跟你的預期輸出一模一樣"),
             ]
             for i, _m in enumerate(self.mutants, start=1):
                 out.append(self.stub(f"m{i}", f"抓到第 {i} 個壞版本"))
@@ -1348,6 +1423,15 @@ class ChaffCheck(Check):
                     out[name] = [{"status": "error", "error": "正確版跑不起來"} for _c in checks]
                     continue
                 out[name] = self.expected_rows(checks, self.out_rows(p.stdout), crashed)
+        elif self.mode == "inputs_text":
+            for name, path in impls.items():
+                p = self.ctx.env.run_file(path, stdin=self._stdin, timeout=self.version_timeout())   # subprocess 餵 stdin，不靠 shell 的 <
+                crashed = p.returncode != 0 or p.stopped
+                if name == "reference" and crashed:
+                    self._ref_err = self.ref_crash_text(p)
+                    out[name] = [{"status": "error", "error": self._ref_err} for _c in checks]
+                    continue
+                out[name] = self.expected_rows(checks, self.prompt_rows(p.stdout), crashed, norm=self.cmp_line)
         elif self.mode == "cases":
             lines = sorted([c.line for c in checks] + [m.line for m in marks])
             for name, path in impls.items():
@@ -1426,7 +1510,9 @@ class ChaffCheck(Check):
             if got == exp or str(got) == str(exp):   # 120 對 120.0、120 對 "120"：數字一樣、型別不一樣
                 msg += "\n  數字一樣、型別不一樣：沒有引號的 120 是整數，\"120\" 是文字，120.0 是小數。"
             return msg
-        if self.mode == "expected_text":
+        if self.mode == "inputs_text" and st.get("status") == "error":
+            return st.get("error") or "正確版跑不起來。"
+        if self.mode in TEXT_MODES:
             if st.get("status") == "error":
                 return "正確版在你的帳本裡跑不起來，先確定 0-5 的環境檢查都過了（uv run check.py env）。"
             if not c.line:
@@ -1473,12 +1559,12 @@ class ChaffCheck(Check):
         self.ctx.summaries.extend(parsed.notes)
 
         n = len(checks)
-        n_count = len([c for c in checks if c.line]) if self.mode == "expected_text" else n   # expected_text：總行數那一條不算
+        n_count = len([c for c in checks if c.line]) if self.mode in TEXT_MODES else n   # expected_text：總行數那一條不算
         count_r.ok = n_count >= self.min
         if not count_r.ok:
             extra = f"（還有 {unfinished} 行有「？」沒填完）" if unfinished else ""
             marked = "；行尾標了特殊作答的不算在裡面" if marks else ""
-            if self.mode == "expected_text":
+            if self.mode in TEXT_MODES:
                 count_r.detail = f"你的預期輸出寫了 {n_count} 行，這課要至少 {self.min} 行{extra}。"
             elif self.mode == "cases":
                 marked = "；標了「已知會當掉」的不算在裡面" if marks else ""
@@ -1504,7 +1590,7 @@ class ChaffCheck(Check):
                 r.ok = bool(catchers)
                 if r.ok:
                     first = catchers[0]
-                    if self.mode == "expected_text":
+                    if self.mode in TEXT_MODES:
                         r.note = f"被第 {checks[first].line} 行抓到" if checks[first].line else "被「總行數」抓到（印出來的行數不一樣）"
                         if rows[first].get("crashed"):
                             r.note += "（這個版本跑到一半當掉了）"
@@ -1516,7 +1602,7 @@ class ChaffCheck(Check):
                     r.detail = "你的檢查在正確版上還沒有一條成立，先修好正確版那一題。"
                     slipped.append(m["hint"])
                 else:
-                    unit = {"expected_text": "行", "cases": "組案例"}.get(self.mode, "條檢查")
+                    unit = {"expected_text": "行", "inputs_text": "行", "cases": "組案例"}.get(self.mode, "條檢查")
                     r.detail = f"溜過去了：{m['hint']}" if reveal else f"溜過去了。（先寫滿 {self.min} {unit}，再告訴你溜過去的是哪一種錯）"
                     slipped.append(m["hint"])
             caught = len(self.mutants) - len(slipped)
@@ -1528,11 +1614,11 @@ class ChaffCheck(Check):
                 self.ctx.summaries.extend(f"  ・{h}" for h in slipped)
             else:
                 # 分兩行（每行 ≤68 欄，同上）
-                noun, unit = {"expected_text": ("預期輸出", "行"), "cases": ("案例", "組案例")}.get(self.mode, ("檢查", "條檢查"))
+                noun, unit = {"expected_text": ("預期輸出", "行"), "inputs_text": ("預期輸出", "行"), "cases": ("案例", "組案例")}.get(self.mode, ("檢查", "條檢查"))
                 self.ctx.summaries.append(f"你的{noun}抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去。")
                 self.ctx.summaries.append(f"  先寫滿 {self.min} {unit}，再告訴你是哪幾種。")
         else:
-            none = {"expected_text": "還沒寫預期輸出", "cases": "還沒有任何案例"}.get(self.mode, "還沒有任何檢查")
+            none = {"expected_text": "還沒寫預期輸出", "inputs_text": "還沒寫預期輸出", "cases": "還沒有任何案例"}.get(self.mode, "還沒有任何檢查")
             wheat_r.detail = f"{none}。" + (f"（有 {unfinished} 行的「？」還沒填）" if unfinished else "")
             for r in mutant_rs:
                 r.detail = f"{none}，所以壞版本都溜過去了。"

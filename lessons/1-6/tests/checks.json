@@ -1,0 +1,28 @@
+{
+  "note": "1-6 的檢查：第①圈先猜輸出（對答 8 題）和分帳機 bill.py（官方測試：check 用 subprocess 把總金額和人數餵給它，跑三次）；第②圈判斷家教對 ValueError 的解釋（對答 3 題）；第③圈 inputs.txt 和 expected.txt（chaff 的 inputs_text 模式：check 用 subprocess 把學員的 inputs.txt 餵給正確版和 3 個壞版本，不靠 shell 的 <，拿掉開頭的提示字以後一行一行比）。my_ask.md 是自評，不檢查。",
+  "checks": [
+    {"type": "answers", "id": "guess", "file": "lessons/1-6/guess.txt", "key": "answers/guess.json", "group": "第一圈"},
+    {"type": "run", "id": "bill1", "file": "lessons/1-6/bill.py", "group": "第一圈",
+     "desc": "bill.py：總金額 1450、4 個人",
+     "stdin": "1450\n4\n",
+     "expect_contains": ["每人 362 元，零頭 2 元"],
+     "hint": "total 和 people 都要用 int() 變成整數（input 交回來的是字串）；每人用 //、零頭用 %（1-4）。印出來照這個樣子：每人 362 元，零頭 2 元。改完記得存檔再跑。",
+     "missing_hint": "bill.py 應該在帳本的 lessons/1-6/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-6。"},
+    {"type": "run", "id": "bill2", "file": "lessons/1-6/bill.py", "group": "第一圈",
+     "desc": "bill.py：總金額 1000、3 個人",
+     "stdin": "1000\n3\n",
+     "expect_contains": ["每人 333 元，零頭 1 元"],
+     "hint": "每人是 total // people、零頭是 total % people，不要把數字直接寫在 print 裡。"},
+    {"type": "run", "id": "bill3", "file": "lessons/1-6/bill.py", "group": "第一圈",
+     "desc": "bill.py：總金額打 1,450（有千分位逗號）",
+     "stdin": "1,450\n4\n",
+     "expect_contains": ["每人 362 元，零頭 2 元"],
+     "hint": "int(\"1,450\") 會當掉（ValueError）：先用 1-5 的 .replace(\",\", \"\") 把逗號拿掉，再交給 int()。"},
+    {"type": "answers", "id": "ai", "file": "lessons/1-6/ai_ask.txt", "key": "answers/ai_ask.json", "group": "第二圈"},
+    {"type": "chaff", "id": "r3", "mode": "inputs_text", "student_file": "lessons/1-6/expected.txt", "inputs_file": "lessons/1-6/inputs.txt",
+     "prompts": ["品項：", "金額："],
+     "crash_hint": "需求卡說金額只會是數字（可以有千分位逗號），品項是文字：看看 inputs.txt 是不是順序寫反了，或金額寫了「元」這類的字。",
+     "reference": "reference/add.py", "mutants": "mutants/mutants.json",
+     "teacher_file": "answers/expected.txt", "teacher_inputs": "answers/inputs.txt", "min_checks": 3}
+  ]
+}

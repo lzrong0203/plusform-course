@@ -1,0 +1,7 @@
+{
+  "id": "1-6",
+  "title": "input、型別轉換，第一次認識函式呼叫",
+  "minutes": 40,
+  "fast_minutes": 8,
+  "after_start": "接下來，用 VS Code 打開帳本的 lessons/1-6：\n  1. 第一圈：guess.txt 先猜 8 題、bill.py 寫一支會問總金額和人數的分帳機\n  2. 第二圈：ai_ask.txt 判斷家教對 ValueError 的解釋；my_ask.md 拿你自己的錯誤訊息問家教（自評）\n  3. 第三圈：inputs.txt 和 expected.txt，替 AI 寫的記帳程式準備輸入和預期輸出\n做完回到課程資料夾打：uv run check.py 1-6"
+}

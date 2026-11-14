@@ -1,0 +1,25 @@
+{
+  "note": "1-6 第①圈：先猜輸出 8 題（對答）。norm_answer 會做 NFKC、拿掉空白與前後的引號、英文不分大小寫。",
+  "normalize": "text",
+  "how": "印出來的樣子（例如：2），選擇題寫 A、B 或 C",
+  "questions": [
+    {"id": "g1", "title": "len(\"午餐\")", "accept": ["2"],
+     "hint": "len 交回有幾個字。", "explain": "「午餐」兩個字，len 交回 2。"},
+    {"id": "g2", "title": "len(\"2026-11-07\")", "accept": ["10"],
+     "hint": "中間的減號也算一個字。", "explain": "八個數字加兩個減號，一共 10 個字。"},
+    {"id": "g3", "title": "int(\"120\") + 1", "accept": ["121"],
+     "hint": "int 把文字 \"120\" 變成整數 120，整數才能拿去加。", "explain": "int 交回整數 120，加 1 是 121。"},
+    {"id": "g4", "title": "int(\" 85 \") + 15", "accept": ["100"],
+     "hint": "int 收的文字，前後可以有空白，它會自己拿掉。", "explain": "int(\" 85 \") 交回 85（官方文件：前後可以有空白），加 15 是 100。"},
+    {"id": "g5", "title": "float(\"85\")", "accept": ["85.0"],
+     "hint": "float 交回小數。", "explain": "float 把 \"85\" 變成小數 85.0，印出來後面多了 .0。"},
+    {"id": "g6", "title": "\"12\" + \"3\"", "accept": ["123"],
+     "hint": "兩邊都加了引號，是兩個字串。字串用 + 是接在一起，不是算數學。", "explain": "兩個字串接在一起：123。要算 15，先用 int 變成整數。"},
+    {"id": "g7", "title": "input 交回來的", "accept": ["B"],
+     "hint": "input 交回來的，就是你打的那幾個字。", "explain": "input 交回來的一定是字串 str，就算你打的是數字。要拿去算，先用 int()。",
+     "choices": {"A": "整數 int", "B": "字串 str", "C": "小數 float"}},
+    {"id": "g8", "title": "int(\"12.5\")", "accept": ["C"],
+     "hint": "int 收的文字，要長得像整數。", "explain": "\"12.5\" 有小數點，int 看不懂，當掉：ValueError: invalid literal for int() with base 10: '12.5'。要小數用 float(\"12.5\")。",
+     "choices": {"A": "印出 12", "B": "印出 12.5", "C": "當掉（ValueError）"}}
+  ]
+}

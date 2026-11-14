@@ -372,7 +372,10 @@ def validate_lesson(lid: str, root: Path, use_env: bool, temp: dict) -> Report:
 
         teacher = d / spec["teacher_file"]
         ledger = temp.get("ledger") if spec.get("needs_ledger") else None
-        ctx, checkers = grader.build(lesson, ledger, env=env, overrides={spec["student_file"]: teacher}, only=[spec])
+        ov = {spec["student_file"]: teacher}
+        if spec.get("inputs_file") and spec.get("teacher_inputs"):   # 1-6 的 inputs_text：老師的 inputs.txt 一起換上
+            ov[spec["inputs_file"]] = d / spec["teacher_inputs"]
+        ctx, checkers = grader.build(lesson, ledger, env=env, overrides=ov, only=[spec])
         ch = checkers[0]
         parsed = ch.parse()
         if parsed.problem:
@@ -420,7 +423,10 @@ def validate_lesson(lid: str, root: Path, use_env: bool, temp: dict) -> Report:
         # ---- 4. 起點檔裡的範例檢查，在正確版上要成立 ----
         start = d / "start" / Path(spec["student_file"]).name
         if start.is_file():
-            _c2, chk2 = grader.build(lesson, ledger, env=env, overrides={spec["student_file"]: start}, only=[spec])
+            ov2 = {spec["student_file"]: start}
+            if spec.get("inputs_file"):   # 1-6 的 inputs_text：起點的 inputs.txt
+                ov2[spec["inputs_file"]] = d / "start" / Path(spec["inputs_file"]).name
+            _c2, chk2 = grader.build(lesson, ledger, env=env, overrides=ov2, only=[spec])
             p2 = chk2[0].parse()
             if p2.problem:
                 rep.bad(f"起點檔 start/{start.name} 讀不懂：{p2.problem}")
