@@ -757,6 +757,8 @@ class RunCheck(Check):
         r.ok = not problems
         if problems:
             r.detail = feed + problems[0] + hint_text
+        elif self.spec.get("time_it") == "timer":   # 1-7 的計時題：記下作答檔最後一次存檔的時間（check.py 照 timer 開始的時間算分鐘）
+            r.data["mtime"] = path.stat().st_mtime
 
 
 # ---------------- call ----------------

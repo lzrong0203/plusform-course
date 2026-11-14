@@ -1,0 +1,26 @@
+{
+  "note": "1-7 第①圈：錯誤配對 6 題（對答）。6 行最後一行都是沙盒 Python 3.13.18 真的跑出來的（製作稿 rec/src/python_3.13.18_outputs.txt）。",
+  "normalize": "text",
+  "how": "A～F 選一個",
+  "choices": {"A": "寫法看不懂", "B": "最前面多了空白", "C": "還沒有的名字", "D": "字串和數字用 + 接", "E": "內容轉不過去", "F": "除以 0"},
+  "questions": [
+    {"id": "m1", "title": "NameError: name 'pirce' is not defined", "accept": ["C"],
+     "hint": "NameError 說的是「名字」：pirce 這個名字還沒有。後面的 Did you mean 也是 Python 猜的。",
+     "explain": "NameError：用了一個還沒有的名字。這裡是 price 打成 pirce，Python 猜你要的是 price。"},
+    {"id": "m2", "title": "ZeroDivisionError: division by zero", "accept": ["F"],
+     "hint": "Zero 是零，Division 是除法。",
+     "explain": "ZeroDivisionError：除號右邊是 0。往上看是哪一個變數等於 0，它是在哪一行設的。"},
+    {"id": "m3", "title": "SyntaxError: unterminated string literal", "accept": ["A"],
+     "hint": "SyntaxError 是 Python 看不懂寫法；string literal 是加了引號的字串。",
+     "explain": "SyntaxError：字串的引號沒有成對（只打了開頭的引號）。程式一行都不會跑，錯誤訊息也沒有 Traceback 那一行。"},
+    {"id": "m4", "title": "ValueError: invalid literal for int()", "accept": ["E"],
+     "hint": "int() 收到的是字串（種類沒問題），可是 '12.5' 長得不像整數。",
+     "explain": "ValueError：種類對、內容不對。int() 收不了有小數點的字串，要小數用 float()。"},
+    {"id": "m5", "title": "TypeError: can only concatenate str (not \"int\") to str", "accept": ["D"],
+     "hint": "concatenate 是接在一起；str 是字串、int 是整數。",
+     "explain": "TypeError：種類不能這樣用。字串只能跟字串用 + 接；數字要放進 f-string，或用逗號隔開交給 print。"},
+    {"id": "m6", "title": "IndentationError: unexpected indent", "accept": ["B"],
+     "hint": "indent 是一行最前面的空白。",
+     "explain": "IndentationError：這一行最前面多了空白（unexpected indent＝沒想到這裡會有空白）。把開頭的空白刪掉。"}
+  ]
+}

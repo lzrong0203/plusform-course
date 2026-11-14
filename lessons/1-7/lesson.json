@@ -1,0 +1,11 @@
+{
+  "id": "1-7",
+  "title": "讀懂錯誤訊息：Traceback 從最下面看",
+  "minutes": 45,
+  "fast_minutes": 8,
+  "after_start": "接下來，用 VS Code 打開帳本的 lessons/1-7：\n  1. 第一圈：p1.py～p8.py 每支藏了一個錯，先猜、再跑、再修；match.txt 錯誤配對 6 題\n  2. 第二圈：ai_help.txt 對照兩種求救；my_help.md 照四樣東西問家教（自評）\n  3. 第三圈（計時，關掉 AI）：準備好了再到課程資料夾打 uv run check.py timer 1-7\n做完回到課程資料夾打：uv run check.py 1-7",
+  "timed": {
+    "shop": {"label": "計時題 shop.py", "standard": 10, "from": "timer", "dir": "start_timed"}
+  },
+  "timer_text": "關掉 AI，打開帳本的 lessons/1-7/shop.py（20 行）：先跑一次，只靠錯誤訊息找出錯在哪裡，修好、存檔，再跑一次。\n做完回到課程資料夾打：uv run check.py 1-7\n計時算到你最後一次存檔 shop.py：只記錄、不扣分。"
+}

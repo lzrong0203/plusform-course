@@ -1,0 +1,30 @@
+# 1-7 第①圈：錯誤配對（對答 6 題）
+#
+# 下面 6 行，是 6 支小程式各自當掉時，錯誤訊息的「最後一行」。
+# 從最後一行看：冒號前面是錯誤的種類，後面是 Python 說的原因。
+# 每一題選一個最可能的原因，在「答：」後面寫 A～F，存檔。
+#
+#   A. 寫法 Python 看不懂：括號或引號沒有成對，或打成全形的符號
+#   B. 這一行的最前面多了空白
+#   C. 用了一個還沒有的名字：打錯字，或還沒設定就先用
+#   D. 字串和數字直接用 + 接在一起
+#   E. 種類對，可是內容轉不過去，像 int("12.5")
+#   F. 除以 0
+
+第 1 題：NameError: name 'pirce' is not defined. Did you mean: 'price'?
+答：
+
+第 2 題：ZeroDivisionError: division by zero
+答：
+
+第 3 題：SyntaxError: unterminated string literal (detected at line 2)
+答：
+
+第 4 題：ValueError: invalid literal for int() with base 10: '12.5'
+答：
+
+第 5 題：TypeError: can only concatenate str (not "int") to str
+答：
+
+第 6 題：IndentationError: unexpected indent
+答：

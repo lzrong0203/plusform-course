@@ -1,0 +1,13 @@
+{
+  "note": "回顧題：學員通過這課以後，往後第 2 課和第 5 課的 check 會各帶一題。",
+  "questions": [
+    {"id": "r1", "q": "錯誤訊息一大段，要先看哪裡？\nA. 第一行 Traceback (most recent call last)\nB. 最後一行（錯誤的種類和原因）\nC. 中間的 File 那一行\n（寫 A、B 或 C）",
+     "accept": ["B"], "hint": "most recent call last 的意思是「最近發生的放在最後面」。", "explain": "從最下面看：最後一行是哪一種錯、原因是什麼；往上一行的 ^ 指出這一行的哪一段；再往上是出事的那一行程式和 File、第幾行。",
+     "choices": {"A": "第一行", "B": "最後一行", "C": "File 那一行"}},
+    {"id": "r2", "q": "一支程式第 1 行 print(\"早餐\")，第 3 行用了還沒設定的名字（NameError）。跑起來，「早餐」會印出來嗎？（寫「會」或「不會」）",
+     "accept": ["會"], "hint": "NameError 是寫法看得懂、跑到那一行才發現的錯。", "explain": "會。NameError、TypeError、ValueError、ZeroDivisionError 都是跑到那一行才當掉，前面的行已經跑了；只有 SyntaxError、IndentationError 是一行都不跑。"},
+    {"id": "r3", "q": "Traceback 說第 5 行 int(amount) 當掉：ValueError: invalid literal for int() with base 10: '午餐'。第 5 行看起來沒寫錯，接下來要看哪裡？\nA. 第 5 行再看一次就好\nB. 往上找 amount 是哪一行設的、為什麼會是午餐\nC. 把 int 拿掉\n（寫 A、B 或 C）",
+     "accept": ["B"], "hint": "錯誤訊息引號裡的，是 int() 實際收到的內容。", "explain": "錯誤出現的地方，不一定是要改的地方。int() 收到「午餐」，表示 amount 在前面就拿錯了：往上找它是哪一行設的（p8 是第 4 行的索引寫錯）。",
+     "choices": {"A": "第 5 行再看一次", "B": "往上找 amount 是哪一行設的", "C": "把 int 拿掉"}}
+  ]
+}

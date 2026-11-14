@@ -173,14 +173,14 @@ def check_concepts(rep: Report, lesson: grader.Lesson, order: list[str]) -> None
 
     scanned = 0
     bad_before = len(rep.problems)
-    for folder in ("reference", "mutants", "start", "answers"):
+    for folder in ("reference", "mutants", "start", "start_timed", "answers"):   # start_timed：1-7 起的計時題（check.py timer 複製）
         files = sorted((d / folder).glob("*")) if (d / folder).is_dir() else []
         for f in files:
             if f.suffix == ".py":
                 try:
                     used = concept_map.concepts_in_source(f.read_text(encoding="utf-8"))
                 except SyntaxError as exc:
-                    if folder == "start":  # 起點檔可以故意壞掉（例如 0-C 要學員修好的 main.py）
+                    if folder in ("start", "start_timed"):  # 起點檔可以故意壞掉（例如 0-C 要學員修好的 main.py）
                         rep.note(f"起點檔 start/{f.name} 第 {exc.lineno} 行故意有語法錯誤，這個檔不做概念檢查")
                     else:
                         rep.bad(f"{folder}/{f.name} 第 {exc.lineno} 行有語法錯誤（{exc.msg}）")
@@ -309,12 +309,14 @@ def validate_lesson(lid: str, root: Path, use_env: bool, temp: dict) -> Report:
     for rel, specs in by_file.items():
         start = d / "start" / Path(rel).name
         if not start.is_file():
+            start = d / "start_timed" / Path(rel).name   # 1-7 的計時題
+        if not start.is_file():
             continue
         out = grader.evaluate(lesson, None, env=local, overrides={rel: start}, only=specs)
         if out.results and all(r.ok for r in out.results):
-            rep.bad(f"起點檔 start/{start.name} 一開始就通過全部 {len(specs)} 項官方測試：學員什麼都不用做")
+            rep.bad(f"起點檔 {start.relative_to(d).as_posix()} 一開始就通過全部 {len(specs)} 項官方測試：學員什麼都不用做")
         else:
-            rep.ok(f"起點檔 start/{start.name} 還沒通過官方測試（學員要自己寫）")
+            rep.ok(f"起點檔 {start.relative_to(d).as_posix()} 還沒通過官方測試（學員要自己寫）")
 
     # ---- 1、2. 壞版本 ----
     for spec in lesson.checks:

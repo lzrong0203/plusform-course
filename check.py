@@ -57,6 +57,7 @@ HELP = """\
   uv run check.py setup ~/code/ledger   記住你的帳本在哪裡（只要做一次）
   uv run check.py start 1-9             把這課的起點檔複製到帳本（已經有的檔案不會蓋掉）
   uv run check.py 1-9                   檢查這一課（課號像 0-4、0-5、1-9；Lv0 關卡打 lv0）
+  uv run check.py timer 1-7             計時題：準備好了再打，它把題目複製到帳本、開始計時（只記錄、不扣分）
   uv run check.py status                看進度、到期的回顧題、你猜得準不準、看得懂進度條
   uv run check.py review                作答今天到期的回顧題
   uv run check.py note 一句話           寫下「下次我會怎麼估」
@@ -309,6 +310,54 @@ def cmd_start(args: list[str], opts: dict) -> int:
     return 0
 
 
+
+def cmd_timer(args: list[str], opts: dict) -> int:
+    """計時題（1-7 起）：準備好了才打。把 lesson.json timed 裡 from＝timer 的題目檔複製到帳本、記下開始的時間；
+    已經開始過的不重算（計時從第一次打 timer 算起）。結束時間是作答檔最後一次存檔的時間，check 全對時印出來。"""
+    if not args:
+        print("要告訴我是哪一課，例如：uv run check.py timer 1-7")
+        return 2
+    lesson = find_lesson(args[0])
+    if lesson is None:
+        return 1
+    rules = {k: v for k, v in lesson.meta.get("timed", {}).items() if v.get("from") == "timer"}
+    if not rules:
+        print(f"{lesson.id} 沒有計時題。")
+        return 2
+    ledger = get_ledger()
+    if ledger is None:
+        return 1
+    records = state.Records(ledger)
+    prog = records.progress()
+    info = prog["lessons"].setdefault(lesson.id, {})
+    timers = info.setdefault("timers", {})
+    t = state.now()
+    print(f"━━ {lesson.id}  計時題 ━━")
+    for cid, rule in rules.items():
+        src = lesson.dir / rule.get("dir", "start_timed")
+        for path in sorted(src.rglob("*")) if src.is_dir() else []:
+            if path.is_dir() or path.name.startswith("."):
+                continue
+            target = ledger / "lessons" / lesson.id / path.relative_to(src)
+            rel = target.relative_to(ledger).as_posix()
+            if target.exists():
+                print(f"  = {rel}（已經有了，沒有蓋掉）")
+            else:
+                copy_start_file(path, target)
+                print(f"  + {rel}")
+        if cid in timers:
+            began = state.parse_time(timers[cid])
+            print(f"計時從 {began.month}/{began.day} {began:%H:%M} 就開始了（第一次打 timer 的時間），這次不重新算。")
+        else:
+            timers[cid] = t.isoformat(timespec="seconds")
+            print(f"開始計時：{t:%H:%M}。")
+    records.save_progress(prog)
+    after = lesson.meta.get("timer_text")
+    if after:
+        print()
+        print(after)
+    return 0
+
 # ====================================================================
 # 行為 1：先猜會過幾題
 # ====================================================================
@@ -418,10 +467,29 @@ def record_timing(lesson: grader.Lesson, outcome: grader.Outcome, info: dict) ->
     timed = lesson.meta.get("timed", {})
     for r in outcome.results:
         rule = timed.get(r.id)
-        if not rule or not r.ok or "minutes" not in r.data:
+        if not rule or not r.ok:
             continue
         mine = info.setdefault("timed", {})
         if r.id in mine:
+            continue
+        if rule.get("from") == "timer":   # 1-7 起的計時題：從打 timer 那一刻，算到最後一次存檔（只記錄、不扣分）
+            if "mtime" not in r.data:
+                continue
+            started = info.get("timers", {}).get(r.id)
+            if not started:
+                print(f"{rule.get('label', r.id)}：沒有先打 uv run check.py timer {lesson.id}，這次沒有計時（不影響過關）。")
+                continue
+            minutes = max(0.0, (r.data["mtime"] - state.parse_time(started).timestamp()) / 60)
+            mine[r.id] = round(minutes, 1)
+            standard = rule.get("standard")
+            line = f"{rule.get('label', r.id)}：照檔案時間算，從開始計時到最後一次存檔，大約花了{grader.spaced(fmt_minutes(minutes))}"
+            if standard:
+                line += f"（參考是 {standard} 分鐘內）。"
+                line += "做到了！" if minutes <= standard else "這次先記下來，多練幾次就會變快。"
+            print(line)
+            print("  （只記錄、不扣分。剛剛如果有用 AI，這個時間就不準：下次關掉 AI 再計一次。）")
+            continue
+        if "minutes" not in r.data:
             continue
         minutes = r.data["minutes"]
         mine[r.id] = minutes
@@ -900,6 +968,8 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_review(rest)
         if cmd == "start":
             return cmd_start(rest, opts)
+        if cmd == "timer":
+            return cmd_timer(rest, opts)
         if cmd == "note":
             return cmd_note(rest)
         return cmd_lesson(cmd, opts)
