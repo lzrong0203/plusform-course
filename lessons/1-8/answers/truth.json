@@ -1,0 +1,15 @@
+{
+  "note": "1-8 第①圈：真值表 4 題（對答）。remind = over and not weekend。norm_answer 會做 NFKC、拿掉空白與前後的引號、英文不分大小寫。",
+  "normalize": "text",
+  "how": "True 或 False",
+  "questions": [
+    {"id": "t1", "title": "over True、weekend True", "accept": ["False"],
+     "hint": "先算 not weekend：not True 是什麼？再跟 over 用 and 接起來。", "explain": "not True 是 False；True and False 是 False：週末不提醒。"},
+    {"id": "t2", "title": "over True、weekend False", "accept": ["True"],
+     "hint": "not False 是什麼？兩邊都成立的時候，and 是什麼？", "explain": "not False 是 True；True and True 是 True：超過預算又不是週末，要提醒。"},
+    {"id": "t3", "title": "over False、weekend True", "accept": ["False"],
+     "hint": "and 只要有一邊是 False，就是 False。", "explain": "over 是 False，and 的左邊就不成立，整個是 False（not True 也是 False）。"},
+    {"id": "t4", "title": "over False、weekend False", "accept": ["False"],
+     "hint": "and 的左邊 over 是什麼？", "explain": "not False 是 True，可是 over 是 False：False and True 是 False，沒超過預算就不提醒。"}
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "1-8",
+  "title": "比較、邏輯與 assert",
+  "minutes": 45,
+  "fast_minutes": 8,
+  "after_start": "接下來，用 VS Code 打開帳本的 lessons/1-8：\n  1. 第一圈：truth.txt 填真值表 4 題；over.py 寫「超過預算了嗎」、weekend.py 寫「是週末嗎」\n  2. 第二圈：ai_check.txt 照家教對短路求值的說法猜 3 題；my_test.md 自己想例子驗證它（自評）\n  3. 第三圈：checks_budget.py 寫 5 條 assert，呼叫課程寫好的 over_budget()（budget.py 不用改）\n做完回到課程資料夾打：uv run check.py 1-8"
+}

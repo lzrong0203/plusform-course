@@ -226,6 +226,10 @@ def op_asserts(req: dict) -> dict:
                     test = stmt.test
                     if isinstance(test, ast.Compare) and len(test.ops) == 1 and isinstance(test.ops[0], ast.Eq):
                         rec["got"] = _value_text(test.left, ns, filename)
+                    elif req.get("got_bare"):   # 1-8 的 bool_hints：assert f(...) 或 assert not f(...)，報出 f(...) 交回什麼
+                        inner = test.operand if isinstance(test, ast.UnaryOp) and isinstance(test.op, ast.Not) else test
+                        if isinstance(inner, ast.Call):
+                            rec["got"] = _value_text(inner, ns, filename)
                 except BaseException as exc:  # noqa: BLE001
                     rec.update(status="error", error=short_error(exc))
             entry["asserts"].append(rec)

@@ -1,0 +1,23 @@
+# 1-8 第①圈：填真值表。先不要跑，用眼睛看：每一題的 remind 是 True 還是 False？
+#
+#   and：兩邊都成立，才成立（只要有一邊是 False，就是 False）
+#   or ：只要有一邊成立，就成立（兩邊都是 False，才是 False）
+#   not：反過來（not True 是 False，not False 是 True）
+#
+# 熊的提醒規則：超過預算，而且不是週末，才提醒。寫成程式是：
+#   remind = over and not weekend
+#   （over：超過預算了嗎　weekend：是週末嗎。not 先算，再算 and）
+#
+# 在「答：」後面寫 True 或 False（第一個字母大寫，不加引號），存檔。猜完可以自己跑跑看，再對一對。
+
+第 1 題：over = True、weekend = True，remind 是？
+答：
+
+第 2 題：over = True、weekend = False，remind 是？
+答：
+
+第 3 題：over = False、weekend = True，remind 是？
+答：
+
+第 4 題：over = False、weekend = False，remind 是？
+答：

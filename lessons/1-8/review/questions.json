@@ -1,0 +1,14 @@
+{
+  "note": "回顧題：學員通過這課以後，往後第 2 課和第 5 課的 check 會各帶一題。",
+  "questions": [
+    {"id": "r1", "q": "spent = 1000、budget = 1000。print(spent > budget) 印出什麼？\nA. True\nB. False\nC. 錯誤訊息\n（寫 A、B 或 C）",
+     "accept": ["B"], "hint": "兩個一樣大的時候，「大於」成立嗎？", "explain": "大於 > 是「比它大」，一樣大不算，印出 False。大於等於 >= 才會是 True。",
+     "choices": {"A": "True", "B": "False", "C": "錯誤訊息"}},
+    {"id": "r2", "q": "哪一個是在「問」x 跟 5 一不一樣？\nA. x = 5\nB. x == 5\nC. 兩個都是\n（寫 A、B 或 C）",
+     "accept": ["B"], "hint": "一個等號在做什麼？（1-2 學過）", "explain": "一個等號是把右邊放進左邊（1-2 的變數）；兩個等號是問兩邊一不一樣，交回 True 或 False。",
+     "choices": {"A": "x = 5", "B": "x == 5", "C": "兩個都是"}},
+    {"id": "r3", "q": "assert over_budget(800, 1000) == False 成立的時候，跑起來畫面會怎樣？\nA. 印出 True\nB. 什麼都不印\nC. 跳出 AssertionError\n（寫 A、B 或 C）",
+     "accept": ["B"], "hint": "assert 什麼時候才會出聲？", "explain": "assert 成立的時候什麼都不會發生；不成立才會跳出 AssertionError，最後一行往上看是第幾行那一條。",
+     "choices": {"A": "印出 True", "B": "什麼都不印", "C": "跳出 AssertionError"}}
+  ]
+}

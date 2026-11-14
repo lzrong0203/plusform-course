@@ -1,0 +1,16 @@
+{
+  "note": "1-8 第②圈：照家教對短路求值的說法猜，再用 1 / 0 自己驗證（對答，跟影片一樣）。",
+  "normalize": "text",
+  "how": "A、B 或 C",
+  "questions": [
+    {"id": "a1", "title": "False and 1 / 0", "accept": ["A"],
+     "hint": "and 的左邊已經是 False，整個還有可能是 True 嗎？", "explain": "左邊是 False，整個一定是 False，右邊的 1 / 0 根本沒有算，所以不會當掉，印出 False。",
+     "choices": {"A": "印出 False", "B": "當掉（ZeroDivisionError）", "C": "印出 True"}},
+    {"id": "a2", "title": "True and 1 / 0", "accept": ["C"],
+     "hint": "and 的左邊是 True 的時候，答案決定了嗎？右邊要不要算？", "explain": "左邊是 True，還不知道整個是不是成立，要算右邊；1 / 0 一算就當掉：ZeroDivisionError: division by zero。這一題證明右邊「該算的時候真的會算」。",
+     "choices": {"A": "印出 True", "B": "印出 False", "C": "當掉（ZeroDivisionError）"}},
+    {"id": "a3", "title": "順序反過來", "accept": ["B"],
+     "hint": "and 從左邊開始算。這次最左邊是什麼？", "explain": "and 先算左邊：spent / budget 是除以 0，還沒輪到 budget > 0 就當掉了。所以 AI 常寫成先檢查 budget > 0，再除。順序很重要。",
+     "choices": {"A": "印出 False", "B": "當掉（ZeroDivisionError）", "C": "印出 True"}}
+  ]
+}

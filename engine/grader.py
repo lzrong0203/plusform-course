@@ -1014,6 +1014,8 @@ class ChaffCheck(Check):
                         kind = None
                         for ln in range(stmt.lineno, (stmt.end_lineno or stmt.lineno) + 1):
                             kind = kind or _mark_in(comments.get(ln, ""))
+                        if self.spec.get("no_marks"):   # 1-8：還沒教特殊作答，行尾的註解一律當成一般的檢查
+                            kind = None
                         if kind:
                             marks.append(Mark(stmt.lineno, kind, text, stmt))
                         else:
@@ -1334,12 +1336,15 @@ class ChaffCheck(Check):
     def run_assert_version(self, impl: Path, lines: list[int]) -> dict[int, dict]:
         """跑一個版本，回傳 {行號: 結果}。卡住或印太多被收掉的，也照進度算出每一行的結果。"""
         timeout = self.version_timeout()
-        reply = self.ctx.env.runner_raw({
+        req = {
             "op": "asserts",
             "checks_file": str(self.ctx.student(self.spec["student_file"])),
             "module": self.spec["module"],
             "impl": str(impl),
-        }, timeout=timeout)
+        }
+        if self.spec.get("bool_hints"):   # 1-8：只寫 assert over_budget(...)／assert not over_budget(...) 也報出交回的值
+            req["got_bare"] = True
+        reply = self.ctx.env.runner_raw(req, timeout=timeout)
         data = reply.result
         if data is not None:
             if "runner_error" in data:
@@ -1473,6 +1478,7 @@ class ChaffCheck(Check):
         if self.mode == "assert":
             msg = f"第 {c.line} 行：{c.text}\n  "
             err = st.get("error") or ""
+            marks_ok = not self.spec.get("no_marks")   # 1-8：還沒教特殊作答，不提「# 已知會當掉」「# 需求有問題」
             if st.get("not_run"):
                 return msg + "前面卡住了，這一行沒有跑到。"
             if st.get("stuck"):
@@ -1481,11 +1487,29 @@ class ChaffCheck(Check):
                 if "NameError" in err and not self.has_import:
                     return msg + (f"程式不認得這個名字（{err}）。"
                                   f"最上面那行 from {self.spec.get('module')} import … 要留著，不要刪掉。")
+                if self.spec.get("bool_hints"):
+                    m = re.search(r"NameError: name '(\w+)' is not defined", err)
+                    if m and m.group(1).lower() in ("true", "false", "ture", "flase"):
+                        return msg + (f"程式不認得 {m.group(1)} 這個名字。True、False 第一個字母要大寫，"
+                                      "不加引號（1-3 學過）。")
+                if not marks_ok:
+                    return msg + f"在正確版上就會當掉（{err}）。看看這一行是不是打錯字，或括號裡少放了東西。"
                 return (msg + f"在正確版上就不成立，而且會當掉（{err}）。\n"
                         "  如果你本來就是要測「正確版也會當掉」的情況，在這行最後加上「# 已知會當掉」。")
             msg += "在正確版上就不成立"
             if st.get("got") is not None:
-                msg += f"（正確版算出來是{show(st['got'])}）"
+                if self.spec.get("bool_hints") and c.stmt is not None and not isinstance(c.stmt.test, ast.Compare):
+                    call = c.stmt.test.operand if isinstance(c.stmt.test, ast.UnaryOp) else c.stmt.test
+                    msg += f"（{ast.unparse(call)} 在正確版交回 {show(st['got'])}）"
+                else:
+                    msg += f"（正確版算出來是{show(st['got'])}）"
+            if self.spec.get("bool_hints") and c.stmt is not None and isinstance(c.stmt.test, ast.Compare):
+                right = c.stmt.test.comparators[0]
+                if isinstance(right, ast.Constant) and isinstance(right.value, str) and right.value.strip().lower() in ("true", "false"):
+                    return msg + (f"。\n  True、False 不加引號：加了引號的 \"{right.value}\" 是文字（1-3 學過），"
+                                  "跟 True、False 永遠不一樣。")
+            if not marks_ok:
+                return msg + "。\n  正確版不會錯，所以是這條檢查要改：再對一次需求卡（剛好等於的時候算哪一邊？）。"
             return msg + "。\n  正確版不會錯，所以是這條檢查要改；如果你覺得是需求沒講清楚，在行尾加上「# 需求有問題」。"
         if self.mode == "cases":
             inp, exp = self._cases[c.line]

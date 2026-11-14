@@ -1,0 +1,20 @@
+# 1-8 第②圈：用你自己的例子，驗證家教說得對不對（對答）
+#
+# 影片裡，熊看到這一行沒有當掉（budget 是 0，右邊明明會除以 0）：
+#   print(budget > 0 and spent / budget > 0.8)
+# 熊問家教為什麼，家教說：and 先看左邊，左邊已經是 False，整個一定是 False，右邊就不算了（這叫短路求值；完整的對話在 補充.md）。
+# 熊不是直接相信，而是用 1 / 0 自己試：1 / 0 只要真的算了，就會當掉（ZeroDivisionError，1-7 學過）。
+#
+# 先不要跑，照家教的說法猜，寫 A、B 或 C，存檔。猜完可以自己跑跑看，再對一對。
+
+第 1 題：print(False and 1 / 0) 會怎樣？
+  A. 印出 False　　B. 當掉（ZeroDivisionError）　　C. 印出 True
+答：
+
+第 2 題：print(True and 1 / 0) 會怎樣？
+  A. 印出 True　　B. 印出 False　　C. 當掉（ZeroDivisionError）
+答：
+
+第 3 題：budget 是 0。把順序反過來，寫成 print(spent / budget > 0.8 and budget > 0)，會怎樣？
+  A. 印出 False　　B. 當掉（ZeroDivisionError）　　C. 印出 True
+答：
