@@ -20,7 +20,7 @@ B. 合計（`total.py`）：果凍兔今天花了三筆：果汁 50 元、晚餐
 今天花了 205 元
 ```
 
-影片裡熊的錢包在 `wallet.py`，可以自己跑跑看，跟你畫的追蹤表對一對。
+影片裡熊的錢包在 `wallet.py`、熊寫的合計在 `today.py`（只有每一步的註解，可以跟著影片打），都可以自己跑跑看，跟你畫的追蹤表對一對。
 
 **第②圈：判斷 AI 的意見（`ai_review.txt`）。** 熊把影片裡的合計程式拿給 AI 看，AI 回了 4 則意見（課程準備的範例示意），其中有的說錯了。每一則判成「採用、不採用、要查證」，寫一句理由，再對答案。最後挑一則寫你的第一張「判讀紀錄」（`record.md`，自評，不檢查）：AI 說了什麼、你查了什麼、你的決定、理由。
 
@@ -56,7 +56,7 @@ git pull
 uv run check.py start 1-2
 ```
 
-它會把起點檔複製到你的帳本 `lessons/1-2/`：`wallet.py`、`trace.txt`、`total.py`、`ai_review.txt`、`record.md`、`expected.txt`。
+它會把起點檔複製到你的帳本 `lessons/1-2/`：`wallet.py`、`today.py`、`trace.txt`、`total.py`、`ai_review.txt`、`record.md`、`expected.txt`。
 
 用 VS Code 打開帳本，寫完存檔，在 VS Code 下面的終端機（帳本資料夾）自己跑跑看：
 

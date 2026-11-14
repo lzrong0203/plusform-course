@@ -3,5 +3,5 @@
   "title": "變數：給資料取名字",
   "minutes": 40,
   "fast_minutes": 8,
-  "after_start": "接下來，用 VS Code 打開帳本的 lessons/1-2：\n  1. 第一圈：trace.txt 追蹤表 6 題、total.py 算果凍兔三筆花費的合計（wallet.py 是影片裡的錢包，可以自己跑跑看）\n  2. 第二圈：ai_review.txt 判斷 4 則 AI 意見；record.md 寫你的第一張判讀紀錄（自評，不檢查）\n  3. 第三圈：expected.txt 寫下果凍兔收據應該印出的樣子\n做完回到課程資料夾打：uv run check.py 1-2"
+  "after_start": "接下來，用 VS Code 打開帳本的 lessons/1-2：\n  1. 第一圈：trace.txt 追蹤表 6 題、total.py 算果凍兔三筆花費的合計（wallet.py 是影片裡的錢包、today.py 可以跟著影片打）\n  2. 第二圈：ai_review.txt 判斷 4 則 AI 意見；record.md 寫你的第一張判讀紀錄（自評，不檢查）\n  3. 第三圈：expected.txt 寫下果凍兔收據應該印出的樣子\n做完回到課程資料夾打：uv run check.py 1-2"
 }
