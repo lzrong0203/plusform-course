@@ -10,6 +10,8 @@ A. 猜型別（`types.txt`）：4 題，先不要跑，用眼睛看每一行 `pr
 
 B. 一筆帳（`entry.py`）：把三行的 `？` 換成對的資料，存檔再跑。
 
+C. 果凍兔的午餐加飲料（`lunch.py`，不檢查）：先跑 `uv run lessons/1-3/lunch.py` 看錯誤訊息的最後一行，再把午餐的引號拿掉，跑出 120。
+
 | 名字 | 是什麼 | 要用的型別 |
 |---|---|---|
 | `amount` | 金額 | 整數元 `int`（不加引號、不加小數點） |
@@ -50,7 +52,7 @@ git pull
 uv run check.py start 1-3
 ```
 
-它會把起點檔複製到你的帳本 `lessons/1-3/`：`types.txt`、`entry.py`、`my_words.md`、`cases.txt`。
+它會把起點檔複製到你的帳本 `lessons/1-3/`：`types.txt`、`entry.py`、`my_words.md`、`cases.txt`，還有影片裡果凍兔的 `lunch.py`（跑跑看會出現什麼錯誤，不檢查）。
 
 用 VS Code 打開帳本，寫完存檔，在 VS Code 下面的終端機（帳本資料夾）自己跑跑看：
 
