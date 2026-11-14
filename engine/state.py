@@ -106,6 +106,11 @@ class Records:
                 "不要刪；刪掉的話進度就不見了。\n",
                 encoding="utf-8",
             )
+        # 0-7 起帳本是 git 存放庫：進度紀錄每跑一次 check.py 就會變，不放進存檔點（不然原始碼控制一直冒出改動，
+        # 按 Discard 也可能把進度退回去）。跟 uv 在 .venv 裡放的 .gitignore 一樣，只寫一個 *。
+        ignore = self.dir / ".gitignore"
+        if not ignore.exists():
+            ignore.write_text("# check.py 的進度紀錄不放進 git 的存檔點\n*\n", encoding="utf-8")
 
     # ---------- progress.json ----------
     def progress(self) -> dict:
