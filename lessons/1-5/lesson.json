@@ -3,5 +3,5 @@
   "title": "字串：索引、切片、方法、f-string",
   "minutes": 40,
   "fast_minutes": 8,
-  "after_start": "接下來，用 VS Code 打開帳本的 lessons/1-5：\n  1. 第一圈：guess.txt 先猜 8 題、receipt.py 排出收據的一行\n  2. 第二圈：ai_quiz.txt 判斷家教出的題目；my_quiz.md 請家教出題（自評）\n  3. 第三圈：cases.txt 替拆帳機寫至少 6 組案例\n做完回到課程資料夾打：uv run check.py 1-5"
+  "after_start": "接下來，用 VS Code 打開帳本的 lessons/1-5：\n  1. 第一圈：guess.txt 先猜 8 題、receipt.py 排出收據的一行（table.py 跑跑看）\n  2. 第二圈：ai_quiz.txt 判斷家教出的題目；my_quiz.md 請家教出題（自評）\n  3. 第三圈：cases.txt 替拆帳機寫至少 6 組案例\n做完回到課程資料夾打：uv run check.py 1-5"
 }
