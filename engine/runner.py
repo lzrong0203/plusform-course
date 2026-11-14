@@ -5,7 +5,7 @@ check.py 把要做的事用 JSON 從 stdin 傳進來（裡面有一個每次都�
 學員程式自己 print 的東西會被丟掉，不會混進結果，也不會把記憶體吃光。
 
 做這幾件事：
-- call：載入一個 .py 檔，呼叫裡面的函式，比對回傳值
+- call：載入一個 .py 檔，呼叫裡面的函式，比對回傳值（strict_type：連型別一起比，1-3 的案例表用）
 - load：只載入一個 .py 檔，看會不會一載入就出錯（老師端驗證壞版本用）
 - asserts：把學員寫的 assert 一條一條拿去跑「一個」版本（正確版或某一個壞版本）。
   每個版本各開一個程序跑，版本之間不會互相影響；一個版本卡住，也不會拖累別的版本。
@@ -145,7 +145,10 @@ def op_call(req: dict) -> dict:
         try:
             with quiet():
                 got = func(*case.get("args", []))
-            out["cases"].append({"ok": got == case["expect"], "got": got if _jsonable(got) else repr(got)})
+            ok = got == case["expect"]
+            if req.get("strict_type"):   # 1-3 的 cases：型別也要一樣（120、120.0、"120" 都不同；True 也不算 1）
+                ok = ok and type(got) is type(case["expect"])
+            out["cases"].append({"ok": ok, "got": got if _jsonable(got) else repr(got), "type": type(got).__name__})
         except BaseException as exc:  # noqa: BLE001
             out["cases"].append({"ok": False, "error": short_error(exc), "line": error_line(exc, path)})
     return out

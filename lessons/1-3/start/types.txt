@@ -1,0 +1,17 @@
+# 1-3 第①圈：猜型別。先不要跑，用眼睛看：每一行 print(type(…)) 會印出哪一種型別？
+#
+# type() 印出來長這樣：<class 'int'>。只要寫引號裡面那個字就好，例如：int
+# 可以寫的有：int（整數）、float（小數）、str（文字）、bool（True／False）、NoneType（None）
+# 在「答：」後面寫，存檔。
+
+第 1 題：print(type(-0.5))
+答：
+
+第 2 題：print(type("35"))
+答：
+
+第 3 題：print(type(False))
+答：
+
+第 4 題：print(type(0))
+答：

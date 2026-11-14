@@ -1,0 +1,23 @@
+{
+  "note": "1-3 的檢查：第①圈猜型別（對答 4 題）和一筆帳 entry.py（官方測試 3 項）；第③圈替課程的 to_yuan() 寫案例表（chaff 的 cases 模式：連型別一起比）。第②圈是自評，不檢查。",
+  "checks": [
+    {"type": "answers", "id": "types", "file": "lessons/1-3/types.txt", "key": "answers/types.json"},
+    {"type": "run", "id": "entry-amount", "file": "lessons/1-3/entry.py",
+     "desc": "一筆帳：金額 amount 是整數 int",
+     "expect_regex": ["\\A[^\\n]*\\n<class 'int'>(\\n|\\Z)"],
+     "hint": "金額用整數元：直接寫數字，不加引號、不加小數點，例如 amount = 120。"},
+    {"type": "run", "id": "entry-note", "file": "lessons/1-3/entry.py",
+     "desc": "一筆帳：備註 note 是文字 str",
+     "expect_regex": ["\\A[^\\n]*\\n[^\\n]*\\n<class 'str'>(\\n|\\Z)"],
+     "hint": "備註是文字：前後加引號，例如 note = \"午餐\"。"},
+    {"type": "run", "id": "entry-receipt", "file": "lessons/1-3/entry.py",
+     "desc": "一筆帳：還沒填的發票號碼 receipt 是 None",
+     "expect_regex": ["\\A[^\\n]*\\n[^\\n]*\\n[^\\n]*\\n<class 'NoneType'>(\\n|\\Z)"],
+     "hint": "還沒填的用 None：N 大寫、不加引號（加了引號就變成文字）。"},
+    {"type": "chaff", "id": "r3", "mode": "cases", "student_file": "lessons/1-3/cases.txt",
+     "module": "to_yuan", "func": "to_yuan", "input_type": "str",
+     "reference": "reference/to_yuan.py", "mutants": "mutants/mutants.json",
+     "teacher_file": "answers/cases.txt", "special": "answers/special.json",
+     "min_checks": 4, "min_marks": 1}
+  ]
+}

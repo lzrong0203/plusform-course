@@ -855,6 +855,67 @@ class Parsed:
 
 
 NOT_RUN = {"status": "error", "error": "沒有跑到（前面卡住了）", "not_run": True}
+CHAFF_NOUN = {"expected_text": "預期輸出", "cases": "案例"}   # 總結那一行的名詞（assert／其他模式是「檢查」）
+
+CURLY_QUOTES = "“”‘’「」『』〝〞＂＇"
+ARROWS = ("->", "→", "=>")
+TYPE_LABEL = {"int": "整數", "float": "小數", "str": "文字", "bool": "布林", "NoneType": "沒有值"}
+
+
+def split_case_line(raw: str) -> tuple[str, str, str | None]:
+    """cases 的一行拆成（程式那一段, 行尾註解, 用到的中文引號）。引號裡的 # 不算註解；引號外面的字做 NFKC（全形箭頭、全形空白）。"""
+    code, quote, i = [], None, 0
+    text = raw.rstrip("\r\n")
+    while i < len(text):
+        ch = text[i]
+        if quote:
+            code.append(ch)
+            if ch == "\\" and i + 1 < len(text):
+                code.append(text[i + 1])
+                i += 1
+            elif ch == quote:
+                quote = None
+        elif ch in "\"'":
+            quote = ch
+            code.append(ch)
+        elif ch == "#":
+            return "".join(code), text[i:], None
+        elif ch in CURLY_QUOTES:
+            return "".join(code), "", ch
+        else:
+            code.append(unicodedata.normalize("NFKC", ch))
+        i += 1
+    return "".join(code), "", None
+
+
+def split_arrow(code: str) -> tuple[str, str | None]:
+    """在引號外面找第一個箭頭（-> → =>），拆成左右兩邊；找不到就回（整段, None）。"""
+    quote, i = None, 0
+    while i < len(code):
+        ch = code[i]
+        if quote:
+            if ch == "\\":
+                i += 1
+            elif ch == quote:
+                quote = None
+        elif ch in "\"'":
+            quote = ch
+        else:
+            for a in ARROWS:
+                if code.startswith(a, i):
+                    return code[:i], code[i + len(a):]
+        i += 1
+    return code, None
+
+
+def typed(value, type_name: str | None = None, bare: bool = False) -> str:
+    """給新手看的值：文字加雙引號；後面標型別（整數 int／小數 float／文字 str）。bare＝只要值、不標型別。"""
+    name = type_name or ("NoneType" if value is None else type(value).__name__)
+    shown = '"' + value + '"' if isinstance(value, str) and name == "str" else repr(value) if name in ("float",) else str(value)
+    if bare:
+        return shown
+    label = TYPE_LABEL.get(name)
+    return f"{shown}（{label} {name}）" if label and name != "NoneType" else f"{shown}（{label or name}）"
 
 
 def _comments(source: str) -> dict[int, str]:
@@ -956,6 +1017,8 @@ class ChaffCheck(Check):
                             checks.append(StudentCheck(stmt.lineno, text, stmt=stmt))
             elif self.mode == "expected_text":
                 checks, unfinished = self.parse_expected_text(lines)
+            elif self.mode == "cases":
+                checks, marks, unfinished, problem = self.parse_cases(lines)
             else:
                 for i, raw in enumerate(lines, start=1):
                     line = raw.strip()
@@ -1025,8 +1088,92 @@ class ChaffCheck(Check):
             rows.append({"status": "pass" if ok else "fail", "why": "missing" if got is None else "line", "row": k + 1, "crashed": crashed})
         return rows
 
+    # ----- cases（2026-11-14，1-3 第③圈）：案例表「輸入 -> 應該變成」，check.py 把輸入丟給各版本的固定函式，連型別一起比 -----
+    def parse_cases(self, lines: list[str]) -> tuple[list[StudentCheck], list[Mark], int, str | None]:
+        """每一行：左邊是丟進函式的值（1-3 是金額文字，要加引號），右邊是應該變成的值，中間用 -> 隔開。
+        # 開頭是說明行；有「？」的行算還沒寫完；行尾的 # 已知會當掉／# 需求有問題 是特殊作答（右邊可以不寫）。
+        左右兩邊都用 ast.literal_eval 讀（整數、小數、文字、True／False、None），看不懂就回一句白話（第一個看不懂的那一行）。"""
+        checks: list[StudentCheck] = []
+        marks: list[Mark] = []
+        unfinished = 0
+        self._cases: dict[int, tuple] = {}
+        want = self.spec.get("input_type", "str")
+        for i, raw in enumerate(lines, start=1):
+            if not raw.strip() or raw.strip().startswith("#"):
+                continue
+            code, comment, bad_quote = split_case_line(raw)
+            kind = _mark_in(comment) if comment else None
+            if bad_quote:
+                return checks, marks, unfinished, (f"第 {i} 行用了中文的引號（{bad_quote}）。"
+                                                  "Python 的文字要用鍵盤上的半形引號 \" 或 '，例如 \"120\"。")
+            if not kind and ("？" in code or "?" in code):
+                unfinished += 1
+                continue
+            left, right = split_arrow(code)
+            if right is None and not kind:
+                return checks, marks, unfinished, (f"第 {i} 行少了箭頭。每一行寫成：左邊的輸入 -> 右邊應該變成的值，"
+                                                  "例如 \"120\" -> 120（箭頭是減號加大於 ->）。")
+            try:
+                inp = ast.literal_eval(left.strip())
+            except (ValueError, SyntaxError, MemoryError, RecursionError):
+                return checks, marks, unfinished, (f"第 {i} 行左邊「{left.strip()}」看不懂。"
+                                                  "左邊是要丟進轉換機的金額文字，前後要加引號，例如 \"120\"。")
+            if want == "str" and not isinstance(inp, str):
+                return checks, marks, unfinished, (f"第 {i} 行左邊的 {left.strip()} 沒有引號，是數字。"
+                                                  f"轉換機收的是文字：寫成 \"{left.strip()}\"。")
+            if kind:
+                marks.append(Mark(i, kind, raw.strip(), None))
+                self._cases[i] = (inp, None)
+                continue
+            try:
+                exp = ast.literal_eval(right.strip())
+            except (ValueError, SyntaxError, MemoryError, RecursionError):
+                return checks, marks, unfinished, (f"第 {i} 行右邊「{right.strip()}」看不懂。"
+                                                  "整數直接寫數字（120）；文字才加引號（\"120\"）；不要寫單位「元」。")
+            checks.append(StudentCheck(i, raw.strip()))
+            self._cases[i] = (inp, exp)
+        return checks, marks, unfinished, None
+
+    def case_rows(self, path: Path, lines: list[int]) -> dict[int, dict]:
+        """用一個程序跑一個版本：每一行的輸入丟進固定的函式，回傳 {行號: 結果}（連型別一起比）。"""
+        cases = [{"args": [self._cases[ln][0]], "expect": self._cases[ln][1]} for ln in lines]
+        timeout = self.version_timeout()
+        reply = self.ctx.env.runner_raw({"op": "call", "file": str(path), "module": self.spec["module"],
+                                         "func": self.spec["func"], "cases": cases, "strict_type": True}, timeout=timeout)
+        data = reply.result
+        if data is None or "runner_error" in (data or {}):
+            why = (f"跑了 {timeout:.0f} 秒還沒結束" if reply.proc.timed_out else
+                   "印了太多東西被停下來" if reply.proc.overflow else
+                   "檢查程式出錯了：" + ((data or {}).get("runner_error") or tail(reply.proc.stderr, 2).strip()))
+            return {ln: {"status": "error", "error": why, "stuck": True} for ln in lines}
+        if data.get("load_error"):
+            err = data["load_error"]
+            return {ln: {"status": "error", "error": f"這個版本載入就出錯了（{err.get('msg')}）"} for ln in lines}
+        out = {}
+        for ln, case in zip(lines, data["cases"]):
+            if "error" in case:
+                out[ln] = {"status": "error", "error": case["error"]}
+            else:
+                out[ln] = {"status": "pass" if case.get("ok") else "fail", "got": case.get("got"), "got_type": case.get("type")}
+        return out
+
     def plan(self):
         parsed = self.parse()
+        if self.mode == "cases":
+            out = [
+                self.stub("count", f"至少寫 {self.min} 組案例"),
+                self.stub("wheat", "你寫的案例，正確版都算得對"),
+            ]
+            for i, _m in enumerate(self.mutants, start=1):
+                out.append(self.stub(f"m{i}", f"抓到第 {i} 個壞版本"))
+            for mk in parsed.marks:
+                stub = self.stub(f"s{mk.line}", f"第 {mk.line} 行標了「{mk.kind}」")
+                stub.special = True
+                out.append(stub)
+            need = int(self.spec.get("min_marks", 0))
+            if need and len([m for m in parsed.marks if m.kind == "已知會當掉"]) < need:
+                out.append(self.stub("smin", f"至少 {need} 組標「已知會當掉」"))
+            return out
         if self.mode == "expected_text":
             out = [
                 self.stub("count", f"預期輸出至少寫 {self.min} 行"),
@@ -1151,6 +1298,13 @@ class ChaffCheck(Check):
                     out[name] = [{"status": "error", "error": "正確版跑不起來"} for _c in checks]
                     continue
                 out[name] = self.expected_rows(checks, self.out_rows(p.stdout), crashed)
+        elif self.mode == "cases":
+            lines = sorted([c.line for c in checks] + [m.line for m in marks])
+            for name, path in impls.items():
+                by_line = self.case_rows(path, lines)
+                out[name] = [by_line[c.line] for c in checks]
+                if name == "reference":
+                    mark_status = {m.line: by_line[m.line] for m in marks}
         elif self.mode == "path_checks":
             sc = json.loads(self.ctx.course(self.spec["scenario"]).read_text(encoding="utf-8"))
             for name, path in impls.items():
@@ -1197,6 +1351,19 @@ class ChaffCheck(Check):
             if st.get("got") is not None:
                 msg += f"（正確版算出來是{show(st['got'])}）"
             return msg + "。\n  正確版不會錯，所以是這條檢查要改；如果你覺得是需求沒講清楚，在行尾加上「# 需求有問題」。"
+        if self.mode == "cases":
+            inp, exp = self._cases[c.line]
+            call = f"{self.spec['func']}({typed(inp, bare=True)})"
+            if st.get("stuck"):
+                return f"第 {c.line} 行：{call} 在正確版上{st.get('error')}。先確定 0-5 的環境檢查都過了（uv run check.py env）。"
+            if st.get("status") == "error":
+                return (f"第 {c.line} 行：{call} 連正確版都會當掉（{st.get('error')}）。\n"
+                        "  如果你本來就是要找「正確版也會當掉」的金額，在這行最後加上「# 已知會當掉」。")
+            got = st.get("got")
+            msg = f"第 {c.line} 行：{call} 正確版變成 {typed(got, st.get('got_type'))}，你寫的是 {typed(exp)}。"
+            if got == exp or str(got) == str(exp):   # 120 對 120.0、120 對 "120"：數字一樣、型別不一樣
+                msg += "\n  數字一樣、型別不一樣：沒有引號的 120 是整數，\"120\" 是文字，120.0 是小數。"
+            return msg
         if self.mode == "expected_text":
             if st.get("status") == "error":
                 return "正確版在你的帳本裡跑不起來，先確定 0-5 的環境檢查都過了（uv run check.py env）。"
@@ -1251,12 +1418,15 @@ class ChaffCheck(Check):
             marked = "；行尾標了特殊作答的不算在裡面" if marks else ""
             if self.mode == "expected_text":
                 count_r.detail = f"你的預期輸出寫了 {n_count} 行，這課要至少 {self.min} 行{extra}。"
+            elif self.mode == "cases":
+                marked = "；標了「已知會當掉」的不算在裡面" if marks else ""
+                count_r.detail = f"你寫了 {n} 組案例，這課要至少 {self.min} 組{extra}{marked}。"
             else:
                 count_r.detail = f"你寫了 {n} 條檢查，這課要至少 {self.min} 條{extra}{marked}。"
         reveal = count_r.ok  # 寫滿最少條數以前，先不講溜過去的是哪一種錯
 
         mark_status: dict[int, dict] = {}
-        if n or (marks and self.mode == "assert"):
+        if n or (marks and self.mode in ("assert", "cases")):
             st, mark_status = self.statuses(checks, marks)
         if n:
             ref = st["reference"]
@@ -1284,23 +1454,23 @@ class ChaffCheck(Check):
                     r.detail = "你的檢查在正確版上還沒有一條成立，先修好正確版那一題。"
                     slipped.append(m["hint"])
                 else:
-                    unit = "行" if self.mode == "expected_text" else "條檢查"
+                    unit = {"expected_text": "行", "cases": "組案例"}.get(self.mode, "條檢查")
                     r.detail = f"溜過去了：{m['hint']}" if reveal else f"溜過去了。（先寫滿 {self.min} {unit}，再告訴你溜過去的是哪一種錯）"
                     slipped.append(m["hint"])
             caught = len(self.mutants) - len(slipped)
             if not slipped:
-                self.ctx.summaries.append(f"你的{'預期輸出' if self.mode == 'expected_text' else '檢查'}把 {len(self.mutants)} 個壞版本全部抓到了。")
+                self.ctx.summaries.append(f"你的{CHAFF_NOUN.get(self.mode, '檢查')}把 {len(self.mutants)} 個壞版本全部抓到了。")
             elif reveal:
                 # 每行壓在 68 欄內（VHS 錄影 70 欄、Terminal.app 預設 80 欄都不折行）：提示一條一行
-                self.ctx.summaries.append(f"你的{'預期輸出' if self.mode == 'expected_text' else '檢查'}抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去：")
+                self.ctx.summaries.append(f"你的{CHAFF_NOUN.get(self.mode, '檢查')}抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去：")
                 self.ctx.summaries.extend(f"  ・{h}" for h in slipped)
             else:
                 # 分兩行（每行 ≤68 欄，同上）
-                noun, unit = ("預期輸出", "行") if self.mode == "expected_text" else ("檢查", "條檢查")
+                noun, unit = {"expected_text": ("預期輸出", "行"), "cases": ("案例", "組案例")}.get(self.mode, ("檢查", "條檢查"))
                 self.ctx.summaries.append(f"你的{noun}抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去。")
                 self.ctx.summaries.append(f"  先寫滿 {self.min} {unit}，再告訴你是哪幾種。")
         else:
-            none = "還沒寫預期輸出" if self.mode == "expected_text" else "還沒有任何檢查"
+            none = {"expected_text": "還沒寫預期輸出", "cases": "還沒有任何案例"}.get(self.mode, "還沒有任何檢查")
             wheat_r.detail = f"{none}。" + (f"（有 {unfinished} 行的「？」還沒填）" if unfinished else "")
             for r in mutant_rs:
                 r.detail = f"{none}，所以壞版本都溜過去了。"
@@ -1309,7 +1479,13 @@ class ChaffCheck(Check):
             key = json.loads(self.ctx.course(self.spec["special"]).read_text(encoding="utf-8")) if self.spec.get("special") else {"rules": []}
             for mk in marks:
                 r = by_id[f"s{mk.line}"]
-                r.ok, r.detail, r.note = judge_mark(mk, key, mark_status.get(mk.line, {}))
+                if self.mode == "cases":
+                    r.ok, r.detail, r.note = judge_case_mark(mk, self._cases[mk.line][0], self.spec["func"], key, mark_status.get(mk.line, {}))
+                else:
+                    r.ok, r.detail, r.note = judge_mark(mk, key, mark_status.get(mk.line, {}))
+        if "smin" in by_id:
+            by_id["smin"].detail = ("還沒有一組標「已知會當掉」：找一個連正確版都轉不了的金額，\n"
+                                    "  在那一行最後加上「# 已知會當掉」（右邊可以不寫）。")
 
 
 def _rule_matches(rule: dict, args: list) -> bool:
@@ -1340,6 +1516,30 @@ def _rule_matches(rule: dict, args: list) -> bool:
             "<": v < value, "<=": v <= value, ">": v > value, ">=": v >= value, "==": v == value, "!=": v != value,
         }[op]
     return True
+
+
+def judge_case_mark(mk: Mark, inp, func: str, key: dict, ref: dict) -> tuple[bool, str, str]:
+    """cases 的特殊作答：「已知會當掉」看正確版真的跑這個輸入會不會當掉；「需求有問題」照 special.json 的 match（正規式比對輸入）。"""
+    call = f"{func}({typed(inp, bare=True)})"
+    crashed = ref.get("status") == "error" and not ref.get("stuck")
+    rules = [r for r in key.get("rules", []) if isinstance(inp, str) and re.search(r.get("match", "(?!)"), inp)]
+    if mk.kind == "已知會當掉":
+        if crashed:
+            explain = next((r["explain"] for r in rules if r["kind"] == "已知會當掉"), key.get("crash_explain", ""))
+            return True, "", f"{call}：正確版真的會當掉（{ref.get('error')}）。" + explain
+        if ref.get("stuck"):
+            return False, f"第 {mk.line} 行標了「已知會當掉」，可是正確版跑 {call} 是卡住（{ref.get('error')}），不是當掉。", ""
+        got = typed(ref.get("got"), ref.get("got_type"))
+        return False, (f"第 {mk.line} 行標了「已知會當掉」，可是正確版轉得出來：{call} 變成 {got}。"
+                       "\n  換一個連正確版都轉不了的金額；或拿掉標記，當成一般的案例。"), ""
+    if crashed:
+        return False, (f"第 {mk.line} 行標了「需求有問題」，方向對了一半：正確版跑 {call} 會當掉（{ref.get('error')}），"
+                       "這比較像「已知會當掉」。"), ""
+    for rule in rules:
+        if rule["kind"] == "需求有問題":
+            return True, "", f"{call}：{rule['explain']}"
+    return False, (f"第 {mk.line} 行標了「需求有問題」，可是 {call} 的需求講得很清楚。"
+                   "\n  把標記拿掉，當成一般的案例就好。"), ""
 
 
 def judge_mark(mk: Mark, key: dict, ref: dict) -> tuple[bool, str, str]:
