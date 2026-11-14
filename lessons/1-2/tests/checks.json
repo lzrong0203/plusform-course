@@ -1,0 +1,39 @@
+{
+  "note": "1-2 的檢查：第①圈追蹤表題（對答）與自己寫合計（官方測試）、第②圈判斷 4 則 AI 意見（對答；判讀紀錄 record.md 是自評，不檢查）、第③圈把果凍兔收據的預期輸出寫進 expected.txt，跟課程的正確版和 3 個壞版本一行一行比（chaff 的 expected_text 模式，1-1 加的）。",
+  "checks": [
+    {
+      "type": "answers",
+      "id": "trace",
+      "file": "lessons/1-2/trace.txt",
+      "key": "answers/trace.json"
+    },
+    {
+      "type": "run",
+      "id": "total",
+      "file": "lessons/1-2/total.py",
+      "desc": "total.py 印出今天花了 205 元",
+      "expect_exact": [
+        "今天花了 205 元"
+      ],
+      "hint": "照 README 第 1 節：三筆花費各放進 juice、dinner、mrt，用名字加起來放進 total，再寫 print(\"今天花了\", total, \"元\")。改完記得存檔再跑。",
+      "missing_hint": "total.py 應該在帳本的 lessons/1-2/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-2。"
+    },
+    {
+      "type": "answers",
+      "id": "ai",
+      "group": "第二圈",
+      "file": "lessons/1-2/ai_review.txt",
+      "key": "answers/ai_review.json"
+    },
+    {
+      "type": "chaff",
+      "id": "r3",
+      "mode": "expected_text",
+      "student_file": "lessons/1-2/expected.txt",
+      "reference": "reference/receipt.py",
+      "mutants": "mutants/mutants.json",
+      "teacher_file": "answers/expected.txt",
+      "min_checks": 6
+    }
+  ]
+}

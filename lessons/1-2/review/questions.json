@@ -1,0 +1,27 @@
+{
+  "note": "1-2 的回顧題：學員通過這課以後，往後第 2 課和第 5 課的 check 會各帶一題。",
+  "questions": [
+    {
+      "id": "r1",
+      "q": "這三行跑完以後，x 裡是多少？\n  x = 10\n  x = x + 5\n  x = x - 3\n（寫數字）",
+      "accept": ["12"],
+      "hint": "= 是「右邊先算，再放進左邊」。一行一行追。",
+      "explain": "10 → 10 + 5 = 15 → 15 - 3 = 12。"
+    },
+    {
+      "id": "r2",
+      "q": "這三行會印出什麼？\n  money = 100\n  money - 30\n  print(money)\n（寫數字）",
+      "accept": ["100"],
+      "hint": "第二行前面有沒有「money =」？",
+      "explain": "第二行算出 70，可是沒有放進任何名字，money 還是 100。"
+    },
+    {
+      "id": "r3",
+      "q": "這兩行會印出什麼？\n  money = 95\n  print(\"money\")\nA. money\nB. 95\n（寫 A 或 B）",
+      "accept": ["A"],
+      "hint": "括號裡的 money 有沒有引號？",
+      "explain": "有引號的是字，照樣印出來：money。沒有引號的 print(money) 才會印出名字裡放的 95。",
+      "choices": {"A": "money", "B": "95"}
+    }
+  ]
+}

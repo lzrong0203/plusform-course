@@ -1,0 +1,9 @@
+{
+  "target": "receipt.py",
+  "note": "1-2 第③圈：AI 照需求卡交出的三個版本（課程準備的，各藏一個跟「名字」有關的問題）。hint 是學員的預期輸出沒抓到這個版本時，畫面上顯示的提示。",
+  "mutants": [
+    {"id": "m1", "file": "receipt_m1.py", "hint": "印完合計就當掉了（合計取名叫 sum，蓋掉了 Python 本來的加總功能）", "what": "合計取名 sum，蓋掉內建的 sum，下一行再呼叫 sum 就 TypeError"},
+    {"id": "m2", "file": "receipt_m2.py", "hint": "捷運那一行印錯了名字（印成晚餐的錢）", "what": "捷運那一行印了 dinner"},
+    {"id": "m3", "file": "receipt_m3.py", "hint": "錢包扣錯了（total 這個名字放了兩次，扣的是後來放進去的那個）", "what": "飲食也放進 total，蓋掉了合計，錢包少扣 25"}
+  ]
+}
