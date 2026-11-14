@@ -4,7 +4,7 @@
       "id": "r1",
       "q": "在 VS Code 改壞了 main.py、還沒按存檔點，要按哪一個回到上一個存檔點？\nA. Commit\nB. Discard Changes\nC. Publish Branch\n（寫 A、B 或 C）",
       "accept": ["B"],
-      "explain": "Discard Changes 會丟掉還沒存進存檔點的改動。丟掉以後找不回來，所以 VS Code 會再問一次。",
+      "explain": "Discard Changes 會丟掉還沒存進存檔點的改動。丟掉的不會進垃圾桶、不保證救得回來，所以 VS Code 會再問一次。",
       "choices": {"A": "Commit", "B": "Discard Changes", "C": "Publish Branch"}
     },
     {

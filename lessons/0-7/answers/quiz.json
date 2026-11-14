@@ -8,9 +8,9 @@
     {"id": "q2", "title": "⌘S 存檔算不算存檔點", "accept": ["B"],
      "hint": "按了 ⌘S 以後，原始碼控制的清單裡出現了什麼？",
      "explain": "⌘S 只是把檔案存起來；VS Code 官方說明：Saving writes the file to disk. It does not create a Git commit."},
-    {"id": "q3", "title": "Discard 以後找不找得回來", "accept": ["C"],
+    {"id": "q3", "title": "Discard 以後保不保證找得回來", "accept": ["C"],
      "hint": "所以 VS Code 才會再問你一次「確定要丟掉嗎」。",
-     "explain": "VS Code 官方說明：丟掉的改動不會進垃圾桶（Discarded edits to tracked files are not moved to the Recycle Bin or Trash）。不確定就先別按 Discard。"},
+     "explain": "VS Code 官方說明：丟掉的改動不會進垃圾桶（Discarded edits to tracked files are not moved to the Recycle Bin or Trash），本機的編輯歷程也不保證救得回來。不確定就先別按 Discard。"},
     {"id": "q4", "title": "讓 AI 動手之前先做什麼", "accept": ["A"],
      "hint": "AI 改壞了，你想退回到哪一個樣子？那個樣子存起來了嗎？",
      "explain": "先按存檔點，AI 改壞了才回得到它動手之前的樣子。"}
