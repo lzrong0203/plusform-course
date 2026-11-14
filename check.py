@@ -34,11 +34,13 @@ if sys.version_info < (3, 13):
 
 sys.dont_write_bytecode = True  # 課程資料夾裡什麼都不寫（連 __pycache__ 也不要）
 
+import json  # noqa: E402
 import os  # noqa: E402
 import re  # noqa: E402
 import shlex  # noqa: E402
 import shutil  # noqa: E402
 import unicodedata  # noqa: E402
+from datetime import timedelta  # noqa: E402
 from pathlib import Path  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent
@@ -61,11 +63,13 @@ HELP = """\
   uv run check.py status                看進度、到期的回顧題、你猜得準不準、看得懂進度條
   uv run check.py review                作答今天到期的回顧題
   uv run check.py note 一句話           寫下「下次我會怎麼估」
+  uv run check.py 1-C1                  檢核站：第一次打是交卷（之後再打是訂正）；沒過領矯正包，隔天以後考卷 B（1-C1B）
 
 選項：
   --predict 數字   直接告訴它「你猜會過幾題」，不用等它問
   --all            一次看全部沒過的題目（平常只顯示第一個）
   --no-review      這次先不提醒回顧題
+  --submit         檢核站：還有題目沒寫也照樣交卷
 
 在別的資料夾也可以用完整路徑：uv run ~/code/plusform-course/check.py 1-9
 """
@@ -123,7 +127,7 @@ def fmt_minutes(m: float) -> str:
 
 
 def parse_args(argv: list[str]) -> tuple[list[str], dict]:
-    opts = {"predict": None, "all": False, "no_review": False}
+    opts = {"predict": None, "all": False, "no_review": False, "submit": False}
     pos: list[str] = []
     i = 0
     while i < len(argv):
@@ -138,6 +142,8 @@ def parse_args(argv: list[str]) -> tuple[list[str], dict]:
             opts["all"] = True
         elif a == "--no-review":
             opts["no_review"] = True
+        elif a == "--submit":
+            opts["submit"] = True
         elif a in ("-h", "--help"):
             pos = ["help"]
         else:
@@ -251,16 +257,8 @@ def copy_start_file(src: Path, target: Path) -> None:
         shutil.copyfile(src, target)
 
 
-def cmd_start(args: list[str], opts: dict) -> int:
-    if not args:
-        print("要告訴我是哪一課，例如：uv run check.py start 1-9")
-        return 2
-    lesson = find_lesson(args[0])
-    if lesson is None:
-        return 1
-    ledger = get_ledger()
-    if ledger is None:
-        return 1
+def copy_start(lesson: grader.Lesson, ledger: Path) -> tuple[list[str], list[str]]:
+    """把起點檔複製到帳本（已經有的不蓋掉）。回傳（複製了的, 已經有的），都是帳本裡的相對路徑。"""
     copied, kept = [], []
     pairs = [(lesson.dir / "start", ledger / "lessons" / lesson.id),
              (lesson.dir / "start_outside", ledger / "lessons")]
@@ -277,6 +275,22 @@ def cmd_start(args: list[str], opts: dict) -> int:
                 continue
             copy_start_file(path, target)
             copied.append(rel)
+    return copied, kept
+
+
+def cmd_start(args: list[str], opts: dict) -> int:
+    if not args:
+        print("要告訴我是哪一課，例如：uv run check.py start 1-9")
+        return 2
+    lesson = find_lesson(args[0])
+    if lesson is None:
+        return 1
+    ledger = get_ledger()
+    if ledger is None:
+        return 1
+    if lesson.meta.get("checkpoint"):
+        return start_checkpoint(lesson, ledger, opts)
+    copied, kept = copy_start(lesson, ledger)
     print(f"━━ {lesson.id}  {lesson.title} ━━")
     if copied:
         print("複製到你的帳本：")
@@ -508,6 +522,8 @@ def cmd_lesson(raw: str, opts: dict) -> int:
     ledger = get_ledger()
     if ledger is None:
         return 1
+    if lesson.meta.get("checkpoint"):
+        return cmd_checkpoint(lesson, ledger, opts)
     records = state.Records(ledger)
     records.ensure()
     info_course = course()
@@ -631,6 +647,363 @@ def cmd_lesson(raw: str, opts: dict) -> int:
     if not opts["no_review"]:
         offer_reviews(records, current=lesson.id)  # 行為 4
     return 0 if all_ok else 1
+
+
+# ====================================================================
+# 檢核站（1-C1 起）：關掉 AI 的小考。第一次打是交卷（成績照這次算），之後再打是訂正；
+# 沒過領矯正包（錯的題目 → 原課章節的時間碼＋練習），卷 A 交卷的隔天以後才能考平行卷 B（lessons/<站>/B/）。
+# 時間只記錄、不擋；檢核站也不擋你往下上課。
+# ====================================================================
+
+def checkpoint_base(lesson: grader.Lesson) -> str:
+    return lesson.meta.get("paper_of") or lesson.id
+
+
+def paper_of(lesson: grader.Lesson) -> str:
+    return lesson.meta.get("paper") or "A"
+
+
+def checkpoint_name(lesson: grader.Lesson) -> str:
+    """「檢核站 1」：卷 B 的標題是「檢核站 1（卷 B）」，拿掉括號那一段。"""
+    return lesson.title.split("（")[0]
+
+
+def answer_files(lesson: grader.Lesson, ledger: Path) -> list[Path]:
+    return [ledger / "lessons" / lesson.id / name for name in lesson.meta.get("answer_files", [])]
+
+
+def code_lines(text: str) -> list[str]:
+    return [ln.strip() for ln in text.splitlines() if ln.strip() and not ln.strip().startswith("#")]
+
+
+def unfinished(lesson: grader.Lesson, ledger: Path) -> list[str]:
+    """還沒寫的：作答檔不在、「答：」後面空白、程式檔跟起點一模一樣或一行程式都沒有。"""
+    out = []
+    for path in answer_files(lesson, ledger):
+        rel = path.relative_to(ledger).as_posix()
+        if not path.is_file():
+            out.append(f"{rel} 找不到（先打 uv run check.py start {lesson.id}）")
+            continue
+        text = grader.read_student_text(path)
+        if path.suffix == ".txt":
+            blanks = [str(i) for i, a in enumerate(grader.read_answer_lines(path), start=1) if not a.strip()]
+            if blanks:
+                out.append(f"{path.name} 第 {'、'.join(blanks)} 題還沒寫")
+            continue
+        start = lesson.dir / "start" / path.name
+        same = start.is_file() and code_lines(text) == code_lines(start.read_text(encoding="utf-8"))
+        if same and code_lines(text):
+            out.append(f"{path.name} 還沒改")
+        elif not code_lines(text):
+            out.append(f"{path.name} 還沒寫程式")
+    return out
+
+
+def remedial_key(lesson: grader.Lesson) -> dict:
+    rel = lesson.meta.get("remedial")
+    path = lesson.dir / rel if rel else None
+    return json.loads(path.read_text(encoding="utf-8")) if path and path.is_file() else {"topics": {}, "items": {}}
+
+
+def item_topics(item: dict, r: grader.Result) -> list[str]:
+    err = r.data.get("error")
+    return item.get("by_error", {}).get(err) or item.get("topics", [])
+
+
+def item_label(item: dict, r: grader.Result) -> str:
+    label = item.get("label", r.desc)
+    err = r.data.get("error")
+    return f"{label}（{err}）" if err and item.get("by_error") else label
+
+
+def where_text(w: dict) -> str:
+    return f"{w['lesson']} 影片 {w['time']} 起"
+
+
+def answer_key(lesson: grader.Lesson, spec_id: str) -> dict | None:
+    spec = next((c for c in lesson.checks if c["id"] == spec_id and c["type"] == "answers"), None)
+    return json.loads(lesson.path(spec["key"]).read_text(encoding="utf-8")) if spec else None
+
+
+def wrong_detail(lesson: grader.Lesson, r: grader.Result) -> list[str]:
+    """矯正包「錯在哪裡」：對答題給你寫的、正確答案和為什麼；程式題給 check 的說明（放在程式碼框裡）。"""
+    spec_id, _, qid = r.id.partition("-")
+    key = answer_key(lesson, spec_id)
+    if key:
+        q = next((x for x in key["questions"] if x["id"] == qid), None)
+        if q:
+            right = q["accept"][0]
+            ch = q.get("choices") or key.get("choices")
+            if ch and right in ch:
+                right = f"{right}（{ch[right]}）"
+            lines = [r.detail.split("\n")[0], f"正確答案：{right}"]
+            if q.get("explain"):
+                lines.append(f"為什麼：{q['explain']}")
+            return lines
+    return ["```", r.detail.replace("\n  ", "\n"), "```"]
+
+
+def write_remedial(lesson: grader.Lesson, ledger: Path, outcome: grader.Outcome, when: str) -> tuple[Path | None, list[str]]:
+    """把矯正包寫進帳本 lessons/<這一份卷>/矯正包.md，用得到的練習檔複製到 lessons/<站>/practice/（已經有的不蓋掉）。
+    回傳（矯正包的位置, 終端機上一題一行的摘要）。全對就不寫。"""
+    failed = [r for r in outcome.results if not r.ok]
+    if not failed:
+        return None, []
+    key = remedial_key(lesson)
+    topics, items = key.get("topics", {}), key.get("items", {})
+    base = checkpoint_base(lesson)
+    pass_at = int(lesson.meta.get("pass_at", outcome.total))
+    t = state.parse_time(when)
+    nxt = (t + timedelta(days=1)).date()
+    summary, used = [], []
+    for r in failed:
+        it = items.get(r.id, {"label": r.desc, "topics": []})
+        tp = [x for x in item_topics(it, r) if x in topics]
+        for x in tp:
+            if x not in used:
+                used.append(x)
+        wh = "、".join(where_text(topics[x]["where"][0]) for x in tp) if tp else "回到那一課再看一次"
+        summary.append(f"  {item_label(it, r)} → {wh}")
+    practice_src = lesson.dir / lesson.meta.get("practice", "practice")
+    practice_dst = ledger / "lessons" / base / "practice"
+    md = [f"# {checkpoint_name(lesson)}　矯正包（卷 {paper_of(lesson)}，{t.month}/{t.day} 交卷："
+          f"過了 {outcome.passed}／{outcome.total} 題，{pass_at} 題以上算過）", "",
+          "這份是照你錯的題目挑的。全程一樣關掉 AI，照順序做：", "",
+          "1. 先看「錯在哪裡」，知道自己哪裡想錯。",
+          "2. 回原課的影片，從寫的時間開始，看那一章。",
+          "3. 做練習：先在紙上寫下答案，再用 uv run 跑一次對答案（指令寫在每個練習檔的最上面）。"]
+    if paper_of(lesson) == "A":
+        md.append(f"4. 明天以後（{nxt.month}/{nxt.day} 起），在課程資料夾打 `uv run check.py start {base}B` 考卷 B。"
+                  "題目不一樣，考的東西一樣。")
+    else:
+        md.append("4. 兩份卷都交過了。照這份把那幾段再看一次、練習做完；檢核站不擋你往下上課。")
+    md += ["", "## 錯在哪裡", ""]
+    for r in failed:
+        it = items.get(r.id, {"label": r.desc})
+        spec_id, _, qid = r.id.partition("-")
+        key_q = next((x for x in (answer_key(lesson, spec_id) or {}).get("questions", []) if x["id"] == qid), None)
+        md.append(f"### {item_label(it, r)}（{key_q['title']}）" if key_q else f"### {item_label(it, r)}")
+        if not key_q:
+            md.append(f"這一題檢查：{r.desc}")
+        md += wrong_detail(lesson, r)
+        md.append("")
+    md += ["## 要回去看的、要做的練習", ""]
+    for x in used:
+        tpc = topics[x]
+        md.append(f"### {tpc['name']}")
+        for w in tpc["where"]:
+            md.append(f"- 影片：{w['lesson']}〈{w['title']}〉{w['time']} 起（{w['chapter']}）")
+        if tpc.get("practice"):
+            rel = f"lessons/{base}/practice/{tpc['practice']}"
+            md.append(f"- 練習：`{rel}`（{tpc.get('how', '先寫下答案，再跑')}：`uv run {rel}`）")
+            src = practice_src / tpc["practice"]
+            dst = practice_dst / tpc["practice"]
+            if src.is_file() and not dst.exists():
+                copy_start_file(src, dst)
+        md.append("")
+    path = ledger / "lessons" / lesson.id / "矯正包.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(md).rstrip() + "\n", encoding="utf-8")
+    return path, summary
+
+
+def start_checkpoint(lesson: grader.Lesson, ledger: Path, opts: dict) -> int:
+    records = state.Records(ledger)
+    prog = records.progress()
+    base = checkpoint_base(lesson)
+    print(f"━━ {lesson.id}  {lesson.title} ━━")
+    if lesson.meta.get("paper_of"):
+        a = prog["lessons"].get(base, {})
+        sub = a.get("submitted")
+        if not sub:
+            print(f"卷 {paper_of(lesson)} 要等卷 A 交卷以後才能考。先打 uv run check.py start {base}，做完交卷（uv run check.py {base}）。")
+            return 1
+        if state.day_of(sub["time"]) >= state.now().date().isoformat():
+            print(f"卷 {paper_of(lesson)} 要隔天以後才能考（你在 {mmdd(sub['time'])} 交了卷 A）。")
+            print(f"今天先做矯正包：帳本的 lessons/{base}/矯正包.md。")
+            return 1
+        if a.get("first_pass"):
+            print(f"（你在 {mmdd(a['first_pass'])} 就過了{checkpoint_name(lesson)}，卷 {paper_of(lesson)} 不用考；想多練一次也可以。）")
+    copied, kept = copy_start(lesson, ledger)
+    if copied:
+        print("複製到你的帳本：")
+        for rel in copied:
+            print(f"  + {rel}")
+    if kept:
+        print("這些已經有了，沒有蓋掉（想重來就先自己刪掉）：")
+        for rel in kept:
+            print(f"  = {rel}")
+    info = prog["lessons"].setdefault(lesson.id, {})
+    info.setdefault("start", state.now().isoformat(timespec="seconds"))
+    if info.get("pre_prediction") is None and not info.get("submitted"):
+        total = len(grader.plan(lesson, ledger))
+        print()
+        print("檢核站開始前，先寫下預測分數。")
+        guess = get_prediction(total, opts, quiet_if_missing=True)
+        if guess is not None:
+            info["pre_prediction"] = guess
+            print(f"記下來了：開始前你猜會過 {guess}／{total} 題。交卷時會再問一次。")
+    records.save_progress(prog)
+    after = lesson.meta.get("after_start")
+    if after:
+        print()
+        print(after)
+    return 0
+
+
+def show_stages(outcome: grader.Outcome, stages: list[str]) -> None:
+    for st in stages:
+        rows = [r for r in outcome.results if r.stage == st]
+        if rows:
+            ok = sum(1 for r in rows if r.ok)
+            print(f"  {'✓' if ok == len(rows) else '✗'} {st}  {ok}／{len(rows)}")
+
+
+def cmd_checkpoint(lesson: grader.Lesson, ledger: Path, opts: dict) -> int:
+    records = state.Records(ledger)
+    records.ensure()
+    base = checkpoint_base(lesson)
+    stages = lesson.meta.get("stages", [])
+    pass_at = int(lesson.meta.get("pass_at", 0))
+    prog = records.progress()
+    info = prog["lessons"].setdefault(lesson.id, {})
+    sub = info.get("submitted")
+    now_iso = state.now().isoformat(timespec="seconds")
+    print(f"━━ {lesson.id}  {lesson.title} ━━")
+
+    if sub:   # 交過卷了：這次是訂正，成績照第一次交卷算
+        print(f"（這是訂正：成績照 {mmdd(sub['time'])} 第一次交卷算，過了 {sub['passed']}／{sub['total']} 題。）")
+        outcome = grader.evaluate(lesson, ledger)
+        print()
+        show_outcome(outcome, opts["all"], stages)
+        records.append("attempts", {"time": now_iso, "lesson": lesson.id, "predicted": None, "passed": outcome.passed,
+                                    "total": outcome.total, "failed": [r.id for r in outcome.results if not r.ok], "redo": True})
+        info["runs"] = info.get("runs", 0) + 1
+        info["last_run"] = now_iso
+        info["last_result"] = [outcome.passed, outcome.total]
+        records.save_progress(prog)
+        print()
+        if outcome.passed == outcome.total:
+            print("訂正完了，全部都對！")
+        base_info = prog["lessons"].get(base, {})
+        if base_info.get("first_pass"):
+            print(f"（{checkpoint_name(lesson)} 在 {mmdd(base_info['first_pass'])} 就過了。）")
+        elif paper_of(lesson) == "A" and not prog["lessons"].get(base + "B", {}).get("submitted"):
+            print(f"卷 B 要隔天以後考：uv run check.py start {base}B")
+        return 0 if outcome.passed == outcome.total else 1
+
+    todo = unfinished(lesson, ledger)
+    if todo and not opts.get("submit"):
+        print("還有題目沒寫，這次先不算交卷：")
+        for x in todo:
+            print(f"  ・{x}")
+        print("不會的也寫一個你覺得最可能的答案，寫完再打一次。")
+        print(f"（真的寫不出來，打 uv run check.py {lesson.id} --submit 照樣交卷。）")
+        return 1
+
+    total = len(grader.plan(lesson, ledger))
+    try:
+        predicted = get_prediction(total, opts)
+    except BadPrediction as exc:
+        print(exc)
+        return 2
+    print()
+    outcome = grader.evaluate(lesson, ledger)
+    passed = outcome.passed
+    ok = passed >= pass_at
+    print(f"結果：過了 {passed}／{outcome.total} 題（{pass_at} 題以上算過）")
+    show_stages(outcome, stages)
+    if opts["all"]:
+        print()
+        for r in outcome.results:
+            print(f"{'✓' if r.ok else '✗'} {r.desc}")
+            if not r.ok:
+                print(f"  {r.detail}")
+
+    pre = info.get("pre_prediction")
+    info.setdefault("first_run", now_iso)
+    info["runs"] = info.get("runs", 0) + 1
+    info["last_run"] = now_iso
+    info["last_result"] = [passed, outcome.total]
+    info["submitted"] = {"time": now_iso, "passed": passed, "total": outcome.total, "pre": pre, "post": predicted, "ok": ok}
+    records.append("attempts", {"time": now_iso, "lesson": lesson.id, "predicted": predicted, "passed": passed, "total": outcome.total,
+                                "failed": [r.id for r in outcome.results if not r.ok], "submit": True})
+
+    minutes = None
+    if info.get("start"):
+        mt = [p.stat().st_mtime for p in answer_files(lesson, ledger) if p.is_file()]
+        if mt:
+            minutes = max(0.0, (max(mt) - state.parse_time(info["start"]).timestamp()) / 60)
+            info["timed_minutes"] = round(minutes, 1)
+            print(f"從開始到最後一次存檔，大約{grader.spaced(fmt_minutes(minutes))}"
+                  f"（參考 {lesson.meta.get('minutes', 20)} 分鐘，只記錄）。")
+    if predicted is not None:
+        text, pct = calibration_line(predicted, passed, outcome.total)
+        print(text)
+        if pre is not None:
+            print(f"（開始前你猜 {pre} 題，做完猜 {predicted} 題，實際 {passed} 題。）")
+            info["first_check"] = {"time": now_iso, "pre": pre, "post": predicted, "passed": passed, "total": outcome.total}
+
+    base_info = prog["lessons"].setdefault(base, {})
+    if ok and not base_info.get("first_pass"):
+        base_info["first_pass"] = now_iso
+        base_info["passed_via"] = paper_of(lesson)
+    order = grader.course_order(course())
+    if base in order:
+        prog["frontier"] = max(prog.get("frontier", -1), order.index(base))
+    records.save_progress(prog)
+
+    path, summary = write_remedial(lesson, ledger, outcome, now_iso)
+    rel = path.relative_to(ledger).as_posix() if path else ""
+    if ok:
+        print(f"✓ 過了！{checkpoint_name(lesson)} 通過。")
+        if summary:
+            print(f"錯的那 {len(summary)} 題，矯正包一樣寫好了：帳本的 {rel}")
+        fast = float(lesson.meta.get("fast_minutes", 0))
+        if fast and minutes is not None and minutes < fast:
+            info["fast_warning_minutes"] = round(minutes, 1)
+            records.save_progress(prog)
+            print(f"⚠ 這是警訊：不到{grader.spaced(fmt_minutes(fast))}就交卷而且過了。")
+            print("  如果是你自己做的，很好，這段可以忽略。如果剛剛有用 AI，這次的成績就不準：關掉 AI 自己再做一次。")
+            print("  （這只是提醒，不扣分。）")
+    elif paper_of(lesson) == "A":
+        print(f"這次沒過。矯正包在帳本的 {rel}：")
+        for ln in summary:
+            print(ln)
+        print(f"練完，明天以後考卷 B：uv run check.py start {base}B")
+    else:
+        print(f"卷 {paper_of(lesson)} 也沒過。矯正包在帳本的 {rel}：")
+        for ln in summary:
+            print(ln)
+        print("照矯正包把那幾段再看一次、練習做完。檢核站不擋你往下上課。")
+    if predicted is not None and abs(calibration_line(predicted, passed, outcome.total)[1]) >= BIG_GAP:
+        print("這次猜的跟實際差比較多。寫一句：下次我會怎麼估？")
+        if interactive():
+            sentence = ask("下次我會：")
+            if sentence and sentence.strip():
+                records.append("notes", {"time": now_iso, "lesson": lesson.id, "text": sentence.strip()})
+                print("記下來了。")
+        else:
+            print('  打：uv run check.py note "下次我會……"')
+    if not opts["no_review"]:
+        offer_reviews(records, current=base)
+    return 0 if ok else 1
+
+
+def checkpoint_status(lid: str, info: dict, lessons: dict) -> tuple[str, str] | None:
+    """status 裡檢核站那一行：卷 A／卷 B 各自交卷的日期與分數，過了沒。"""
+    parts = []
+    for paper, key in (("A", lid), ("B", lid + "B")):
+        sub = lessons.get(key, {}).get("submitted")
+        if sub:
+            parts.append(f"卷 {paper} {mmdd(sub['time'])} 交卷 {sub['passed']}／{sub['total']}" + ("" if sub.get("ok") else "（沒過）"))
+        elif lessons.get(key, {}).get("start"):
+            parts.append(f"卷 {paper} 開始了，還沒交卷")
+    if not parts:
+        return None
+    if info.get("first_pass"):
+        return "✓", f"{mmdd(info['first_pass'])} 通過；" + "；".join(parts)
+    return "✗", "；".join(parts)
 
 
 # ====================================================================
@@ -842,7 +1215,8 @@ def curve_line(a: dict) -> str:
     n = min(10, round(abs(pct) / 10))
     left = ("█" * n).rjust(10) if pct < 0 else " " * 10
     right = ("█" * n).ljust(10) if pct > 0 else " " * 10
-    return f"  {mmdd(a['time']):>5} {a['lesson']:<4} {left}│{right} {pct:+.0f}%（猜 {a['predicted']}，過 {a['passed']}／{a['total']}）"
+    lid = a["lesson"] if len(a["lesson"]) <= 4 else a["lesson"].replace("-", "")   # 卷 B（1-C1B）寫成 1C1B，曲線才對得齊
+    return f"  {mmdd(a['time']):>5} {lid:<4} {left}│{right} {pct:+.0f}%（猜 {a['predicted']}，過 {a['passed']}／{a['total']}）"
 
 
 def recent_summary(recent: list[dict]) -> str:
@@ -880,7 +1254,10 @@ def cmd_status() -> int:
         for lid in ids:
             info = lessons.get(lid, {})
             title = titles.get(lid, lid)
-            if info.get("first_pass"):
+            cps = checkpoint_status(lid, info, lessons) if (lid in ready and grader.load_lesson(lid, ROOT).meta.get("checkpoint")) else None
+            if cps:
+                mark, extra = cps
+            elif info.get("first_pass"):
                 mark, extra = "✓", f"{mmdd(info['first_pass'])} 通過"
             elif info.get("runs"):
                 p, t = info.get("last_result", [0, 0])
@@ -930,8 +1307,9 @@ def cmd_status() -> int:
         for lid, info in lessons.items():
             fc = info.get("first_check")
             if fc:
-                # 一行寫得完（VHS 錄影 70 欄）：日期另外在上面的曲線那一行
-                print(f"  {lid} 關卡第一次對答案：開始前猜 {fc['pre']}、做完猜 {fc['post']}、實際 {fc['passed']}／{fc['total']}")
+                # 一行寫得完（VHS 錄影 70 欄）：日期另外在上面的曲線那一行；檢核站（1-C1 起）的是交卷
+                what = "交卷" if info.get("submitted") else "關卡第一次對答案"
+                print(f"  {lid} {what}：開始前猜 {fc['pre']}、做完猜 {fc['post']}、實際 {fc['passed']}／{fc['total']}")
         notes = records.read("notes")
         if notes:
             print(f"  你寫過的「下次我會怎麼估」：{notes[-1]['text']}")

@@ -19,7 +19,7 @@
      起點腳本不能跟安全版一模一樣。
   5. 正確版、壞版本、起點檔、參考答案只用了 CONCEPTS.md 列的概念或終端機指令（用 ast 粗略檢查）；
      CONCEPTS.md 列的每個概念，教的課不能比這課晚，除非標成「例外」並寫理由（會列出來）。
-  6. 檔案齊全：README 的六段、lesson.json、tests/checks.json、start/、review/、CONCEPTS.md，
+  6. 檔案齊全：README 的六段、lesson.json、tests/checks.json、start/、review/（平行卷不用）、CONCEPTS.md，
      每個 chaff 有 3 個壞版本；answers 的題數跟 start/ 作答檔的「答：」行數一樣；
      回顧題格式正確；「已知會當掉」的例子真的會讓正確版當掉；腳本只用假終端機模擬得了的寫法。
 
@@ -159,7 +159,7 @@ def check_concepts(rep: Report, lesson: grader.Lesson, order: list[str]) -> None
     allowed, commands, unknown, exceptions = parse_concepts_md(concepts_md)
     for name in unknown:
         rep.bad(f"CONCEPTS.md 裡的「{name}」對不到 concept_map.py 的概念名稱")
-    here = lesson_index(lesson.id, order)
+    here = lesson_index(lesson.meta.get("paper_of") or lesson.id, order)   # 平行卷（1-C1B）照原本那一站在課表的位置
     for key in sorted(allowed, key=list(concept_map.CONCEPTS).index):
         label, teach = concept_map.CONCEPTS[key]
         later = teach is None or lesson_index(teach, order) > here
@@ -173,15 +173,15 @@ def check_concepts(rep: Report, lesson: grader.Lesson, order: list[str]) -> None
 
     scanned = 0
     bad_before = len(rep.problems)
-    for folder in ("reference", "mutants", "start", "start_timed", "answers"):   # start_timed：1-7 起的計時題（check.py timer 複製）
+    for folder in ("reference", "mutants", "start", "start_timed", "answers", "practice"):   # start_timed：1-7 起的計時題；practice：1-C1 起的矯正包練習
         files = sorted((d / folder).glob("*")) if (d / folder).is_dir() else []
         for f in files:
             if f.suffix == ".py":
                 try:
                     used = concept_map.concepts_in_source(f.read_text(encoding="utf-8"))
                 except SyntaxError as exc:
-                    if folder in ("start", "start_timed"):  # 起點檔可以故意壞掉（例如 0-C 要學員修好的 main.py）
-                        rep.note(f"起點檔 start/{f.name} 第 {exc.lineno} 行故意有語法錯誤，這個檔不做概念檢查")
+                    if folder in ("start", "start_timed", "practice"):  # 起點檔、矯正包練習可以故意壞掉（例如 0-C 要學員修好的 main.py）
+                        rep.note(f"{folder}/{f.name} 第 {exc.lineno} 行故意有語法錯誤，這個檔不做概念檢查")
                     else:
                         rep.bad(f"{folder}/{f.name} 第 {exc.lineno} 行有語法錯誤（{exc.msg}）")
                     continue
@@ -201,7 +201,8 @@ def check_concepts(rep: Report, lesson: grader.Lesson, order: list[str]) -> None
 
 def check_files(rep: Report, lesson: grader.Lesson) -> None:
     d = lesson.dir
-    missing = [f for f in ("README.md", "lesson.json", "tests/checks.json", "CONCEPTS.md", "review/questions.json")
+    paper = bool(lesson.meta.get("paper_of"))   # 平行卷（1-C1B）：回顧題跟著原本那一站，這裡不用另外放
+    missing = [f for f in ("README.md", "lesson.json", "tests/checks.json", "CONCEPTS.md") + (() if paper else ("review/questions.json",))
                if not (d / f).is_file()]
     if not (d / "start").is_dir() or not any((d / "start").iterdir()):
         missing.append("start/（起點檔）")
@@ -216,6 +217,8 @@ def check_files(rep: Report, lesson: grader.Lesson) -> None:
     if not missing:
         rep.ok("檔案齊全，README 有固定的六段")
 
+    if paper:
+        return
     try:
         questions = lesson.review_questions()
         ids = [q.get("id") for q in questions]
@@ -263,10 +266,10 @@ def validate_lesson(lid: str, root: Path, use_env: bool, temp: dict) -> Report:
                 rep.bad(f"{template.name} 有 {n} 個「答：」，可是 {spec['key']} 有 {len(key['questions'])} 題")
             else:
                 rep.ok(f"{template.name} 的題數跟 {spec['key']} 一樣（{n} 題）")
-            if key.get("choices"):
-                outside = [a for q in key["questions"] for a in q["accept"] if a.upper() not in {c.upper() for c in key["choices"]}]
-                if outside:
-                    rep.bad(f"{spec['key']} 的答案 {outside[0]} 不在選項裡")
+            outside = [a for q in key["questions"] if q.get("choices") or key.get("choices")
+                       for a in q["accept"] if a.upper() not in {c.upper() for c in (q.get("choices") or key["choices"])}]
+            if outside:
+                rep.bad(f"{spec['key']} 的答案 {outside[0]} 不在選項裡")
         elif spec["type"] == "tree":
             if not (d / spec["spec"]).is_file():
                 rep.bad(f"找不到 {spec['spec']}")
@@ -473,6 +476,8 @@ def main(argv: list[str] | None = None) -> int:
     root = Path(args.root).resolve()
     course = grader.course_info(root)
     ids = [grader.normalize_id(x, course) for x in args.lessons] or grader.available_lessons(root)
+    if not args.lessons:   # 檢核站的平行卷（1-C1B，放在 lessons/1-C1/B/）也一起驗
+        ids = [x for lid in ids for x in [lid] + [lid + p for p in json.loads((root / "lessons" / lid / "lesson.json").read_text(encoding="utf-8")).get("papers", [])]]
     temp: dict = {}
     failed = 0
     try:

@@ -1,0 +1,13 @@
+{
+  "note": "回顧題：通過檢核站 1 以後，往後第 2 課和第 5 課的檢查會各帶一題（混合 1-1～1-4）。",
+  "questions": [
+    {"id": "r1", "q": "下面兩行一共印出幾行？\n  print(\"早餐\", end=\" \")\n  print(65)\nA. 1 行\nB. 2 行\nC. 3 行\n（寫 A、B 或 C）",
+     "accept": ["A"], "hint": "end 換掉的是什麼？", "explain": "end=\" \" 把最後面的換行換成空格，下一個 print 接在同一行：早餐 65。",
+     "choices": {"A": "1 行", "B": "2 行", "C": "3 行"}},
+    {"id": "r2", "q": "跑完這三行，a 裡是多少？\n  a = 10\n  b = a + 5\n  b = b * 2\n（寫一個數字）",
+     "accept": ["10"], "hint": "後面兩行有改到 a 嗎？", "explain": "等號只改左邊那個名字：後面兩行都在改 b，a 還是 10。"},
+    {"id": "r3", "q": "print(type(10 / 5)) 會印出什麼？\nA. <class 'int'>\nB. <class 'float'>\nC. 2\n（寫 A、B 或 C）",
+     "accept": ["B"], "hint": "一條斜線的答案是哪一種？", "explain": "/ 的答案一定是小數：10 / 5 是 2.0，型別是 float。",
+     "choices": {"A": "<class 'int'>", "B": "<class 'float'>", "C": "2"}}
+  ]
+}

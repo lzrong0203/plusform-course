@@ -71,6 +71,8 @@ uv run check.py review      # 作答今天到期的回顧題
 
 課號長得像 `0-4`、`0-5`、`1-9`。Lv0 關卡打 `lv0`（也可以打 `0-C`）；`env` 等於 `0-5`。
 
+檢核站（`1-C1` 起，關掉 AI 的小考）：`start` 以後第一次打 `uv run check.py 1-C1` 是**交卷**，成績照這次算（之後再打是訂正）；沒過會在帳本寫一份矯正包（錯的題目、要回哪一課影片的哪個時間看、練習），隔天以後再考平行卷 B（`uv run check.py start 1-C1B`）。詳細在 `lessons/1-C1/README.md`。
+
 不在課程資料夾裡的時候，也可以打完整路徑：`uv run ~/code/plusform-course/check.py 1-9`。
 
 ### 常見錯誤

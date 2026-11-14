@@ -1,0 +1,27 @@
+{
+  "note": "1-C1 檢核站 1（卷 B）：卷 A 第一次交卷以後、隔天以後才能開始（check.py start 1-C1B）。題型、題數、判分跟卷 A 一樣（10 題，第一次交卷過 8 題以上算過），每一題考的概念跟卷 A 同一題一樣（answers/trace.json 的 note）。",
+  "checks": [
+    {"type": "answers", "id": "trace", "file": "lessons/1-C1B/trace.txt", "key": "answers/trace.json", "group": "第一部分 追蹤", "stage": "第一部分 追蹤"},
+    {"type": "run", "id": "fix-run", "file": "lessons/1-C1B/fix.py", "group": "第二部分 修好", "stage": "第二部分 修好",
+     "desc": "fix.py 跑得起來，印出「一共」和「平均」兩行",
+     "expect_contains": ["一共", "平均"],
+     "hint": "錯誤訊息從最下面一行看起：它說是哪一種錯？上面寫著第幾行？修好一個，存檔，再跑一次。",
+     "missing_hint": "fix.py 應該在帳本的 lessons/1-C1B/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-C1B。"},
+    {"type": "run", "id": "fix-out", "file": "lessons/1-C1B/fix.py", "group": "第二部分 修好", "stage": "第二部分 修好",
+     "desc": "fix.py 印出來的跟題目的兩行一模一樣",
+     "expect_exact": ["一共 245 元", "平均 81 元"],
+     "hint": "跑得起來以後，跟最上面註解的兩行一行一行比。平均只留整數元：除法要用哪一種？",
+     "hint_on_crash": false},
+    {"type": "run", "id": "write-out", "file": "lessons/1-C1B/write.py", "group": "第三部分 手寫", "stage": "第三部分 手寫",
+     "desc": "write.py 印出每人、零頭、驗算三行",
+     "expect_exact": ["每人 391 元", "零頭 4 元", "驗算 2350"],
+     "hint": "每人用 //（除完只留整數）、零頭用 %（除完剩多少），都用 total 和 6 算；驗算是每人乘 6 再加零頭。"},
+    {"type": "run", "id": "write-swap", "file": "lessons/1-C1B/write.py", "group": "第三部分 手寫", "stage": "第三部分 手寫",
+     "desc": "把 total = 2350 換成 total = 1999 再跑一次，也算得對",
+     "swap": {"find": "^[ \\t]*total[ \\t]*=[ \\t]*2350[ \\t]*(#.*)?$", "to": "total = 1999",
+              "feed": "check 把你的 total = 2350 換成 total = 1999，再跑一次。",
+              "missing": "找不到 total = 2350 這一行。題目規定第一行要寫 total = 2350（check 會把它換成別的金額再跑一次）。"},
+     "expect_exact": ["每人 333 元", "零頭 1 元", "驗算 1999"],
+     "hint": "金額換了，印出來的也要跟著變：每人、零頭、驗算都要用 total 算，不能直接寫 391、4、2350。"}
+  ]
+}

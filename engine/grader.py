@@ -5,11 +5,12 @@ check.py（學員端）和 tools/validate_lesson.py（老師端）共用這一�
 
 檢查的種類（checks.json 裡每一項的 "type"）：
   tree          帳本裡應該有／不該有哪些資料夾和檔案
-  answers       對答：學員在「答：」後面寫的答案，對照 answers/ 的固定答案
+  answers       對答：學員在「答：」後面寫的答案，對照 answers/ 的固定答案（題目自己的 choices 優先，1-C1 起）
   uv_project    帳本是 uv 專案（有 pyproject.toml）
   python_pin    帳本把 Python 釘在指定版本（.python-version）
   uv_python     帳本用的是自己 .venv 裡的 Python，不是系統 Python
-  run           在帳本的環境裡跑學員的程式（stdin 由這裡餵），比對印出來的字
+  run           在帳本的環境裡跑學員的程式（stdin 由這裡餵），比對印出來的字；swap＝先把一行換掉再跑（1-C1 第三部分：
+                金額換了也要算得對）；當掉時 Result.data["error"] 記錯誤種類（1-C1 矯正包用）
   call          呼叫學員寫的函式，比對回傳值
   chaff         wheat/chaff：學員寫的檢查要在正確版全過、在每個壞版本至少錯一條
   script_match  學員改過的腳本，在假的資料夾裡跑起來要跟安全版一樣
@@ -29,6 +30,7 @@ import re
 import secrets
 import shutil
 import sys
+import tempfile
 import tokenize
 import tomllib
 import unicodedata
@@ -66,6 +68,10 @@ def normalize_id(raw: str, course: dict) -> str:
     m = re.fullmatch(r"(\d+)-[cC](\d*)", text)
     if m:
         return f"{int(m.group(1))}-C{m.group(2)}"
+    # 檢核站的平行卷（1-C1 起）：1-C1B、1-c1b、1-C1-B 都當成 1-C1B（卷 B 放在 lessons/1-C1/B/，見 load_lesson）
+    m = re.fullmatch(r"(\d+)-[cC](\d+)[-_ ]?([bB])", text)
+    if m:
+        return f"{int(m.group(1))}-C{m.group(2)}B"
     return text
 
 
@@ -107,9 +113,24 @@ class LessonNotFound(Exception):
     pass
 
 
+PAPER_ID = re.compile(r"(\d+-C\d+)([B-Z])")
+
+
+def paper_folder(lesson_id: str, root: Path = COURSE_ROOT) -> Path | None:
+    """檢核站的平行卷（1-C1 起）：1-C1B 放在 lessons/1-C1/B/（不在課表裡，回顧題、課表順序都照原本的 1-C1）。"""
+    m = PAPER_ID.fullmatch(lesson_id)
+    if not m:
+        return None
+    folder = root / "lessons" / m.group(1) / m.group(2)
+    return folder if (folder / "lesson.json").is_file() else None
+
+
 def load_lesson(lesson_id: str, root: Path = COURSE_ROOT) -> Lesson:
     folder = root / "lessons" / lesson_id
     meta_path = folder / "lesson.json"
+    if not meta_path.is_file():
+        folder = paper_folder(lesson_id, root) or folder
+        meta_path = folder / "lesson.json"
     if not meta_path.is_file():
         raise LessonNotFound(lesson_id)
     meta = json.loads(meta_path.read_text(encoding="utf-8"))
@@ -576,9 +597,10 @@ class AnswersCheck(Check):
         answers = read_answer_lines(path)
         kind = key.get("normalize", "text")
         home = key.get("home")
-        choices = key.get("choices")
-        how = key.get("how") or (or_list(sorted(choices)) if choices else "你的答案")
         for i, (r, q) in enumerate(zip(results, key["questions"]), start=1):
+            # 1-C1 起：題目自己寫了 choices 就用它（同一個作答檔裡有的寫數字、有的選 A／B／C）；沒寫照舊用整份的
+            choices = q.get("choices") or key.get("choices")
+            how = (or_list(sorted(choices)) if q.get("choices") else None) or key.get("how") or (or_list(sorted(choices)) if choices else "你的答案")
             given = answers[i - 1] if i - 1 < len(answers) else ""
             if not given.strip():
                 r.detail = f"還沒作答：打開帳本裡的 {rel}，在第 {i} 題的「答：」後面寫{how}，存檔。"
@@ -704,6 +726,18 @@ def crash_story(p: Proc, stdin: str, given_label: str = "這題") -> str:
     return "程式當掉了。錯誤訊息最後幾行：\n" + tail(err)
 
 
+ERROR_LINE = re.compile(r"^([A-Za-z_]\w*(?:Error|Exception|Interrupt|Exit))\b")
+
+
+def error_kind(stderr: str) -> str | None:
+    """錯誤訊息最下面那一行的錯誤種類（TypeError、SyntaxError…），找不到是 None。"""
+    for line in reversed(_text(stderr).splitlines()):
+        m = ERROR_LINE.match(line.strip())
+        if m:
+            return m.group(1)
+    return None
+
+
 class RunCheck(Check):
     def missing_text(self, rel: str) -> str:
         hint = self.spec.get("missing_hint")
@@ -725,7 +759,25 @@ class RunCheck(Check):
         if str(path) in self.ctx.stuck:
             r.detail = f"同一支程式剛剛就{self.ctx.stuck[str(path)]}，這題先不再等一次。先修好那個問題。"
             return
-        p = self.ctx.env.run_file(path, stdin=stdin)
+        swap = self.spec.get("swap")
+        if swap:
+            # 1-C1 第三部分：把學員程式裡的一行（例如 total = 1730）換成別的金額，再跑一次，看是不是用算的、不是把答案寫死。
+            # 換過的程式寫在系統的暫存資料夾（同一個檔名），不寫帳本、也不寫課程資料夾；只對寫了 swap 的 checks.json 生效
+            src = read_student_text(path)
+            pat = re.compile(swap["find"], re.MULTILINE)
+            if not pat.search(src):
+                r.detail = swap.get("missing", "找不到題目規定要有的那一行。")
+                return
+            tmpdir = Path(tempfile.mkdtemp(prefix="plusform-swap-"))
+            try:
+                moved = tmpdir / path.name
+                moved.write_text(pat.sub(swap["to"], src, count=1), encoding="utf-8")
+                p = self.ctx.env.run_file(moved, stdin=stdin)
+            finally:
+                shutil.rmtree(tmpdir, ignore_errors=True)
+            feed = swap.get("feed", "") + ("\n  " if swap.get("feed") else "") + feed
+        else:
+            p = self.ctx.env.run_file(path, stdin=stdin)
         if p.timed_out:
             self.ctx.stuck[str(path)] = f"跑了 {self.ctx.env.timeout:.0f} 秒還沒結束"
             r.detail = feed + f"跑了 {self.ctx.env.timeout:.0f} 秒還沒結束，被停下來了：可能有無窮迴圈。"
@@ -735,6 +787,7 @@ class RunCheck(Check):
             r.detail = feed + "你的程式印了太多東西，被停下來了：可能是迴圈沒停下來。"
             return
         if p.returncode != 0:
+            r.data["error"] = error_kind(p.stderr)   # 1-C1 的矯正包照錯誤種類（SyntaxError、NameError、TypeError…）指回原課
             r.detail = feed + crash_story(p, stdin) + (hint_text if self.spec.get("hint_on_crash", True) else "")
             return
         got = output_lines(p.stdout)
