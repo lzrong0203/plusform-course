@@ -33,7 +33,7 @@ B. `my_help.md`（自評）：拿你自己看到的錯誤訊息，照四樣東�
   2. 往上一行：`^` 和 `~` 指出這一行的哪一段出事。
   3. 再往上：出事的那一行程式。
   4. 再往上：`File "…/p4.py", line 6`：哪個檔案、第幾行。
-  5. 最上面：`Traceback (most recent call last):`，「最近發生的放在最後面」，所以從最下面看。
+  5. 最上面：`Traceback (most recent call last):`，「最近一次的呼叫放在最後面」，所以從最下面看。
 - `SyntaxError`、`IndentationError` 是 Python 看不懂寫法：**一行都不跑**，錯誤訊息也沒有 `Traceback` 那一行。其他四種（`NameError`、`TypeError`、`ValueError`、`ZeroDivisionError`）是跑到那一行才當掉：**前面的行已經跑了**，印出來的字會在錯誤訊息上面。
 - 六種錯誤，白話：
 
