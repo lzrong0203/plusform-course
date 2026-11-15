@@ -228,13 +228,14 @@ class Grading(unittest.TestCase):
         self.assertEqual(oks(ev("1-C3B", WRITE_IDS)), [False, False, False])
 
     def test_set_order_never_gets_all_three_with_a_fixed_seed(self):
-        # 用 set 決定印的順序：每一類只有一筆、沒看過的分類那兩組是同樣四個鍵、第一次出現的順序相反，種子固定時至少錯一組（Codex 審卷 B）
+        # 用 set 決定印的順序：同樣四個鍵跑三種第一次出現的順序（每一類只有一筆兩組、沒看過的分類一組），種子固定時至少錯一組（Codex 審卷 B 兩輪：
+        # 5618 是第二輪找到的、只有兩種順序時卷 B 會全對的種子；2021、9186、9601 是兩種順序時模擬找到的；10000 個固定種子模擬三種順序 0 次全對）
         old = os.environ.get("PYTHONHASHSEED")
         try:
             for lid, var, data in (("1-C3", "records", DATA_A), ("1-C3B", "pays", 'pays = [("現金", 120), ("悠遊卡", 30), ("現金", 85), ("信用卡", 990), ("悠遊卡", 45)]\n')):
                 fresh_start(lid)
                 write(L / "lessons" / lid / "write.py", data + BODY["set_order"].replace("records", var))
-                for seed in ("0", "128", "177", "254"):
+                for seed in ("0", "128", "177", "254", "5618", "2021", "9186", "9601"):
                     os.environ["PYTHONHASHSEED"] = seed   # child_env 照抄 os.environ：每一次跑學員程式都用同一個種子
                     self.assertFalse(all(oks(ev(lid, WRITE_IDS))), (lid, seed))
         finally:
