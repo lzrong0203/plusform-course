@@ -48,7 +48,7 @@ git pull
 uv run check.py start 1-17
 ```
 
-它會把起點檔複製到你的帳本 `lessons/1-17/`：`predict.txt`、`convert.py`、`pairs.py`、`short_quiz.txt`、`tutor.md`、`report.py`、`describe.md`、`answer.py`、`describe_quiz.txt`。
+它會把起點檔複製到你的帳本 `lessons/1-17/`：`predict.txt`、`convert.py`、`pairs.py`、`short_quiz.txt`、`tutor.md`、`report.py`、`describe.md`、`answer.py`、`describe_quiz.txt`，還有影片裡熊打的示範檔 `same.py`（check 不檢查，想跟著影片打一次就用它）。
 
 用 VS Code 打開帳本，寫完存檔，在 VS Code 下面的終端機（帳本資料夾）自己跑跑看：
 
