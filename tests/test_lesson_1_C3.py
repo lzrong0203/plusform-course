@@ -31,6 +31,9 @@ WRITE_A = (D / "reference" / "write.py").read_text(encoding="utf-8")
 START_WRITE_A = (D / "start" / "write.py").read_text(encoding="utf-8")
 DATA_A = 'records = [("早餐", 60), ("午餐", 120), ("早餐", 45), ("飲料", 65), ("午餐", 90)]\n'
 WRITE_IDS = ["write-one", "write-sum", "write-new"]
+REM = json.loads((D / "remedial.json").read_text(encoding="utf-8"))
+T_SORT = REM["topics"]["sort"]["where"][0]["time"]      # 1-13 排序那一章（時間碼照各課說明欄，那幾課重剪就會變，測試照 remedial.json 比）
+T_TOT = REM["topics"]["totals"]["where"][0]["time"]     # 1-15 各分類的小計那一章
 
 # 第三部分常見的寫法（接在 records 那一行後面）：對的兩種、寫錯的幾種
 BODY = {
@@ -335,9 +338,9 @@ class Flow(unittest.TestCase):
         self.assertIn("你猜 10 題，實際過了 8 題：高估了 2 題", out)
         self.assertIn("（開始前你猜 9 題，做完猜 10 題，實際 8 題。）", out)
         self.assertIn("這次沒過。矯正包在帳本的 lessons/1-C3/矯正包.md：", out)
-        self.assertIn("  追蹤第 4 題 → 1-13 影片 5:11 起", out)
-        self.assertIn("  手寫：同一類有好幾筆 → 1-15 影片 4:15 起", out)
-        self.assertIn("  手寫：沒看過的分類、一筆都沒有 → 1-15 影片 4:15 起", out)
+        self.assertIn(f"  追蹤第 4 題 → 1-13 影片 {T_SORT} 起", out)
+        self.assertIn(f"  手寫：同一類有好幾筆 → 1-15 影片 {T_TOT} 起", out)
+        self.assertIn(f"  手寫：沒看過的分類、一筆都沒有 → 1-15 影片 {T_TOT} 起", out)
         self.assertIn("練完，明天以後考卷 B：uv run check.py start 1-C3B", out)
         self.assertLessEqual(len(out.splitlines()), 16)   # 影片錄的是這一段：一個畫面 17 列（含指令那一列）
         for line in out.splitlines():
@@ -348,8 +351,8 @@ class Flow(unittest.TestCase):
                 self.assertIn(line, readme)
         pack = (L / "lessons/1-C3/矯正包.md").read_text(encoding="utf-8")
         self.assertIn("正確答案：C（None [50, 90, 120]）", pack)
-        self.assertIn("1-15〈dict：用名字找資料〉4:15 起", pack)
-        self.assertIn("1-13〈list：一串帳目〉5:11 起", pack)
+        self.assertIn(f"1-15〈dict：用名字找資料〉{T_TOT} 起", pack)
+        self.assertIn(f"1-13〈list：一串帳目〉{T_SORT} 起", pack)
         self.assertIn("11/26 起", pack)
         self.assertEqual(pack.count("### 依分類加總"), 1)   # 兩題都錯在同一類沒有加起來：同一個主題只列一次
         self.assertEqual(sorted(p.name for p in (L / "lessons/1-C3/practice").iterdir()), ["p_sort.py", "p_totals.py"])

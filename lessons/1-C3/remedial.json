@@ -20,13 +20,13 @@
     {
      "lesson": "1-16",
      "title": "可變與參照：為什麼你的 list 自己變了",
-     "time": "3:32",
+     "time": "3:34",
      "chapter": "第①圈 複製一份：copy 和切片"
     },
     {
      "lesson": "1-13",
      "title": "list：一串帳目",
-     "time": "3:28",
+     "time": "3:30",
      "chapter": "第①圈 改內容：append、insert、remove、pop、in、sum"
     }
    ],
@@ -58,7 +58,7 @@
     {
      "lesson": "1-13",
      "title": "list：一串帳目",
-     "time": "5:11",
+     "time": "5:12",
      "chapter": "第①圈 排序：sorted 和 sort，b = a.sort() 是什麼"
     }
    ],
@@ -71,13 +71,13 @@
     {
      "lesson": "1-15",
      "title": "dict：用名字找資料",
-     "time": "3:19",
+     "time": "3:29",
      "chapter": "第①圈 查不到的鍵：KeyError 和 get"
     },
     {
      "lesson": "1-15",
      "title": "dict：用名字找資料",
-     "time": "1:36",
+     "time": "1:46",
      "chapter": "第①圈 dict：鍵和值、用名字拿、list 裡放 dict"
     }
    ],
@@ -90,13 +90,13 @@
     {
      "lesson": "1-17",
      "title": "看懂 AI 最愛的寫法（上）：推導式、zip",
-     "time": "1:41",
+     "time": "1:47",
      "chapter": "第①圈 迴圈折成一行、只留想要的"
     },
     {
      "lesson": "1-17",
      "title": "看懂 AI 最愛的寫法（上）：推導式、zip",
-     "time": "5:22",
+     "time": "5:31",
      "chapter": "第①圈 zip 配成一對對、長度不同、enumerate"
     }
    ],
@@ -122,7 +122,7 @@
     {
      "lesson": "1-17",
      "title": "看懂 AI 最愛的寫法（上）：推導式、zip",
-     "time": "4:01",
+     "time": "4:07",
      "chapter": "第①圈 翻成白話、改回迴圈（同一條 assert）"
     }
    ],
@@ -135,7 +135,7 @@
     {
      "lesson": "1-15",
      "title": "dict：用名字找資料",
-     "time": "1:36",
+     "time": "1:46",
      "chapter": "第①圈 dict：鍵和值、用名字拿、list 裡放 dict"
     }
    ],
@@ -148,7 +148,7 @@
     {
      "lesson": "1-15",
      "title": "dict：用名字找資料",
-     "time": "4:15",
+     "time": "4:25",
      "chapter": "第①圈 各分類的小計、1-9 的燈號改成對照表"
     }
    ],
