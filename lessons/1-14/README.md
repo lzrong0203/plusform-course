@@ -106,12 +106,12 @@ $ uv run lessons/1-14/kinds.py
 
 ```
 你的檢查抓到 2 個壞版本，還有 1 個溜過去：
-  ・需求說排好序：交回的是排好的 list 嗎？（in 和 len 看不出順序）
+  ・需求說排好序：交回的是排好的 list 嗎？
 ```
 
 ## 5. 怎麼測
 
-`uv run check.py 1-14` 會先問你：「你覺得會過幾題？」先猜一個數字再按 Enter，它才開始檢查。一共 18 題：
+`uv run check.py 1-14` 會先問你：「你覺得會過幾題？」先猜一個數字再按 Enter，它才開始檢查。一共 19 題：
 
 - 第一圈：`predict.txt` 4 題、`record.py` 2 題（原本的 record 跑一次；check 把 record 換成別的一筆再跑一次）、`swap.py` 2 題、`kinds.py` 2 題（一樣跑兩次）
 - 第二圈：`set_quiz.txt` 4 題
