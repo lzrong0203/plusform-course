@@ -7,5 +7,6 @@ def by_category(entries):
         return
     result = {}
     for kind, amount in entries:
-        result[kind] = result.get(kind, 0) + amount
+        old = result.get(kind, 0)
+        result[kind] = old + amount
     return result
