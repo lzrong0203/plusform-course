@@ -1,0 +1,43 @@
+{
+ "note": "1-11 的檢查：第①圈 range.txt（對答 4 題）、week.py（累加、計數、找最大值：跑一次原本的 week，再把 week 換成別的七個數字跑一次，要用算的）、number.py（enumerate 編號）、table.py（兩層迴圈的預算表）、parsons.py（拼圖：Parsons，1-11 新的檢查種類 parsons，只對寫了它的 checks.json 生效）；第②圈 trace_quiz.txt（這個迴圈印幾行，對答 3 題），tutor.md 是自評、不檢查；第③圈 facts.txt（chaff 的新模式 table_facts，只對寫了它的 checks.json 生效：學員先不跑程式，寫下預算表應該有幾列、第 3 天晚餐那格是多少，check 跑正確版和 3 個壞版本，數列、找那一格，一件一件比）。",
+ "checks": [
+  {"type": "answers", "id": "range", "file": "lessons/1-11/range.txt", "key": "answers/range.json", "group": "第一圈"},
+  {"type": "run", "id": "week-1", "file": "lessons/1-11/week.py", "group": "第一圈",
+   "desc": "week.py：一週一共 890 元、超過預算 2 天、最多的一天 200 元", "timeout": 5,
+   "expect_regex": ["一週一共\\s*890\\s*元", "超過預算\\s*2\\s*天", "最多的一天\\s*200\\s*元"],
+   "hint": "total 從 0 開始、放在迴圈外面，每一圈加上這一天；超過 150 的天數用 count 數（剛好 150 不算）；最多的一天先設 biggest = 0，這一天比它大就換掉。照 README 成品示範的三行印出來。",
+   "missing_hint": "week.py 應該在帳本的 lessons/1-11/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-11。"},
+  {"type": "run", "id": "week-2", "file": "lessons/1-11/week.py", "group": "第一圈",
+   "desc": "week.py：week 換成別的七個數字，也算得對（不是把答案寫死）", "timeout": 5,
+   "swap": {"find": "^[ \\t]*week[ \\t]*=[ \\t]*\\[.*\\][ \\t]*(#.*)?$", "to": "week = [100, 160, 90, 300, 150, 151, 20]",
+            "feed": "check 把你的 week 換成 [100, 160, 90, 300, 150, 151, 20]，再跑一次。",
+            "missing": "找不到 week = [...] 這一行。第一行的 week 要留著（check 會把它換成別的七個數字再跑一次）。"},
+   "expect_regex": ["一週一共\\s*971\\s*元", "超過預算\\s*3\\s*天", "最多的一天\\s*300\\s*元"],
+   "hint": "數字換了，印出來的也要跟著變：三件事都要用 for 一個一個算，不能直接寫 890、2、200。"},
+  {"type": "run", "id": "number", "file": "lessons/1-11/number.py", "group": "第一圈",
+   "desc": "number.py：用 enumerate 編號，第 1 天 120 元……第 7 天 180 元", "timeout": 5,
+   "expect_exact": ["第 1 天 120 元", "第 2 天 85 元", "第 3 天 200 元", "第 4 天 95 元", "第 5 天 150 元", "第 6 天 60 元", "第 7 天 180 元"],
+   "hint": "for day, cost in enumerate(week, start=1): 每一圈給你編號和那一天的花費；start=1 讓編號從 1 開始（不寫會從 0 開始）。"},
+  {"type": "run", "id": "table", "file": "lessons/1-11/table.py", "group": "第一圈",
+   "desc": "table.py：7 天 × 3 餐的預算表，一共 7 列", "timeout": 5,
+   "expect_exact": ["第 1 天：60 120 150", "第 2 天：60 120 150", "第 3 天：60 120 150", "第 4 天：60 120 150", "第 5 天：60 120 150", "第 6 天：60 120 150", "第 7 天：60 120 150"],
+   "hint": "外層 for day in range(1, 8)，先 print 第幾天（end=\"\" 不換行）；內層 for 跑三餐，每餐 print(cost, end=\" \")；內層跑完、換下一天之前，print() 換行（它跟內層的 for 對齊，不要縮進內層）。"},
+  {"type": "parsons", "id": "pz", "file": "lessons/1-11/parsons.py", "group": "第一圈", "timeout": 5,
+   "lines": ["n = n + 1", "for day in range(1, 4):", "print(\"第\", n, \"餐：第\", day, \"天，預算\", cost, \"元\")", "n = 0", "for cost in [60, 120, 150]:"],
+   "expect_exact": ["第 1 餐：第 1 天，預算 60 元", "第 2 餐：第 1 天，預算 120 元", "第 3 餐：第 1 天，預算 150 元",
+                    "第 4 餐：第 2 天，預算 60 元", "第 5 餐：第 2 天，預算 120 元", "第 6 餐：第 2 天，預算 150 元",
+                    "第 7 餐：第 3 天，預算 60 元", "第 8 餐：第 3 天，預算 120 元", "第 9 餐：第 3 天，預算 150 元"],
+   "desc_order": "拼圖：五行都用上、沒有改字，排好以後 Python 讀得懂",
+   "desc_run": "拼圖：排好跑出來是第 1 餐到第 9 餐",
+   "hint": "n = 0 只做一次，放在最外面；外層跑天、內層跑三餐；n 加 1 和 print 都要在內層裡，n 先加再印。",
+   "missing_hint": "parsons.py 應該在帳本的 lessons/1-11/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-11。"},
+  {"type": "answers", "id": "trace", "file": "lessons/1-11/trace_quiz.txt", "key": "answers/trace_quiz.json", "group": "第二圈"},
+  {"type": "chaff", "id": "r3", "mode": "table_facts", "student_file": "lessons/1-11/facts.txt",
+   "reference": "reference/plan.py", "mutants": "mutants/mutants.json", "teacher_file": "answers/facts.txt", "min_checks": 1, "timeout": 5,
+   "facts": [
+    {"label": "應該有幾列", "kind": "rows", "hint": "需求卡說每天一列：一週有幾天？（空白的一行不算一列）"},
+    {"label": "第 3 天晚餐那格", "kind": "cell", "row": "第 3 天", "col": 3,
+     "hint": "每一格是「到這一餐為止，這週一共」：一天三餐是 60 + 120 + 150，到第 3 天晚餐是幾天加起來？"}
+   ]}
+ ]
+}

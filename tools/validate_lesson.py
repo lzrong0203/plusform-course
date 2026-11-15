@@ -97,7 +97,8 @@ def shell_commands(text: str) -> set[str]:
 
 
 def strip_comments(text: str) -> str:
-    return "\n".join(ln for ln in (x.strip() for x in text.splitlines()) if ln and not ln.startswith("#"))
+    # 1-11：行首的縮排留著比（Python 的縮排有意義：print() 縮進內層迴圈就是另一支程式）；行尾空白、空行、註解行照舊不比
+    return "\n".join(x.rstrip() for x in text.splitlines() if x.strip() and not x.strip().startswith("#"))
 
 
 def make_temp_ledger() -> tuple[Path, Path]:
@@ -293,7 +294,7 @@ def validate_lesson(lid: str, root: Path, use_env: bool, temp: dict) -> Report:
     check_concepts(rep, lesson, order)
 
     # ---- 3. 正確版通過官方測試；4. 起點程式不能一開始就全過 ----
-    official = [s for s in lesson.checks if s["type"] in ("call", "run")]
+    official = [s for s in lesson.checks if s["type"] in ("call", "run", "parsons")]   # parsons（1-11 起）：正確版要排得對、起點檔不能一開始就過
     covered = 0
     for spec in official:
         ref = d / "reference" / Path(spec["file"]).name

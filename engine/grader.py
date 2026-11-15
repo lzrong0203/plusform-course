@@ -15,6 +15,7 @@ check.py（學員端）和 tools/validate_lesson.py（老師端）共用這一�
   chaff         wheat/chaff：學員寫的檢查要在正確版全過、在每個壞版本至少錯一條
   script_match  學員改過的腳本，在假的資料夾裡跑起來要跟安全版一樣
   git_commits   帳本是 git 存放庫，而且至少有幾個存檔點（commit）
+  parsons       拼圖（Parsons，1-11 起）：把打亂的程式行排回去、自己縮排；行都要是題目給的（不能改字、多寫、少寫），排好跑出來要跟範例一樣
 
 學員寫的檔案一律用 utf-8-sig 讀（Windows 記事本會在最前面加看不見的 BOM），
 讀不懂（例如存成 Big5）就給白話的說明，不噴 Traceback。
@@ -448,6 +449,7 @@ DEFAULT_GROUP = {
     "chaff": "第三圈",  # 終端機輸出不用圈號字元：③ 在 xterm.js、Terminal.app 會跟下一個字疊在一起
     "script_match": "官方測試",
     "git_commits": "官方測試",
+    "parsons": "官方測試",
 }
 
 
@@ -825,6 +827,86 @@ class RunCheck(Check):
             r.data["mtime"] = path.stat().st_mtime
 
 
+# ---------------- parsons（拼圖，2026-11-15，1-11 起；只對寫了 type parsons 的 checks.json 生效） ----------------
+
+def _flat_code(text: str) -> str:
+    """比對拼圖的一行：NFKC 後拿掉所有空白（學員多打或少打一個空格不算改字；縮排另外檢查）。"""
+    return "".join(unicodedata.normalize("NFKC", text).split())
+
+
+class ParsonsCheck(Check):
+    """學員把打亂的程式行排回正確的順序、自己加縮排（每一層四個空格）。兩題：
+      order：題目給的行一行不少、一行不多、沒有改字，縮排是四個空格的倍數，而且 Python 讀得懂（沒有 IndentationError／SyntaxError）
+      run：  排好跑起來，印出來的跟 expect_exact 一模一樣（排法不只一種也沒關係，照跑出來的結果判）
+    spec：file、lines（題目給的行，不含縮排）、expect_exact、timeout（秒，選填）、hint（選填）。# 開頭的說明行和空行不算。"""
+
+    def plan(self):
+        s = self.spec
+        return [self.stub("order", s.get("desc_order", "拼圖：每一行都用上、沒有改字，排好以後 Python 讀得懂")),
+                self.stub("run", s.get("desc_run", "拼圖：排好跑出來跟範例一模一樣"))]
+
+    def run(self, results):
+        order_r, run_r = results
+        rel = self.spec["file"]
+        path = self.ctx.student(rel)
+        if not path.is_file():
+            order_r.detail = run_r.detail = self.ctx.missing(rel, self.spec.get("missing_hint"))
+            return
+        source = read_student_text(path)
+        body = [(i, raw.rstrip("\r\n")) for i, raw in enumerate(source.splitlines(), start=1)
+                if raw.strip() and not raw.strip().startswith("#")]
+        given = [_flat_code(x) for x in self.spec["lines"]]
+        shown = {_flat_code(x): x for x in self.spec["lines"]}
+        left = list(given)
+        problems = []
+        for i, raw in body:
+            k = _flat_code(raw)
+            if k in left:
+                left.remove(k)
+            else:
+                problems.append(f"第 {i} 行「{raw.strip()}」不是拼圖裡的行（或是同一行用了兩次）。"
+                                "拼圖只能搬動和縮排，不能改字、不能多寫。")
+        for k in left:
+            problems.append(f"少了「{shown[k]}」這一行：題目給的每一行都要用上。")
+        for i, raw in body:
+            lead = raw[: len(raw) - len(raw.lstrip())]
+            if "\t" in lead:
+                problems.append(f"第 {i} 行用了 Tab 縮排：每一層請打四個空格（VS Code 按 Tab 也會變成四個空格）。")
+            elif len(lead) % 4:
+                problems.append(f"第 {i} 行往右縮了 {len(lead)} 格：每一層縮四格（4、8、12……）。")
+        if not problems:
+            try:
+                ast.parse(source)
+            except SyntaxError as exc:
+                bad = exc.text.strip() if exc.text else ""
+                if isinstance(exc, IndentationError) or "indent" in (exc.msg or ""):
+                    problems.append(f"Python 讀到第 {exc.lineno} 行就說縮排不對（{type(exc).__name__}）：{bad}\n"
+                                    "  for 那一行最後有冒號，下一行要往右縮四格；同一層的行要對齊。")
+                else:
+                    problems.append(f"第 {exc.lineno} 行有語法錯誤（{exc.msg}）：{bad}")
+        order_r.ok = not problems
+        if problems:
+            order_r.detail = first_problem(problems)
+            run_r.detail = "先把上一題（每一行都用上、縮排對）修好，再看跑出來的結果。"
+            return
+        t = self.spec.get("timeout")
+        p = self.ctx.env.run_file(path, timeout=min(self.ctx.env.timeout, float(t)) if t else None)
+        hint = f"\n  提示：{self.spec['hint']}" if self.spec.get("hint") else ""
+        if p.timed_out or p.overflow:
+            run_r.detail = "跑了太久或印了太多東西，被停下來了：看看是不是排成了停不下來的樣子。" + hint
+            return
+        if p.returncode != 0:
+            run_r.detail = crash_story(p, "") + hint
+            return
+        want = output_lines("\n".join(self.spec["expect_exact"]))
+        got = output_lines(p.stdout)
+        run_r.ok = got == want
+        if not run_r.ok:
+            mine = "\n".join("    " + ln.rstrip() for ln in p.stdout.splitlines() if ln.strip()) or "    （什麼都沒印）"
+            run_r.detail = ("排好跑出來跟範例不一樣。\n  範例：\n" + "\n".join("    " + w for w in want)
+                            + f"\n  你的（{len(got)} 行）：\n" + mine + hint)
+
+
 # ---------------- call ----------------
 
 class CallCheck(Check):
@@ -1092,6 +1174,8 @@ class ChaffCheck(Check):
                 problem = self.read_inputs()
             elif self.mode == "cases":
                 checks, marks, unfinished, problem = self.parse_cases(lines)
+            elif self.mode == "table_facts":
+                checks, unfinished, problem = self.parse_facts(lines)
             else:
                 for i, raw in enumerate(lines, start=1):
                     line = raw.strip()
@@ -1233,6 +1317,75 @@ class ChaffCheck(Check):
         last = next((ln.strip() for ln in reversed(p.stderr.splitlines()) if ln.strip()), "")
         return (f"你的 {name} 讓正確版也當掉了（最後一行：{last}）。\n"
                 f"  {self.spec.get('crash_hint', '看看是不是寫了需求卡說不會出現的字。')}")
+
+    # ----- table_facts（2026-11-15，1-11 第③圈）：學員先不跑程式，照需求卡寫下表格的幾件事（應該有幾列、某一格是多少），
+    #       check 跑正確版和 3 個壞版本（不餵輸入），數印出來的列、找那一格，一件一件比。只對寫了 mode table_facts 的 checks.json 生效 -----
+    @staticmethod
+    def fact_key(text: str) -> str:
+        return "".join(unicodedata.normalize("NFKC", text).split())
+
+    def parse_facts(self, lines: list[str]) -> tuple[list[StudentCheck], int, str | None]:
+        """每一行「冒號前面的字：數字」。冒號前面要照原本的寫（spec 的 facts[].label），只改「？」；# 開頭是說明行。
+        回傳（檢查, 還沒寫完的行數, 一句白話的問題或 None）。self._facts[行號] = (fact, 學員寫的數字)。"""
+        facts = {self.fact_key(f["label"]): f for f in self.spec["facts"]}
+        labels = "「" + "」「".join(f["label"] for f in self.spec["facts"]) + "」"
+        checks: list[StudentCheck] = []
+        unfinished = 0
+        seen: set[str] = set()
+        self._facts: dict[int, tuple[dict, int]] = {}
+        for i, raw in enumerate(lines, start=1):
+            line = raw.strip()
+            if not line or line.startswith("#"):
+                continue
+            flat = unicodedata.normalize("NFKC", line)
+            if ":" not in flat:
+                return checks, unfinished, f"第 {i} 行「{line}」少了冒號。照原本的格式「開頭：數字」寫，只改「？」那裡。"
+            left, right = flat.split(":", 1)
+            key = self.fact_key(left)
+            if key not in facts:
+                return checks, unfinished, f"第 {i} 行「{line}」：冒號前面的字被改到了，只要改「？」就好。\n  冒號前面照原本的寫：{labels}。"
+            if key in seen:
+                return checks, unfinished, f"第 {i} 行「{line}」：{facts[key]['label']}寫了兩次，留一行就好。"
+            seen.add(key)
+            if "?" in right:
+                unfinished += 1
+                continue
+            val = "".join(right.split()).replace(",", "")
+            m = re.fullmatch(r"(-?\d+)(列|元|格|行)?", val)
+            if not m:
+                return checks, unfinished, (f"第 {i} 行「{line}」：冒號後面寫一個整數就好（例如 5），"
+                                            "不要寫算式或文字。")
+            checks.append(StudentCheck(i, line))
+            self._facts[i] = (facts[key], int(m.group(1)))
+        return checks, unfinished, None
+
+    @staticmethod
+    def table_rows(stdout: str) -> list[str]:
+        """印出來的字 → 一列一列（空白的列不算，跟需求卡「每天一列」的數法一樣）。"""
+        return [unicodedata.normalize("NFKC", x).strip() for x in _text(stdout).replace("\r\n", "\n").split("\n") if x.strip()]
+
+    @staticmethod
+    def fact_value(fact: dict, rows: list[str]) -> int | None:
+        """這個版本印出來的表，這一件事是多少（找不到是 None）：
+        rows＝有幾列；cell＝從 fact["row"]（例如「第 3 天」）那個標籤後面開始、到下一個同樣的標籤（第 N 天）之前，冒號後面第 col 個數字。
+        照標籤找、不照換行找：同一天的格子被換行拆成好幾列（print() 縮錯層），那一格的數字一樣找得到，只有列數不一樣。"""
+        if fact["kind"] == "rows":
+            return len(rows)
+        words = unicodedata.normalize("NFKC", fact["row"]).split()
+        head = r"\s*".join(re.escape(x) for x in words) + r"(?!\d)"
+        label = r"\s*".join(r"\d+" if x.isdigit() else re.escape(x) for x in words) + r"(?!\d)"   # 第 3 天 → 第 N 天
+        text = "\n".join(rows)
+        m = re.search(head, text)
+        if not m:
+            return None
+        rest = text[m.end():]
+        nxt = re.search(label, rest)
+        if nxt:
+            rest = rest[:nxt.start()]
+        rest = rest.split(":", 1)[1] if ":" in rest.split("\n", 1)[0] else rest
+        nums = re.findall(r"-?\d+", rest)
+        k = int(fact["col"]) - 1
+        return int(nums[k]) if 0 <= k < len(nums) else None
 
     # ----- cases（2026-11-14，1-3 第③圈）：案例表「輸入 -> 應該變成」，check.py 把輸入丟給各版本的固定函式，連型別一起比 -----
     def parse_cases(self, lines: list[str]) -> tuple[list[StudentCheck], list[Mark], int, str | None]:
@@ -1379,6 +1532,14 @@ class ChaffCheck(Check):
             for i, _m in enumerate(self.mutants, start=1):
                 out.append(self.stub(f"m{i}", f"抓到第 {i} 個壞版本"))
             return out
+        if self.mode == "table_facts":   # 1-11：寫的是表格的幾件事（應該有幾列、某一格是多少）
+            out = [
+                self.stub("count", f"至少寫 {self.min} 件事（只改「？」）"),
+                self.stub("wheat", "你寫的每一件事，正確版都對得上"),
+            ]
+            for i, _m in enumerate(self.mutants, start=1):
+                out.append(self.stub(f"m{i}", f"抓到第 {i} 個壞版本"))
+            return out
         out = [
             self.stub("count", f"至少寫 {self.min} 條檢查"),
             self.stub("wheat", "你的檢查在正確版上要全部成立"),
@@ -1518,6 +1679,20 @@ class ChaffCheck(Check):
                 out[name] = [by_line[c.line] for c in checks]
                 if name == "reference":
                     mark_status = {m.line: by_line[m.line] for m in marks}
+        elif self.mode == "table_facts":
+            for name, path in impls.items():
+                p = self.ctx.env.run_file(path, timeout=self.version_timeout())
+                crashed = p.returncode != 0 or p.stopped
+                if name == "reference" and crashed:
+                    out[name] = [{"status": "error", "error": "正確版跑不起來"} for _c in checks]
+                    continue
+                rows_out = self.table_rows(p.stdout)
+                rows = []
+                for c in checks:
+                    fact, want = self._facts[c.line]
+                    got = self.fact_value(fact, rows_out)
+                    rows.append({"status": "pass" if got == want else "fail", "got": got, "crashed": crashed})
+                out[name] = rows
         elif self.mode == "path_checks":
             sc = json.loads(self.ctx.course(self.spec["scenario"]).read_text(encoding="utf-8"))
             for name, path in impls.items():
@@ -1608,6 +1783,12 @@ class ChaffCheck(Check):
             if got == exp or str(got) == str(exp):   # 120 對 120.0、120 對 "120"：數字一樣、型別不一樣
                 msg += "\n  數字一樣、型別不一樣：沒有引號的 120 是整數，\"120\" 是文字，120.0 是小數。"
             return msg
+        if self.mode == "table_facts":   # 1-11：不講正確的數字，只給提示（spec 的 facts[].hint）
+            if st.get("status") == "error":
+                return "正確版在你的帳本裡跑不起來，先確定 0-5 的環境檢查都過了（uv run check.py env）。"
+            fact, want = self._facts[c.line]
+            return (f"第 {c.line} 行「{c.text}」：跟正確版印出來的不一樣。\n"
+                    f"  提示：{fact.get('hint', '再對一次需求卡。')}")
         if self.mode == "inputs_text" and st.get("status") == "error":
             return st.get("error") or "正確版跑不起來。"
         if self.mode in TEXT_MODES:
@@ -1668,7 +1849,8 @@ class ChaffCheck(Check):
                 marked = "；標了「已知會當掉」的不算在裡面" if marks else ""
                 count_r.detail = f"你寫了 {n} 組案例，這課要至少 {self.min} 組{extra}{marked}。"
             else:
-                count_r.detail = f"你寫了 {n} 條檢查，這課要至少 {self.min} 條{extra}{marked}。"
+                count_r.detail = (f"你寫了 {n} 件事，這課要至少 {self.min} 件{extra}。" if self.mode == "table_facts"
+                                  else f"你寫了 {n} 條檢查，這課要至少 {self.min} 條{extra}{marked}。")
         reveal = count_r.ok  # 寫滿最少條數以前，先不講溜過去的是哪一種錯
 
         mark_status: dict[int, dict] = {}
@@ -1700,7 +1882,7 @@ class ChaffCheck(Check):
                     r.detail = "你的檢查在正確版上還沒有一條成立，先修好正確版那一題。"
                     slipped.append(m["hint"])
                 else:
-                    unit = {"expected_text": "行", "inputs_text": "行", "cases": "組案例"}.get(self.mode, "條檢查")
+                    unit = {"expected_text": "行", "inputs_text": "行", "cases": "組案例", "table_facts": "件事"}.get(self.mode, "條檢查")
                     r.detail = f"溜過去了：{m['hint']}" if reveal else f"溜過去了。（先寫滿 {self.min} {unit}，再告訴你溜過去的是哪一種錯）"
                     slipped.append(m["hint"])
             caught = len(self.mutants) - len(slipped)
@@ -1716,11 +1898,11 @@ class ChaffCheck(Check):
                 self.ctx.summaries.extend(f"  ・{h}" for h in slipped)
             else:
                 # 分兩行（每行 ≤68 欄，同上）
-                noun, unit = {"expected_text": ("預期輸出", "行"), "inputs_text": ("預期輸出", "行"), "cases": ("案例", "組案例")}.get(self.mode, ("檢查", "條檢查"))
+                noun, unit = {"expected_text": ("預期輸出", "行"), "inputs_text": ("預期輸出", "行"), "cases": ("案例", "組案例"), "table_facts": ("檢查", "件事")}.get(self.mode, ("檢查", "條檢查"))
                 self.ctx.summaries.append(f"你的{noun}抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去。")
                 self.ctx.summaries.append(f"  先寫滿 {self.min} {unit}，再告訴你是哪幾種。")
         else:
-            none = {"expected_text": "還沒寫預期輸出", "inputs_text": "還沒寫預期輸出", "cases": "還沒有任何案例"}.get(self.mode, "還沒有任何檢查")
+            none = {"expected_text": "還沒寫預期輸出", "inputs_text": "還沒寫預期輸出", "cases": "還沒有任何案例", "table_facts": "還沒寫任何一件事（「？」還沒改）"}.get(self.mode, "還沒有任何檢查")
             wheat_r.detail = f"{none}。" + (f"（有 {unfinished} 行的「？」還沒填）" if unfinished else "")
             for r in mutant_rs:
                 r.detail = f"{none}，所以壞版本都溜過去了。"
@@ -1915,6 +2097,7 @@ CHECKERS = {
     "chaff": ChaffCheck,
     "script_match": ScriptMatchCheck,
     "git_commits": GitCheck,
+    "parsons": ParsonsCheck,
 }
 
 

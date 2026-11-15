@@ -1,0 +1,7 @@
+{
+  "id": "1-11",
+  "title": "for、range、enumerate 與兩層迴圈",
+  "minutes": 50,
+  "fast_minutes": 10,
+  "after_start": "接下來，用 VS Code 打開帳本的 lessons/1-11：\n  1. 第一圈：range.txt 追 4 題；week.py 算一週合計、超過預算的天數、最多的一天；number.py 用 enumerate 編號；table.py 印 7 天 × 3 餐的預算表；parsons.py 把打亂的五行排回去\n  2. 第二圈：請家教出三題「這個迴圈印幾行」，先在紙上追再貼答案，記在 tutor.md（自評）；trace_quiz.txt 三題\n  3. 第三圈：facts.txt 先別跑程式，寫下預算表應該有幾列、第 3 天晚餐那格是多少\n做完回到課程資料夾打：uv run check.py 1-11"
+}
