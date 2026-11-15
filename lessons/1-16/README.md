@@ -54,7 +54,7 @@ git pull
 uv run check.py start 1-16
 ```
 
-它會把起點檔複製到你的帳本 `lessons/1-16/`：`predict.txt`、`ids.py`、`ledgers.py`、`final_a.txt`、`tutor.md`、`budget.py`（AI 寫的、算錯的那一支，第③圈要修）、`checks_budget.py`。
+它會把起點檔複製到你的帳本 `lessons/1-16/`：`predict.txt`、`ids.py`、`ledgers.py`、`final_a.txt`、`tutor.md`、`budget.py`（AI 寫的、算錯的那一支，第③圈要修）、`checks_budget.py`，還有影片裡熊在 VS Code 打的 `two.py`（第 2、5 行空著，可以跟著打一次；check 不檢查）。
 
 用 VS Code 打開帳本，寫完存檔，在 VS Code 下面的終端機（帳本資料夾）自己跑跑看：
 
