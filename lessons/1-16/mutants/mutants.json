@@ -1,0 +1,9 @@
+{
+  "target": "budget.py",
+  "note": "hint 是學員的 assert 沒抓到這個壞版本時，畫面上顯示的提示（每行壓在 68 欄內；中文字一個佔兩欄）。三個都是參照的錯：m1 就是學員拿到的 budget.py（nov、dec 都直接等於 fixed，三個名字同一個 list，三行都印 15619）；m2 只有 nov 複製（11 月、12 月的合計都對，可是 fixed 被加進機票）；m3 只有 dec 複製（11 月對，fixed 先被加進午餐，12 月從被改過的 fixed 複製）。寫一條「固定開銷還是 12499」就三個都抓到；只檢查 11 月的合計只抓得到 m1。",
+  "mutants": [
+    {"id": "m1", "file": "budget_m1.py", "hint": "原本的 budget.py 三行都印 15619：assert 右邊寫你自己算好的答案", "what": "nov、dec 都直接等於 fixed：三個名字指著同一個 list，三行都印 15619"},
+    {"id": "m2", "file": "budget_m2.py", "hint": "兩個月的合計都對了，固定開銷 fixed 本身有沒有被改到？", "what": "只有 nov 複製了一份，dec 還是直接等於 fixed：機票加進了固定開銷"},
+    {"id": "m3", "file": "budget_m3.py", "hint": "12 月的合計對嗎？固定開銷 fixed 有沒有被改到？", "what": "只有 dec 複製了一份：nov 的午餐先加進了 fixed，12 月從被改過的 fixed 複製"}
+  ]
+}

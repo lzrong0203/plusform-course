@@ -1,0 +1,19 @@
+{
+ "note": "1-16 第①圈：不能改裡面的型別（對答 3 題）。norm_answer 會做 NFKC、拿掉空白與前後的引號、英文不分大小寫；第 2、3 題用選擇題。",
+ "normalize": "text",
+ "how": "第 1 題寫印出來的字（例如：5），第 2、3 題寫 A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {"id": "p1", "title": "x = x + 1 以後 y 是多少", "accept": ["5"],
+   "hint": "int 不能改裡面。x + 1 是做出一個新的數字，名字 x 換過去指它；y 有被動到嗎？",
+   "explain": "y = x 讓 y 也指著 5。x = x + 1 算出一個新的 6，只有名字 x 換過去指 6，y 還是指著 5，所以印出 5（官方 FAQ 的例子：ints are immutable）。"},
+  {"id": "p2", "title": "s = s + \"便當\" 以後 t 是什麼", "accept": ["C"],
+   "hint": "str 也不能改裡面。s + \"便當\" 是做出一個新的字串，還是改掉原本的？",
+   "explain": "字串不能改裡面。s + \"便當\" 做出一個新的字串「午餐便當」，名字 s 換過去指它；t 還指著原本的「午餐」，所以印出 午餐。",
+   "choices": {"A": "午餐便當", "B": "出現錯誤訊息", "C": "午餐"}},
+  {"id": "p3", "title": "哪一個可以直接改裡面", "accept": ["A"],
+   "hint": "1-14 學過 tuple 放進去就不能改。這三個裡面，哪一個有 append、可以寫 x[0] = 0？",
+   "explain": "list 是可變的（mutable）：append、x[0] = 0 都是直接改裡面。tuple、str、int 是不可變的（immutable），要變只能做一個新的，再把名字換過去（官方文件：numbers, strings and tuples are immutable, while dictionaries and lists are mutable）。",
+   "choices": {"A": "[120, 85]（list）", "B": "(\"11/03\", 120)（tuple）", "C": "\"午餐\"（str）"}}
+ ]
+}

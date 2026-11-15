@@ -1,0 +1,26 @@
+{
+  "note": "回顧題：學員通過這課以後，往後第 2 課和第 5 課的 check 會各帶一題。",
+  "questions": [
+    {
+      "id": "r1",
+      "q": "a = [1, 2]\nb = a\nb.append(3)\nprint(len(a))\n印出多少？（寫數字）",
+      "accept": ["3"],
+      "hint": "b = a 有沒有做出第二個 list？",
+      "explain": "b = a 只是讓 b 也指著同一個 list，b.append(3) 改的就是 a 那一個，所以 a 有 3 個，len(a) 是 3。"
+    },
+    {
+      "id": "r2",
+      "q": "a = [1, 2]\nb = a.copy()\nb.append(3)\nprint(a)\n印出什麼？\nA. [1, 2]\nB. [1, 2, 3]\nC. None\n（寫 A、B 或 C）",
+      "accept": ["A"],
+      "explain": "a.copy() 做出第二個 list，b.append(3) 只改 b 那一個，a 還是 [1, 2]。",
+      "choices": {"A": "[1, 2]", "B": "[1, 2, 3]", "C": "None"}
+    },
+    {
+      "id": "r3",
+      "q": "下面哪一個是「不能改裡面」的型別？\nA. list\nB. dict\nC. tuple\n（寫 A、B 或 C）",
+      "accept": ["C"],
+      "explain": "tuple、int、str 不能改裡面（immutable），要變只能做一個新的；list、dict、set 可以直接改裡面（mutable），所以兩個名字指著同一個的時候，從另一個名字也看得到改變。",
+      "choices": {"A": "list", "B": "dict", "C": "tuple"}
+    }
+  ]
+}

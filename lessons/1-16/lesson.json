@@ -1,0 +1,7 @@
+{
+  "id": "1-16",
+  "title": "可變與參照：為什麼你的 list 自己變了",
+  "minutes": 45,
+  "fast_minutes": 10,
+  "after_start": "接下來，用 VS Code 打開帳本的 lessons/1-16：\n  1. 第一圈：predict.txt 先別跑、預測 3 題；ids.py 用 is 和兩個等號印出三行；ledgers.py 把果凍兔的兩本帳本分開\n  2. 第二圈：請家教考你「最後 a 是什麼」，每一題先畫圖，記在 tutor.md（自評）；final_a.txt 四題\n  3. 第三圈：先在 checks_budget.py 寫一條 assert，證明 budget.py 算錯了；再修好 budget.py，讓同一條 assert 成立\n做完回到課程資料夾打：uv run check.py 1-16"
+}
