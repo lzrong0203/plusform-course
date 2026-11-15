@@ -652,7 +652,9 @@ class AnswersCheck(Check):
             elif q.get("keywords"):   # 1-15 起（只對寫了 keywords 的題目）：自己寫一句話，每一組關鍵字至少要有一個、reject 裡的一個都不能有
                 flat = norm_answer(given, "text")
                 r.ok = (all(any(norm_answer(k, "text") in flat for k in group) for group in q["keywords"])
-                        and not any(norm_answer(k, "text") in flat for k in q.get("reject", [])))
+                        and not any(norm_answer(k, "text") in flat for k in q.get("reject", []))
+                        # reject_re（1-15 v2，Codex 第二輪：「不要歸給最大」這種否定句，逐字列舉擋不完）：正規式，比對 norm_answer 後的字（去掉空白、NFKC）
+                        and not any(re.search(rx, flat) for rx in q.get("reject_re", [])))
             else:
                 r.ok = norm_answer(given, kind, home) in accepted
             if not r.ok:
