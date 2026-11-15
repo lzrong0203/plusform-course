@@ -17,13 +17,13 @@
    "stage": "讀程式",
    "timeout": 5,
    "lines": [
-    "print(\"第\", week, \"週存到\", saved, \"元\")",
-    "saved = saved + 150",
+    "print(\"第\", week, \"週存到\", bank, \"元\")",
+    "bank = bank + 150",
     "week = 0",
-    "if saved >= 500:",
+    "if bank >= 500:",
     "while True:",
     "break",
-    "saved = 0",
+    "bank = 0",
     "week = week + 1"
    ],
    "expect_exact": [
@@ -31,7 +31,7 @@
    ],
    "desc_order": "拼圖：八行都用上、沒有改字，排好以後 Python 讀得懂",
    "desc_run": "拼圖：排好跑出來是「第 4 週存到 600 元」",
-   "hint": "saved = 0、week = 0 只做一次，放在最外面；每一週要做的（week 加 1、saved 加 150、檢查夠了沒）縮在 while 底下；break 縮在 if 底下；最後才印一次。",
+   "hint": "bank = 0、week = 0 只做一次，放在最外面；每一週要做的（week 加 1、bank 加 150、檢查夠了沒）縮在 while 底下；break 縮在 if 底下；最後才印一次。",
    "missing_hint": "parsons.py 應該在帳本的 lessons/1-12/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-12。"
   },
   {

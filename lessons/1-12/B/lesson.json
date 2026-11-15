@@ -8,10 +8,18 @@
   "checkpoint": true,
   "noun": "關卡",
   "pass_at": 16,
-  "stages": ["讀程式", "從零寫 v0.1"],
-  "answer_files": ["trace.txt", "parsons.py", "fix.py", "ledger.py"],
+  "stages": [
+    "讀程式",
+    "從零寫 v0.1"
+  ],
+  "answer_files": [
+    "trace.txt",
+    "parsons.py",
+    "fix.py",
+    "ledger.py"
+  ],
   "remedial": "../remedial.json",
-  "remedial_show": 3,
+  "remedial_show": 2,
   "practice": "../practice",
-  "after_start": "卷 B 開始了。第一部分是考卷：全程關掉 AI，參考 45 分鐘（只記錄）。\n  作答檔：帳本的 lessons/1-12B/（trace.txt、parsons.py、fix.py、ledger.py）\n寫完回到課程資料夾打：uv run check.py 1-12B（交卷）"
+  "after_start": "卷 B 開始了。第一部分是考卷：全程關掉 AI，參考 45 分鐘（只記錄）。\n  作答檔：lessons/1-12B/（trace.txt、parsons.py、fix.py、ledger.py）\n寫完回到課程資料夾打：uv run check.py 1-12B（交卷）"
 }

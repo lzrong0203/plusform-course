@@ -5,11 +5,11 @@
 # 排好跑起來，要印出這一行：
 #   第 4 週存到 600 元
 # 排好存檔，在帳本資料夾打 uv run lessons/1-12/parsons.py 跑跑看。
-print("第", week, "週存到", saved, "元")
-saved = saved + 150
+print("第", week, "週存到", bank, "元")
+bank = bank + 150
 week = 0
-if saved >= 500:
+if bank >= 500:
 while True:
 break
-saved = 0
+bank = 0
 week = week + 1

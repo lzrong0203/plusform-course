@@ -1051,7 +1051,7 @@ def print_remedial(lesson: grader.Lesson, summary: list[str]) -> None:
 
 def gate_progress(base: grader.Lesson, ledger: Path, records: state.Records, now_iso: str, just_copied: list[str]) -> bool:
     """第二、三部分的檢查和升級。回傳這一次有沒有全部做完（升級了、或早就升級了）。
-    第二、三部分的檔案剛放進帳本的那一次，只說檔案放好了（還沒寫，不用檢查）。每行壓在 70 欄內（VHS 錄影）。"""
+    第二、三部分的檔案剛放進帳本的那一次，只說檔案放好了（還沒寫，不用檢查）。每行壓在 70 欄內、整段（連交卷）15 行內（VHS 錄影一個畫面 17 列）。"""
     prog = records.progress()
     info = prog["lessons"].setdefault(base.id, {})
     done = info.setdefault("gate", {})
@@ -1087,7 +1087,6 @@ def gate_progress(base: grader.Lesson, ledger: Path, records: state.Records, now
     need = int(base.meta.get("gate_days", 3))
     level = base.meta.get("level_name", "這一級")
     finished = all(p["part"] in done for p in parts)
-    print()
     if info.get("level_up"):
         print(f"（{level}在 {mmdd(info['level_up'])} 就過關了。）")
     elif finished and days >= need:

@@ -175,13 +175,13 @@ class Grading(unittest.TestCase):
 
     def test_parsons_break_outside_loop_is_not_in_order(self):
         # Codex 審卷 B：print 放進 if、break 排到最外面，行數、縮排都對，ast 讀得懂，可是 compile 會說 'break' outside loop
-        bad = "saved = 0\nweek = 0\nwhile True:\n    week = week + 1\n    saved = saved + 150\n    if saved >= 500:\n        print(\"第\", week, \"週存到\", saved, \"元\")\nbreak\n"
+        bad = "bank = 0\nweek = 0\nwhile True:\n    week = week + 1\n    bank = bank + 150\n    if bank >= 500:\n        print(\"第\", week, \"週存到\", bank, \"元\")\nbreak\n"
         write(L / "lessons/1-12/parsons.py", bad)
         out = ev("1-12", ["pz"])
         self.assertEqual([r.ok for r in out.results], [False, False])
         self.assertIn("不在迴圈裡", out.results[0].detail)
         write(L / "lessons/1-12/parsons.py", text("reference/parsons.py").replace(
-            '        break\nprint("第", week, "週存到", saved, "元")\n', '        print("第", week, "週存到", saved, "元")\n        break\n'))
+            '        break\nprint("第", week, "週存到", bank, "元")\n', '        print("第", week, "週存到", bank, "元")\n        break\n'))
         out = ev("1-12", ["pz"])
         self.assertEqual([r.ok for r in out.results], [True, True], [r.detail for r in out.results])   # 印在 break 前面也對（排法不只一種）
 
@@ -326,6 +326,8 @@ class Flow(unittest.TestCase):
         self.assertIn("關卡開始前，先寫下預測分數。", r.stdout)
         self.assertIn("記下來了：開始前你猜會過 17／20 題。交卷時會再問一次。", r.stdout)
         self.assertIn("全程關掉 AI，參考 45 分鐘（只記錄）", r.stdout)
+        for line in r.stdout.splitlines():   # start 的畫面也錄進影片：70 欄寫得完
+            self.assertLessEqual(sum(2 if ord(c) > 0x2E7F else 1 for c in line), 70, line)
         r = self.run_(["1-12", "--predict", "18"], DAY1)
         self.assertEqual(r.returncode, 1)
         self.assertIn("第一部分還有題目沒寫，這次先不算交卷：", r.stdout)
@@ -352,13 +354,13 @@ class Flow(unittest.TestCase):
         self.assertIn("這次沒過。矯正包在帳本的 lessons/1-12/矯正包.md：", out)
         self.assertIn("  預測第 2 題 → 1-10 影片", out)
         self.assertIn("  錯誤訊息第 9 題 → 1-10 影片", out)
-        self.assertIn("  修好：空白的一行 → 1-10 影片", out)
-        self.assertIn("  （還有 2 題，寫在矯正包裡）", out)
+        self.assertNotIn("  修好：空白的一行 → 1-10 影片", out)   # 終端機只列前 2 題（remedial_show）
+        self.assertIn("  （還有 3 題，寫在矯正包裡）", out)
         self.assertIn("練完，明天以後考卷 B：uv run check.py start 1-12B", out)
         self.assertIn("第二、三部分的檔案放進帳本了：checks_share.py、share.py、tutor.md", out)
         self.assertIn("做完再打一次 uv run check.py 1-12，檢查第二、三部分和升級。", out)
         lines = out.splitlines()
-        self.assertLessEqual(len(lines), 18, out)   # 影片錄的是這一段：一個畫面 18 列、沒有捲動
+        self.assertLessEqual(len(lines), 15, out)   # 影片錄的是這一段：一個畫面 17 列（指令＋15 行＋提示字元），沒有捲動
         for line in lines:   # 70 欄寫得完（中文算兩欄）
             self.assertLessEqual(sum(2 if ord(c) > 0x2E7F else 1 for c in line), 70, line)
         pack = (L / "lessons/1-12/矯正包.md").read_text(encoding="utf-8")
@@ -429,7 +431,7 @@ class Flow(unittest.TestCase):
         self.assertIn("第三部分 分帳的 assert：✓ 5／5", out)
         self.assertIn("★ Lv1 上 看得懂（上）過關！三部分都過了，練習了 8 天，可以升級了。", out)
         lines = out.splitlines()
-        self.assertLessEqual(len(lines), 18, out)
+        self.assertLessEqual(len(lines), 15, out)
         for line in lines:
             self.assertLessEqual(sum(2 if ord(c) > 0x2E7F else 1 for c in line), 70, line)
         prog = json.loads((L / ".check/progress.json").read_text(encoding="utf-8"))
