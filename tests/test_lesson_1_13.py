@@ -105,6 +105,16 @@ class Asserts(unittest.TestCase):
         out = r3(BEAR_V1 + "c = [120, 300, 85]\nassert index_of_max(c) == 1\nassert len(c) == 3\n")
         self.assertFalse(part(out, "m1").ok)
 
+    def test_sum_after_does_not_catch_the_sort(self):
+        """思考站的 A：查完以後合計一樣是 505，排好也還是 505，抓不到壞版本 1。"""
+        out = r3(BEAR_V1 + "c = [120, 300, 85]\nassert index_of_max(c) == 1\nassert sum(c) == 505\n")
+        self.assertFalse(part(out, "m1").ok)
+
+    def test_looking_up_twice_catches_the_sort(self):
+        """同一個 list 查第二次：第一次查完已經被排好，第二次交回 2（Codex 第一輪抓到的，所以思考站的 A 不能寫「再查一次」）。"""
+        out = r3(BEAR_V1 + "c = [120, 300, 85]\nassert index_of_max(c) == 1\nassert index_of_max(c) == 1\n")
+        self.assertTrue(part(out, "m1").ok, part(out, "m1").detail)
+
     def test_removing_after_the_lookup_also_catches_the_sort(self):
         out = r3(BEAR_V1 + "c = [120, 300, 85]\nassert index_of_max(c) == 1\nassert remove_last(c) == 85\n")
         self.assertTrue(part(out, "m1").ok, part(out, "m1").detail)
