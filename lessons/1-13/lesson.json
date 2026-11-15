@@ -1,0 +1,7 @@
+{
+  "id": "1-13",
+  "title": "list：一串帳目",
+  "minutes": 50,
+  "fast_minutes": 10,
+  "after_start": "接下來，用 VS Code 打開帳本的 lessons/1-13：\n  1. 第一圈：index.txt 先別跑、預測 4 題；ledger.py 加一筆、算筆數和合計、拿第一筆和最後一筆；fix.py 照註解改帳目；sort.py 印出排好的，原本的順序也要留著\n  2. 第二圈：請家教追問你 sort 和 sorted 差在哪，記在 tutor.md（自評）；sort_quiz.txt 三題\n  3. 第三圈：checks_list.py 用註解和 assert 寫下需求，呼叫課程寫好的 remove_last() 和 index_of_max()（entries.py 不用改）\n做完回到課程資料夾打：uv run check.py 1-13"
+}

@@ -1,0 +1,18 @@
+{
+  "note": "1-13 第②圈：sort() 和 sorted()（對答 3 題，影片裡家教追問的題型；數字換過）。",
+  "normalize": "text",
+  "how": "A、B 或 C",
+  "choices": {"A": "[5, 2, 4]", "B": "[2, 4, 5]", "C": "None"},
+  "strict_choice": true,
+  "questions": [
+    {"id": "s1", "title": "b = sorted(a) 以後 print(a)", "accept": ["A"],
+     "hint": "sorted(a) 交回的是一串新的。a 本身有沒有被動到？",
+     "explain": "sorted(a) 排好以後交回一串新的（放進 b），a 還是原本的 [5, 2, 4]。"},
+    {"id": "s2", "title": "b = a.sort() 以後 print(b)", "accept": ["C"],
+     "hint": "a.sort() 直接把 a 排好。它有交回一串新的嗎？",
+     "explain": "a.sort() 直接把 a 本身排好，交回的是 None（什麼都沒有），所以 b 是 None。要排好的那一串，看 a，或改用 sorted(a)。"},
+    {"id": "s3", "title": "a.sort() 以後 print(a)", "accept": ["B"],
+     "hint": "a.sort() 排的是誰？",
+     "explain": "a.sort() 把 a 本身排好，a 變成 [2, 4, 5]；原本的順序就不見了。要留著原本的順序，用 sorted(a)。"}
+  ]
+}

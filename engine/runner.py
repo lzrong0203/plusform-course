@@ -179,6 +179,11 @@ def op_load(req: dict) -> dict:
     return {"load_error": None, "names": names}
 
 
+def _snapshot(value):
+    """1-13 eval_once：當下的值先存一份（list 之後被改掉，報出來的還是算出來那一刻的樣子）。"""
+    return json.loads(json.dumps(value)) if _jsonable(value) else repr(value)
+
+
 def _value_text(node, ns, filename):
     try:
         code = compile(ast.Expression(node), filename, "eval")
@@ -217,10 +222,25 @@ def op_asserts(req: dict) -> dict:
                 rec.update(status="error", error=broken, skipped=True)
             else:
                 emit("start", f"assert {stmt.lineno}")
+                test = stmt.test
+                once = (req.get("eval_once") and isinstance(test, ast.Compare) and len(test.ops) == 1
+                        and isinstance(test.ops[0], ast.Eq))
                 try:
-                    with quiet():
-                        exec(code, ns)  # noqa: S102
-                    rec["status"] = "pass"
+                    if once:
+                        # 1-13 的 eval_once：左右兩邊各算一次（remove_last(a) 這種會改 list 的呼叫，不能為了報「交回什麼」再呼叫一次）
+                        with quiet():
+                            left = eval(compile(ast.Expression(test.left), filename, "eval"), ns)  # noqa: S307
+                            got = _snapshot(left)
+                            right = eval(compile(ast.Expression(test.comparators[0]), filename, "eval"), ns)  # noqa: S307
+                            same = left == right
+                        if same:
+                            rec["status"] = "pass"
+                        else:
+                            rec.update(status="fail", got=got)
+                    else:
+                        with quiet():
+                            exec(code, ns)  # noqa: S102
+                        rec["status"] = "pass"
                 except AssertionError:
                     rec["status"] = "fail"
                     test = stmt.test

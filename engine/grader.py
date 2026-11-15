@@ -1654,6 +1654,8 @@ class ChaffCheck(Check):
         }
         if self.spec.get("bool_hints"):   # 1-8：只寫 assert over_budget(...)／assert not over_budget(...) 也報出交回的值
             req["got_bare"] = True
+        if self.spec.get("eval_once"):   # 1-13：assert 左右各算一次（remove_last(a) 會改 list，不能為了報「交回什麼」再呼叫一次）
+            req["eval_once"] = True
         reply = self.ctx.env.runner_raw(req, timeout=timeout)
         data = reply.result
         if data is not None:

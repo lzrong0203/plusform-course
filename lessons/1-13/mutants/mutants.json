@@ -1,0 +1,9 @@
+{
+  "target": "entries.py",
+  "note": "hint 是學員的 assert 沒抓到這個壞版本時，畫面上顯示的提示（每行壓在 68 欄內；中文字一個佔兩欄）。m1 是這一課的主角：index_of_max 交回的位置是對的，可是最後多了一行 amounts.sort()，把傳進來的 list 排好了（原本的順序被打亂）；只看交回的答案抓不到，要在查完以後檢查原本的 list 還是原本的順序（或查完再刪最後一筆，會刪錯）。m2 刪的是第一筆；m3 一樣大的交回最後面那一筆（大於寫成大於等於）。",
+  "mutants": [
+    {"id": "m1", "file": "entries_m1.py", "hint": "查完最大的以後，原本的 list 還是原本的順序嗎？", "what": "index_of_max 找對了位置，最後多了一行 amounts.sort()：傳進來的 list 被排好，原本的順序不見了"},
+    {"id": "m2", "file": "entries_m2.py", "hint": "刪掉的是最後一筆嗎？（交回的、剩下的都看一看）", "what": "remove_last 寫成 amounts.pop(0)：刪掉的是第一筆"},
+    {"id": "m3", "file": "entries_m3.py", "hint": "一樣大的有兩筆時，交回的是前面那一筆嗎？", "what": "index_of_max 的大於寫成大於等於：一樣大的交回最後面那一筆"}
+  ]
+}
