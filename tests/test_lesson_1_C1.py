@@ -24,7 +24,7 @@ L = BASE / "ledger 帳本"   # 路徑有空白和中文
 D = COURSE / "lessons" / "1-C1"
 DAY1, DAY1_LATE, DAY2 = "2026-11-16T19:00:00+08:00", "2026-11-16T23:30:00+08:00", "2026-11-17T20:00:00+08:00"
 RIGHT_A = ["11/15", "4", "50", "465 50", "196 2", "B"]
-RIGHT_B = ["2026-11", "3", "50", "275 50", "102 2", "C"]
+RIGHT_B = ["2026-11", "3", "50", "275 50", "102 2", "A"]
 WRITE_A = (D / "reference" / "write.py").read_text(encoding="utf-8")
 FIX_A = (D / "reference" / "fix.py").read_text(encoding="utf-8")
 
@@ -144,6 +144,11 @@ class Grading(unittest.TestCase):
         out = ev("1-C1", ["fix-run", "fix-out"])
         self.assertTrue(part(out, "fix-run").ok)
         self.assertIn("53.333333333333336", part(out, "fix-out").detail)
+        write(L / "lessons/1-C1/fix.py", 'print("一共 平均")\n')   # 兩個詞擠在同一行：不算「印出兩行」（Codex 審卷 B 時抓到判分比說明寬）
+        self.assertFalse(part(ev("1-C1", ["fix-run"]), "fix-run").ok)
+        write(L / "lessons/1-C1/fix.py", 'print("一共  160  元")\nprint()\nprint("平均",  53, "元")\n')   # 多打的空格、空白的行不算錯（照 README 的說法）
+        out = ev("1-C1", ["fix-run", "fix-out"])
+        self.assertTrue(part(out, "fix-run").ok and part(out, "fix-out").ok, [r.detail for r in out.results])
 
 
 class Flow(unittest.TestCase):

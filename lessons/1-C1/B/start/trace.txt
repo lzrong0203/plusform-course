@@ -36,7 +36,7 @@
   3  left = budget - spent
   4  each = left // 4
   5  print(each, left % 4)
-  6  print(type(left // 4))
+  6  print(type(left / 4))
 
 第 5 題：第 5 行印出什麼？
 答：
