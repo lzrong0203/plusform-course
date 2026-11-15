@@ -1,0 +1,20 @@
+{
+ "note": "1-17 第①圈：先猜推導式和 zip（對答 3 題，都是選擇題）。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {"id": "p1", "title": "[p * 2 for p in prices]", "accept": ["A"],
+   "choices": {"A": "[20, 40, 60]", "B": "[10, 20, 30, 10, 20, 30]", "C": "120"},
+   "hint": "先看中間：從 prices 一筆一筆拿出 p。再看最前面：每一筆放進去的是什麼？",
+   "explain": "從 prices 一筆一筆拿出 p，每一筆放 p * 2 進新的 list：10、20、30 變成 [20, 40, 60]。推導式做出的是一個新的 list，不是加總。"},
+  {"id": "p2", "title": "[a for a in amounts if a >= 100]", "accept": ["B"],
+   "choices": {"A": "[5, 99]", "B": "[120, 100]", "C": "[False, True, False, True]"},
+   "hint": "後面的 if 決定哪幾筆放進去；100 本身算不算大於等於 100？",
+   "explain": "if a >= 100 只留 100 以上的（100 也算），放進去的是 a 本身，照原本的順序：[120, 100]。前面寫的是 a，不是 a >= 100，所以不會變成 True／False。"},
+  {"id": "p3", "title": "zip 三個對兩個", "accept": ["C"],
+   "choices": {"A": "3 行", "B": "出現錯誤訊息", "C": "2 行"},
+   "hint": "zip 配到哪一串用完就停？會不會出錯誤訊息？",
+   "explain": "zip 停在比較短的那一串（官方文件：By default, zip() stops when the shortest iterable is exhausted）。只有兩對，印兩行，週三沒有配到，也沒有錯誤訊息。要長度不同就出錯，可以加 strict=True（3.10 起），或先 assert 兩串一樣長。"}
+ ]
+}

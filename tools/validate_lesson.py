@@ -242,6 +242,18 @@ def run_script_ok(rep: Report, label: str, text: str, sc: dict) -> vshell.VResul
     return res
 
 
+def flat_checks(checks: list[dict]) -> list[dict]:
+    """1-17 起：either（兩條路選一條）裡面每條路的檢查也要驗（正確版過、起點檔不能一開始就過、作答檔題數）；沒有 either 的課＝原本的 checks。"""
+    out: list[dict] = []
+    for c in checks:
+        if c.get("type") == "either":
+            for p in c.get("paths", []):
+                out.extend(flat_checks(p.get("checks", [])))
+        else:
+            out.append(c)
+    return out
+
+
 def validate_lesson(lid: str, root: Path, use_env: bool, temp: dict) -> Report:
     rep = Report(lid)
     try:
@@ -255,7 +267,7 @@ def validate_lesson(lid: str, root: Path, use_env: bool, temp: dict) -> Report:
     check_files(rep, lesson)
     local = grader.Env(None, local=True)
 
-    for spec in lesson.checks:
+    for spec in flat_checks(lesson.checks):
         if spec["type"] == "answers":
             key = json.loads((d / spec["key"]).read_text(encoding="utf-8"))
             template = d / "start" / Path(spec["file"]).name
@@ -294,7 +306,7 @@ def validate_lesson(lid: str, root: Path, use_env: bool, temp: dict) -> Report:
     check_concepts(rep, lesson, order)
 
     # ---- 3. 正確版通過官方測試；4. 起點程式不能一開始就全過 ----
-    official = [s for s in lesson.checks if s["type"] in ("call", "run", "parsons")]   # parsons（1-11 起）：正確版要排得對、起點檔不能一開始就過
+    official = [s for s in flat_checks(lesson.checks) if s["type"] in ("call", "run", "parsons")]   # parsons（1-11 起）：正確版要排得對、起點檔不能一開始就過
     covered = 0
     for spec in official:
         ref = d / "reference" / Path(spec["file"]).name

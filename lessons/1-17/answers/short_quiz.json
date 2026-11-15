@@ -1,0 +1,24 @@
+{
+ "note": "1-17 第②圈：看懂精簡的寫法（隨片測驗 4 題）。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {"id": "q1", "title": "推導式裡的 d 是什麼", "accept": ["A"],
+   "choices": {"A": "日期本身", "B": "第幾天的編號", "C": "金額"},
+   "hint": "zip(dates, amounts) 每一對是什麼？for d, a 把那一對拆成哪兩個？",
+   "explain": "zip 每一次交出一對（日期, 金額），for d, a 拆包：d 是日期本身（例如 \"11/01\"），a 是金額。不是索引：用 range(len(dates)) 時拿到的才是編號。"},
+  {"id": "q2", "title": "改回迴圈，a - 20 放哪裡", "accept": ["C"],
+   "choices": {"A": "for 那一行", "B": "if 那一行", "C": "append 的括號裡"},
+   "hint": "推導式最前面那一段，是每一圈要放進新 list 的東西。迴圈裡是哪一行把東西放進去？",
+   "explain": "for 和 if 照順序抄成兩行（官方教學：the order of the for and if statements is the same），最前面的 a - 20 變成最裡面那一行 back.append(a - 20)。"},
+  {"id": "q3", "title": "zip 四天配三筆，最後印什麼", "accept": ["B"],
+   "choices": {"A": "11/04", "B": "11/03", "C": "出現錯誤訊息"},
+   "hint": "金額只有三筆，zip 配到第幾對就停？",
+   "explain": "zip 停在比較短的那一串：只有三對，最後一行是 11/03；11/04 沒有配到，也不會出錯誤訊息。所以配對之前先 assert len(dates) == len(amounts)。"},
+  {"id": "q4", "title": "enumerate 從 1 開始", "accept": ["C"],
+   "choices": {"A": "0 120", "B": "1 85", "C": "1 120"},
+   "hint": "start=1 改的是編號從幾開始，還是從第幾筆開始？",
+   "explain": "enumerate 把（編號, 值）配成一對；start=1 只改編號從 1 開始，值還是從第一筆 120 開始，所以第一行是 1 120（官方文件：list(enumerate(seasons, start=1)) → [(1, 'Spring'), …]）。"}
+ ]
+}

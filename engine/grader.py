@@ -18,6 +18,8 @@ check.py（學員端）和 tools/validate_lesson.py（老師端）共用這一�
   git_commits   帳本是 git 存放庫，而且至少有幾個存檔點（commit）
   parsons       拼圖（Parsons，1-11 起）：把打亂的程式行排回去、自己縮排；行都要是題目給的（不能改字、多寫、少寫），排好跑出來要跟範例一樣
   filled        自評的表單寫了沒（1-12 起）：每個標籤（例如「家教問：」「我的回答：」）後面都寫了字就算交了，內容不改對錯
+  either        兩條路選一條（1-17 起）：每條路是一串上面這些檢查、題數一樣；照學員做的那一條判（answer.py 的測試，或選擇題版）
+                （run 在 1-17 另加兩個只對寫了它的題目生效的欄位：loose＝比的時候空格不算；ast_require＝規定用推導式／迴圈＋append 寫）
 
 學員寫的檔案一律用 utf-8-sig 讀（Windows 記事本會在最前面加看不見的 BOM），
 讀不懂（例如存成 Big5）就給白話的說明，不噴 Traceback。
@@ -859,9 +861,13 @@ class RunCheck(Check):
         joined = "\n".join(got)
         shown = "\n".join("    " + ln.rstrip() for ln in p.stdout.splitlines() if ln.strip()) or "    （什麼都沒印）"
         problems = []
+        if self.spec.get("ast_require"):   # 1-17 起（只對寫了它的題目）：照規定的寫法寫（推導式、迴圈＋append），不能 cut2 = cut 直接抄答案
+            problems.extend(ast_problems(read_student_text(path), self.spec["ast_require"]))
         if "expect_exact" in self.spec:
             want = output_lines("\n".join(self.spec["expect_exact"]) if isinstance(self.spec["expect_exact"], list) else self.spec["expect_exact"])
-            if got != want:
+            # 1-17 起（只對寫了 loose 的題目）：空格不算（AI 照描述寫的程式，「2 筆」跟「2筆」都對）；全形半形照舊用 NFKC 當成一樣
+            same = [re.sub(r"\s+", "", x) for x in got] == [re.sub(r"\s+", "", x) for x in want] if self.spec.get("loose") else got == want
+            if not same:
                 problems.append("印出來的跟應該的不一樣。\n  應該是：\n" + "\n".join("    " + w for w in want) + "\n  你的印出：\n" + shown)
         for pattern in self.spec.get("expect_regex", []):
             if not re.search(pattern, joined, re.MULTILINE):
@@ -877,6 +883,113 @@ class RunCheck(Check):
             r.detail = feed + problems[0] + hint_text
         elif self.spec.get("time_it") == "timer":   # 1-7 的計時題：記下作答檔最後一次存檔的時間（check.py 照 timer 開始的時間算分鐘）
             r.data["mtime"] = path.stat().st_mtime
+
+
+def _assigned(tree: ast.AST, name: str) -> list[ast.AST]:
+    """name = …（最外層、for／if 裡面都算）的右邊。"""
+    return [n.value for n in ast.walk(tree) if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == name for t in n.targets)]
+
+
+def _appends_in_for(tree: ast.AST, name: str) -> bool:
+    """有一個 for 迴圈，裡面（含 if 裡面）有 name.append(…)。"""
+    for f in ast.walk(tree):
+        if isinstance(f, ast.For):
+            for n in ast.walk(f):
+                if (isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr == "append"
+                        and isinstance(n.func.value, ast.Name) and n.func.value.id == name):
+                    return True
+    return False
+
+
+def ast_problems(source: str, rules: list[dict]) -> list[str]:
+    """1-17：run 題的 ast_require＝[{name, kind: listcomp|loop, msg}]。
+    listcomp：name 這個名字要等於一個推導式（name = [… for … in …]）；loop：要先 name = []，再在 for 迴圈裡 name.append(…)。
+    語法錯誤交給跑的時候報（這裡不重複）。"""
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return []
+    out = []
+    for rule in rules:
+        name, kind = rule["name"], rule["kind"]
+        values = _assigned(tree, name)
+        if kind == "listcomp":
+            ok = any(isinstance(v, ast.ListComp) for v in values)
+            default = f"{name} 要用一行推導式寫（{name} = [… for … in …]），不能直接寫答案或抄另一個名字。"
+        else:
+            ok = any(isinstance(v, ast.List) and not v.elts for v in values) and _appends_in_for(tree, name)
+            default = f"{name} 要改回迴圈：先寫 {name} = []，再在 for 迴圈裡 {name}.append(…)。"
+        if not ok:
+            out.append(rule.get("msg") or default)
+    return out
+
+
+# ---------------- either（兩條路選一條，1-17 起；只對寫了 type either 的 checks.json 生效） ----------------
+
+class EitherCheck(Check):
+    """兩條路選一條做（1-17 第③圈：有 AI 帳號的跑 answer.py 的測試，沒有的做選擇題版）。
+    spec：paths＝[{name, touch, checks: [...]}, …]（每條路的題數都一樣＝n）、descs（n 題各自的說明）、neither（兩條都還沒做時的說明）。
+    走哪一條：全過的那一條（兩條都全過取第一條）→ 只動過一條（touch 那個檔跟起點檔不一樣）就是那一條 → 兩條都動過取過得多的 → 都沒動過照第一條報，說明換成 neither。
+    題數固定（猜幾題、--all 都照 n 算），學員只要做一條。"""
+
+    def plan(self):
+        descs = self.spec["descs"]
+        return [self.stub(str(k), d) for k, d in enumerate(descs, start=1)]
+
+    def _touched(self, rel: str) -> bool:
+        path = self.ctx.student(rel)
+        if not path.is_file():
+            return False
+        start = self.ctx.lesson.dir / "start" / Path(rel).name
+        try:
+            mine = read_student_text(path)
+        except NotReady:
+            return True
+        if rel.endswith(".txt"):   # 作答檔：「答：」後面寫了東西就算動過
+            return any(a.strip() for a in read_answer_lines(path))
+        theirs = start.read_text(encoding="utf-8") if start.is_file() else ""
+        code = lambda s: [x.rstrip() for x in s.splitlines() if x.strip() and not x.strip().startswith("#")]   # noqa: E731
+        return code(mine) != code(theirs)
+
+    def _run_path(self, p: dict) -> list[Result]:
+        out: list[Result] = []
+        for spec in p["checks"]:
+            ch = CHECKERS[spec["type"]]({**spec, "group": self.group}, self.ctx)
+            stubs = ch.plan()
+            try:
+                ch.run(stubs)
+            except (NotReady, RunnerTrouble) as exc:
+                for r in stubs:
+                    r.ok, r.detail = False, str(exc)
+            out.extend(stubs)
+        return out
+
+    def run(self, results):
+        paths = self.spec["paths"]
+        runs = [self._run_path(p) for p in paths]
+        for p, rs in zip(paths, runs):
+            if len(rs) != len(results):
+                raise RunnerTrouble(f"課程的 checks.json 寫錯了：「{p['name']}」有 {len(rs)} 題，應該是 {len(results)} 題。")
+        touched = [self._touched(p["touch"]) for p in paths]
+        full = [k for k, rs in enumerate(runs) if all(r.ok for r in rs)]
+        if full:
+            pick = full[0]
+        elif sum(touched) == 1:
+            pick = touched.index(True)
+        elif any(touched):
+            pick = max((k for k in range(len(paths)) if touched[k]), key=lambda k: sum(r.ok for r in runs[k]))
+        else:
+            pick = 0
+        chosen = runs[pick]
+        for r, got in zip(results, chosen):
+            r.ok, r.detail, r.note, r.data = got.ok, got.detail, got.note, got.data
+        if not any(touched) and not full and self.spec.get("neither"):
+            first = next((r for r in results if not r.ok), None)
+            if first is not None:
+                first.detail = self.spec["neither"]
+        others = "、".join(f"「{p['name']}」" for k, p in enumerate(paths) if k != pick)
+        if any(touched) or full:
+            self.ctx.summaries.append(f"{self.group}：照你做的「{paths[pick]['name']}」判（{others}不用做）。")
 
 
 # ---------------- parsons（拼圖，2026-11-15，1-11 起；只對寫了 type parsons 的 checks.json 生效） ----------------
@@ -2237,6 +2350,7 @@ CHECKERS = {
     "git_commits": GitCheck,
     "parsons": ParsonsCheck,
     "filled": FilledCheck,
+    "either": EitherCheck,
 }
 
 

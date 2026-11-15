@@ -1,0 +1,26 @@
+{
+  "note": "回顧題：學員通過這課以後，往後第 2 課和第 5 課的 check 會各帶一題。",
+  "questions": [
+    {
+      "id": "r1",
+      "q": "nums = [3, 8, 12]\nprint([n for n in nums if n > 5])\n印出什麼？\nA. [8, 12]\nB. [3]\nC. [False, True, True]\n（寫 A、B 或 C）",
+      "accept": ["A"],
+      "explain": "先看 for：從 nums 一筆一筆拿出 n；再看 if：n > 5 才留；最前面放的是 n 本身。所以是 [8, 12]。",
+      "choices": {"A": "[8, 12]", "B": "[3]", "C": "[False, True, True]"}
+    },
+    {
+      "id": "r2",
+      "q": "for d, a in zip([\"一\", \"二\", \"三\", \"四\"], [10, 20, 30]):\n    print(d, a)\n印出幾行？（寫數字）",
+      "accept": ["3"],
+      "hint": "zip 配到哪一串用完就停？",
+      "explain": "zip 停在比較短的那一串：金額只有 3 筆，只配出 3 對、印 3 行，「四」沒有配到，也不會出錯誤訊息。"
+    },
+    {
+      "id": "r3",
+      "q": "把 big = [a for a in amounts if a >= 100] 改回迴圈，第一行要先寫什麼？\nA. for a in amounts:\nB. big = []\nC. if a >= 100:\n（寫 A、B 或 C）",
+      "accept": ["B"],
+      "explain": "推導式做出的是一個新的 list，改回迴圈要先準備空的 big = []，再照順序寫 for、if，最裡面 big.append(a)。",
+      "choices": {"A": "for a in amounts:", "B": "big = []", "C": "if a >= 100:"}
+    }
+  ]
+}

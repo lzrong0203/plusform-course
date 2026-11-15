@@ -1,0 +1,7 @@
+{
+  "id": "1-17",
+  "title": "看懂 AI 最愛的寫法（上）：推導式、zip",
+  "minutes": 45,
+  "fast_minutes": 10,
+  "after_start": "接下來，用 VS Code 打開帳本的 lessons/1-17：\n  1. 第一圈：predict.txt 先別跑、預測 3 題；convert.py 三段迴圈改成推導式、一段推導式改回迴圈，用 assert 確認一樣；pairs.py 用 zip 把日期和金額配對印出來\n  2. 第二圈：請家教把你的迴圈改精簡、逐行用白話解釋，你自己解釋得出來才收，記在 tutor.md（自評）；short_quiz.txt 四題\n  3. 第三圈（兩條選一條）：有 AI 帳號的，先讀懂 report.py、在 describe.md 用白話描述它，貼給免費的聊天版 AI 寫程式，再把程式貼進 answer.py；沒有帳號的，做 describe_quiz.txt 三題\n做完回到課程資料夾打：uv run check.py 1-17"
+}
