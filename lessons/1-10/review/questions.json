@@ -1,0 +1,26 @@
+{
+  "note": "回顧題：學員通過這課以後，往後第 2 課和第 5 課的 check 會各帶一題。",
+  "questions": [
+    {
+      "id": "r1",
+      "q": "saved = 0\nwhile saved < 300:\n    saved = saved + 100\n這個迴圈跑幾次？（寫數字）",
+      "accept": ["3", "3次"],
+      "hint": "每一圈開始前都先看條件：saved 是 0、100、200、300 的時候，saved < 300 各成立嗎？",
+      "explain": "saved 是 0、100、200 的時候成立，各跑一次；變成 300 以後，300 < 300 不成立。一共 3 次。"
+    },
+    {
+      "id": "r2",
+      "q": "在 while 迴圈裡，break 和 continue 差在哪？\nA. 一樣，都是離開迴圈\nB. break 整個迴圈結束；continue 只跳過這一圈剩下的，回到 while 再看條件\nC. continue 整個迴圈結束；break 只跳過這一圈\n（寫 A、B 或 C）",
+      "accept": ["B"],
+      "explain": "break 讓整個迴圈結束，跳到迴圈下面那一行；continue 只把這一圈剩下的跳過，回到 while 重新看條件。",
+      "choices": {"A": "一樣，都是離開迴圈", "B": "break 整個結束；continue 只跳過這一圈", "C": "continue 整個結束；break 只跳過這一圈"}
+    },
+    {
+      "id": "r3",
+      "q": "程式跑起來一直印、停不下來（無窮迴圈），在終端機要按什麼停下來？\nA. Command C\nB. Control C（Windows 是 Ctrl+C）\nC. Enter\n（寫 A、B 或 C）",
+      "accept": ["B"],
+      "explain": "按住 Control 再按 C（Windows 是 Ctrl+C），Python 會停下來，錯誤訊息最後一行是 KeyboardInterrupt。Command C 是複製。",
+      "choices": {"A": "Command C", "B": "Control C（Windows 是 Ctrl+C）", "C": "Enter"}
+    }
+  ]
+}

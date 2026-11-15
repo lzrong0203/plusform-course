@@ -417,6 +417,19 @@ def validate_lesson(lid: str, root: Path, use_env: bool, temp: dict) -> Report:
                     red.append(f"{n_red} 項官方測試")
             if not red:
                 rep.bad(f"壞版本 {m['file']} 沒有讓任何參考測試變紅，學員不可能抓到它")
+            elif holds == 0 and spec.get("plain_inputs") and rows and all(r.get("stuck") for r in rows):
+                # 1-10：這個壞版本只在老師的輸入（有空白的一行）卡在無窮迴圈、被逾時停下來；藏不藏得住改用一般的輸入（plain_inputs）看
+                ov3 = {spec["student_file"]: d / spec["plain_expected"], spec["inputs_file"]: d / spec["plain_inputs"]}
+                _c3, chk3 = grader.build(lesson, ledger, env=env, overrides=ov3, only=[spec])
+                p3 = chk3[0].parse()
+                st3, _ = chk3[0].statuses(p3.checks, p3.marks)
+                ok_ref = all(x.get("status") == "pass" for x in st3["reference"])
+                same = all(x.get("status") == "pass" for x in st3[f"m{i}"])
+                if ok_ref and same:
+                    rep.ok(f"壞版本 {m['file']} 遇到老師的輸入會卡住（逾時被停下來，算抓到）；用 {spec['plain_inputs']} 跑，"
+                           f"它跟正確版一樣（藏得住）（{m.get('what', m['hint'])}）")
+                else:
+                    rep.bad(f"壞版本 {m['file']} 用 {spec['plain_inputs']} 跑也跟正確版不一樣：太明顯了")
             elif holds == 0:
                 rep.bad(f"壞版本 {m['file']} 在老師的標準檢查上一條都不成立：太明顯了，學員隨便寫一條都抓得到它")
             elif target_tests and n_red == len(target_tests):

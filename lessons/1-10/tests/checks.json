@@ -1,0 +1,135 @@
+{
+ "note": "1-10 的檢查：第①圈 loops.txt 迴圈跑幾次（對答 4 題）和 record.py 記到 q 為止（官方測試：check 用 subprocess 把金額和 q 餵給它，跑三次；每次最多 5 秒，停不下來就說可能是無窮迴圈）；第②圈 max10.py 最多記 10 筆（跑三次，同樣有逾時）和 lead_quiz.txt 帶我寫的三個問題（對答）；第③圈 inputs.txt 和 expected.txt（chaff 的 inputs_text 模式，1-6 起：check 用 subprocess 把學員的 inputs.txt 餵給正確版和 3 個壞版本；每個版本最多 5 秒，卡在無窮迴圈的版本被停下來、算抓到，stuck_note 印一行讓學員看得到）。lead.md 是自評，不檢查。",
+ "checks": [
+  {
+   "type": "answers",
+   "id": "loops",
+   "file": "lessons/1-10/loops.txt",
+   "key": "answers/loops.json",
+   "group": "第一圈"
+  },
+  {
+   "type": "run",
+   "id": "rec-1",
+   "file": "lessons/1-10/record.py",
+   "group": "第一圈",
+   "desc": "record.py：打 120、85、q → 一共 205 元",
+   "stdin": "120\n85\nq\n",
+   "timeout": 5,
+   "expect_contains": [
+    "一共 205 元"
+   ],
+   "hint": "每打一筆就加進 total（input 交回字串，先用 int() 變成整數）；打 q 才停，最後印出「一共 205 元」。改完記得存檔再跑。",
+   "stuck_hint": "迴圈裡要有一行讓條件有機會不成立：每一圈都要再問一次金額（或打 q 的時候 break）。自己試跑停不下來，按 Ctrl+C。",
+   "missing_hint": "record.py 應該在帳本的 lessons/1-10/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-10。",
+   "eof_hint": "打 q 的時候要停下來：條件寫 text != \"q\"，或在迴圈裡 if text == \"q\": break。"
+  },
+  {
+   "type": "run",
+   "id": "rec-2",
+   "file": "lessons/1-10/record.py",
+   "group": "第一圈",
+   "desc": "record.py：一開始就打 q → 一共 0 元",
+   "stdin": "q\n",
+   "timeout": 5,
+   "expect_contains": [
+    "一共 0 元"
+   ],
+   "hint": "一開始就打 q，迴圈一次都不用跑，直接印出一共 0 元。",
+   "stuck_hint": "打 q 的時候要停下來：條件寫成 text != \"q\"，或在迴圈裡 if text == \"q\": break。",
+   "eof_hint": "打 q 的時候要停下來：條件寫 text != \"q\"，或在迴圈裡 if text == \"q\": break。"
+  },
+  {
+   "type": "run",
+   "id": "rec-3",
+   "file": "lessons/1-10/record.py",
+   "group": "第一圈",
+   "desc": "record.py：中間多按一下 Enter（空白的一行）→ 跳過，一共 205 元",
+   "stdin": "120\n\n85\nq\n",
+   "timeout": 5,
+   "expect_contains": [
+    "一共 205 元"
+   ],
+   "hint": "空白的一行交給 int() 會當掉（ValueError）：先用 if text == \"\": continue 跳過，再問一次。",
+   "stuck_hint": "continue 會直接跳回 while，它下面的那幾行都不做：如果「再問一次」寫在迴圈最後面，就會被跳過，text 一直是空的。把 input 搬到迴圈的第一行（while True:），或在 continue 前面先再問一次。",
+   "eof_hint": "打 q 的時候要停下來：條件寫 text != \"q\"，或在迴圈裡 if text == \"q\": break。"
+  },
+  {
+   "type": "run",
+   "id": "max-1",
+   "file": "lessons/1-10/max10.py",
+   "group": "第二圈",
+   "desc": "max10.py：連打 12 筆 100、都沒打 q → 記滿 10 筆自己停，一共 10 筆，合計 1000 元",
+   "stdin": "100\n100\n100\n100\n100\n100\n100\n100\n100\n100\n100\n100\n",
+   "timeout": 5,
+   "expect_regex": [
+    "一共\\s*10\\s*筆",
+    "1000\\s*元"
+   ],
+   "hint": "最多記 10 筆：用一個 count 記已經記了幾筆（從 0 開始），while 的條件寫 count < 10，每記一筆 count 加 1。最後印出一共幾筆、合計多少。",
+   "stuck_hint": "count 有沒有每記一筆就加 1？沒有加，count < 10 永遠成立。",
+   "missing_hint": "max10.py 應該在帳本的 lessons/1-10/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-10。",
+   "eof_hint": "記滿 10 筆要自己停：while 的條件寫 count < 10，每記一筆 count 加 1。"
+  },
+  {
+   "type": "run",
+   "id": "max-2",
+   "file": "lessons/1-10/max10.py",
+   "group": "第二圈",
+   "desc": "max10.py：打 120、85、q → 一共 2 筆，合計 205 元（q 不算一筆）",
+   "stdin": "120\n85\nq\n",
+   "timeout": 5,
+   "expect_regex": [
+    "一共\\s*2\\s*筆",
+    "205\\s*元"
+   ],
+   "hint": "q 不算一筆：count = count + 1 要放在 if text == \"q\": break 的下面，真的記了一筆才加。",
+   "stuck_hint": "打 q 的時候要 break。",
+   "eof_hint": "打 q 的時候要 break。"
+  },
+  {
+   "type": "run",
+   "id": "max-3",
+   "file": "lessons/1-10/max10.py",
+   "group": "第二圈",
+   "desc": "max10.py：打 120、空白的一行、85、q → 一共 2 筆（空白不算一筆）",
+   "stdin": "120\n\n85\nq\n",
+   "timeout": 5,
+   "expect_regex": [
+    "一共\\s*2\\s*筆",
+    "205\\s*元"
+   ],
+   "hint": "空白的一行也不算一筆：count = count + 1 要放在 continue 的下面。",
+   "stuck_hint": "continue 會跳回 while，下面的都不做：再問一次的 input 要在迴圈的第一行。",
+   "eof_hint": "打 q 的時候要 break。"
+  },
+  {
+   "type": "answers",
+   "id": "lead",
+   "file": "lessons/1-10/lead_quiz.txt",
+   "key": "answers/lead_quiz.json",
+   "group": "第二圈"
+  },
+  {
+   "type": "chaff",
+   "id": "r3",
+   "mode": "inputs_text",
+   "student_file": "lessons/1-10/expected.txt",
+   "inputs_file": "lessons/1-10/inputs.txt",
+   "prompts": [
+    "金額，打 q 結束："
+   ],
+   "timeout": 5,
+   "stuck_note": true,
+   "eof_hint": "程式會一直問到你打 q：inputs.txt 的最後一行要寫 q。",
+   "crash_hint": "需求卡說金額只會是整數，或是空白的一行、q：看看 inputs.txt 是不是寫了「元」、小數點，或打了大寫的 Q。",
+   "reference": "reference/tally.py",
+   "mutants": "mutants/mutants.json",
+   "teacher_file": "answers/expected.txt",
+   "teacher_inputs": "answers/inputs.txt",
+   "min_checks": 1,
+   "plain_inputs": "answers/inputs_plain.txt",
+   "plain_expected": "answers/expected_plain.txt"
+  }
+ ]
+}

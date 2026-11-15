@@ -739,6 +739,11 @@ def error_kind(stderr: str) -> str | None:
 
 
 class RunCheck(Check):
+    def own_timeout(self) -> float | None:
+        """1-10 起：checks.json 這一題寫了 timeout（秒）就用它（再上限環境的逾時），沒寫照舊用環境的（預設 30 秒）。"""
+        t = self.spec.get("timeout")
+        return min(self.ctx.env.timeout, float(t)) if t else None
+
     def missing_text(self, rel: str) -> str:
         hint = self.spec.get("missing_hint")
         if self.spec.get("package_hint") and is_package_layout(self.ctx.ledger):
@@ -777,17 +782,23 @@ class RunCheck(Check):
                 shutil.rmtree(tmpdir, ignore_errors=True)
             feed = swap.get("feed", "") + ("\n  " if swap.get("feed") else "") + feed
         else:
-            p = self.ctx.env.run_file(path, stdin=stdin)
+            p = self.ctx.env.run_file(path, stdin=stdin, timeout=self.own_timeout())
+        stuck_hint = f"\n  提示：{self.spec['stuck_hint']}" if self.spec.get("stuck_hint") else ""   # 1-10：卡住時的白話（只對寫了它的題目）
         if p.timed_out:
-            self.ctx.stuck[str(path)] = f"跑了 {self.ctx.env.timeout:.0f} 秒還沒結束"
-            r.detail = feed + f"跑了 {self.ctx.env.timeout:.0f} 秒還沒結束，被停下來了：可能有無窮迴圈。"
+            secs = self.own_timeout() or self.ctx.env.timeout
+            self.ctx.stuck[str(path)] = f"跑了 {secs:.0f} 秒還沒結束"
+            r.detail = feed + f"跑了 {secs:.0f} 秒還沒結束，被停下來了：可能有無窮迴圈。" + stuck_hint
             return
         if p.overflow:
             self.ctx.stuck[str(path)] = "印了太多東西被停下來"
-            r.detail = feed + "你的程式印了太多東西，被停下來了：可能是迴圈沒停下來。"
+            r.detail = feed + "你的程式印了太多東西，被停下來了：可能是迴圈沒停下來。" + stuck_hint
             return
         if p.returncode != 0:
             r.data["error"] = error_kind(p.stderr)   # 1-C1 的矯正包照錯誤種類（SyntaxError、NameError、TypeError…）指回原課
+            if "EOFError" in p.stderr and self.spec.get("eof_hint"):   # 1-10：迴圈一直問、輸入讀完了還沒停（只對寫了它的題目）
+                n_in = len(stdin.splitlines())
+                r.detail = feed + f"給它的 {n_in} 行輸入都讀完了，你的程式還在問（EOFError）：迴圈沒有停下來。\n  提示：{self.spec['eof_hint']}"
+                return
             r.detail = feed + crash_story(p, stdin) + (hint_text if self.spec.get("hint_on_crash", True) else "")
             return
         got = output_lines(p.stdout)
@@ -1012,6 +1023,7 @@ class ChaffCheck(Check):
         self.mutant_dir = ctx.course(spec["mutants"]).parent
         self.min = spec.get("min_checks", 1)
         self._parsed: Parsed | None = None
+        self._stuck_names: list[str] = []   # 1-10 stuck_note：跑到逾時被停下來的版本
         self.ref_labels: list[str] = []
         self.has_import = True
 
@@ -1212,6 +1224,9 @@ class ChaffCheck(Check):
         asks = self.spec.get("prompts", [])
         if p.timed_out:
             return f"正確版跑了 {self.version_timeout():.0f} 秒還沒結束。先確定 0-5 的環境檢查都過了（uv run check.py env）。"
+        if "EOFError" in p.stderr and self.spec.get("eof_hint"):   # 1-10：迴圈會一直問，問幾次不固定
+            return (f"{name} 的 {self._n_inputs} 行都讀完了，正確版還在問，讀到檔案最後就當掉了（EOFError）。"
+                    f"\n  {self.spec['eof_hint']}")
         if "EOFError" in p.stderr:
             return (f"{name} 只有 {self._n_inputs} 行，程式要問 {len(asks)} 次（{or_list(asks)}），字不夠，正確版讀到檔案最後就當掉了（EOFError）。"
                     f"\n  一行寫一個要打的字，照它問的順序。")
@@ -1491,7 +1506,11 @@ class ChaffCheck(Check):
                     self._ref_err = self.ref_crash_text(p)
                     out[name] = [{"status": "error", "error": self._ref_err} for _c in checks]
                     continue
-                out[name] = self.expected_rows(checks, self.prompt_rows(p.stdout), crashed, norm=self.cmp_line)
+                rows = self.expected_rows(checks, self.prompt_rows(p.stdout), crashed, norm=self.cmp_line)
+                if self.spec.get("stuck_note") and p.timed_out:   # 1-10：卡在無窮迴圈、被逾時停下來，不是當掉
+                    rows = [dict(x, crashed=False, stuck=True) for x in rows]
+                    self._stuck_names.append(name)
+                out[name] = rows
         elif self.mode == "cases":
             lines = sorted([c.line for c in checks] + [m.line for m in marks])
             for name, path in impls.items():
@@ -1687,6 +1706,10 @@ class ChaffCheck(Check):
             caught = len(self.mutants) - len(slipped)
             if not slipped:
                 self.ctx.summaries.append(f"你的{CHAFF_NOUN.get(self.mode, '檢查')}把 {len(self.mutants)} 個壞版本全部抓到了。")
+            stuck_caught = [k for k, r in enumerate(mutant_rs, start=1) if r.ok and f"m{k}" in self._stuck_names]
+            if stuck_caught and self.spec.get("stuck_note"):   # 1-10：看得到 check 的逾時（每行 ≤68 欄）
+                self.ctx.summaries.append(f"  其中 {len(stuck_caught)} 個卡在迴圈裡停不下來：")
+                self.ctx.summaries.append(f"  check 等了 {self.version_timeout():.0f} 秒，把它停下來，算你抓到。")
             elif reveal:
                 # 每行壓在 68 欄內（VHS 錄影 70 欄、Terminal.app 預設 80 欄都不折行）：提示一條一行
                 self.ctx.summaries.append(f"你的{CHAFF_NOUN.get(self.mode, '檢查')}抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去：")
