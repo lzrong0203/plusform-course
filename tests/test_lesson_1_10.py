@@ -247,15 +247,19 @@ class Max10(unittest.TestCase):
         self.assertEqual([r.ok for r in out.results], [True, False, False])
         self.assertIn("break 的下面", out.results[1].detail)
 
-    def test_tutor_style_print_with_commas_is_fine(self):
+    def test_f_string_print_and_while_condition_are_fine(self):
+        """另一種寫法：while count < 10:（沒有最後那個 if）、f-string 印出，check 一樣收。"""
         src = (D / "reference" / "max10.py").read_text(encoding="utf-8")
-        write(L / "lessons" / LID / "max10.py", src.replace('print(f"一共 {count} 筆，合計 {total} 元")', 'print("一共", count, "筆，合計", total, "元")'))
+        alt = src.replace("while True:", "while count < 10:").replace("    if count == 10:\n        break\n", "")
+        alt = alt.replace('print("一共", count, "筆，合計", total, "元")', 'print(f"一共 {count} 筆，合計 {total} 元")')
+        self.assertNotEqual(alt, src)
+        write(L / "lessons" / LID / "max10.py", alt)
         out = ev(["max-1", "max-2", "max-3"])
         self.assertTrue(all(r.ok for r in out.results), [r.detail for r in out.results])
 
     def test_no_cap_crashes_at_the_end_of_input(self):
         src = (D / "reference" / "max10.py").read_text(encoding="utf-8")
-        write(L / "lessons" / LID / "max10.py", src.replace("while count < 10:", "while True:"))
+        write(L / "lessons" / LID / "max10.py", src.replace("    if count == 10:\n        break\n", ""))   # 拿掉記滿 10 筆就停的那兩行
         out = ev(["max-1", "max-2", "max-3"])
         self.assertEqual([r.ok for r in out.results], [False, True, True])
         self.assertIn("EOFError", out.results[0].detail)
