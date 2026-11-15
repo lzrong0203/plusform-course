@@ -1,0 +1,23 @@
+{
+  "note": "1-14 第①圈：tuple 和拆包預測（對答 4 題）。norm_answer 會做 NFKC、拿掉空白與前後的引號、英文不分大小寫；第 2～4 題用選擇題（錯誤訊息、<class 'int'>、5 5 寫法太多種）。",
+  "normalize": "text",
+  "how": "第 1 題寫印出來的字（例如：11/03），第 2～4 題寫 A、B 或 C",
+  "strict_choice": true,
+  "questions": [
+    {"id": "p1", "title": "record[1] 印出什麼", "accept": ["午餐"],
+     "hint": "tuple 也從 0 開始數：record[0] 是日期，那 record[1] 是哪一個？",
+     "explain": "索引從 0 開始：0 是 \"11/03\"、1 是 \"午餐\"、2 是 120。print 印字串不會印出引號，所以印出 午餐。"},
+    {"id": "p2", "title": "record[2] = 90 會怎樣", "accept": ["B"],
+     "hint": "tuple 跟 list 長得很像，只差括號。差在哪裡？放進去以後，還能改嗎？",
+     "explain": "tuple 放進去就不能改，record[2] = 90 會出現 TypeError: 'tuple' object does not support item assignment（tuple 不支援改某一格）。要改就整筆換掉：record = (\"11/03\", \"午餐\", 90)。",
+     "choices": {"A": "record 變成 (\"11/03\", \"午餐\", 90)", "B": "出現錯誤訊息（TypeError）", "C": "多一個 90，變成四個"}},
+    {"id": "p3", "title": "one = (120) 是什麼型別", "accept": ["A"],
+     "hint": "只用括號包住一個值，Python 會把它當成 tuple 嗎？",
+     "explain": "(120) 只是加了括號的 120，還是整數 int。只有一個值的 tuple 要在後面加逗號：(120,)。官方教學 5.3 說用括號包住一個值是不夠的。",
+     "choices": {"A": "<class 'int'>", "B": "<class 'tuple'>", "C": "<class 'list'>"}},
+    {"id": "p4", "title": "a = b、b = a 以後印出什麼", "accept": ["B"],
+     "hint": "等號是把右邊放進左邊（1-2）。a = b 跑完，a 是多少？這時再 b = a，b 拿到的是哪個數？",
+     "explain": "a = b 先把 5 放進 a，原本的 3 就不見了；b = a 再把 a 裡的 5 放進 b，兩個都是 5。要交換，用一行拆包：a, b = b, a（右邊先算好 (5, 3)，再拆給 a 和 b）。",
+     "choices": {"A": "5 3", "B": "5 5", "C": "3 3"}}
+  ]
+}

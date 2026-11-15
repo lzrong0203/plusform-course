@@ -1,0 +1,26 @@
+{
+  "note": "回顧題：學員通過這課以後，往後第 2 課和第 5 課的 check 會各帶一題。",
+  "questions": [
+    {
+      "id": "r1",
+      "q": "record = (\"11/05\", \"電影\", 300)\ndate, item, amount = record\nprint(item)\n印出什麼？（寫印出來的字）",
+      "accept": ["電影"],
+      "hint": "拆包照順序一個對一個：第一個給 date，第二個給 item……",
+      "explain": "拆包照順序：\"11/05\" 給 date、\"電影\" 給 item、300 給 amount，所以 print(item) 印出 電影。"
+    },
+    {
+      "id": "r2",
+      "q": "kinds = [\"餐飲\", \"交通\", \"餐飲\", \"餐飲\"]\nprint(len(set(kinds)))\n印出多少？（寫數字）",
+      "accept": ["2"],
+      "hint": "set 會把重複的拿掉，剩下幾種？",
+      "explain": "set(kinds) 把重複的拿掉，只剩 餐飲 和 交通 兩種，所以 len 是 2。"
+    },
+    {
+      "id": "r3",
+      "q": "kinds = {\"餐飲\", \"交通\"}\nresult = sorted(kinds)\nresult 是什麼？\nA. 一個排好的 list\nB. 一個排好的 set\nC. None\n（寫 A、B 或 C）",
+      "accept": ["A"],
+      "explain": "sorted 不管給它什麼，都交回一個新的、排好的 list。set 本身沒有保證順序，要固定的順序就用 sorted。",
+      "choices": {"A": "一個排好的 list", "B": "一個排好的 set", "C": "None"}
+    }
+  ]
+}

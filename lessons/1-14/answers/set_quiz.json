@@ -1,0 +1,24 @@
+{
+  "note": "1-14 第②圈：set 的順序（隨片測驗：set 順序陷阱，對答 4 題）。影片裡熊以為 set 會幫他排好，家教說不對，熊自己跑兩次看到順序不一樣。",
+  "normalize": "text",
+  "how": "A、B 或 C",
+  "strict_choice": true,
+  "questions": [
+    {"id": "q1", "title": "set 跑兩次的順序", "accept": ["C"],
+     "choices": {"A": "一定一樣，照放進去的順序", "B": "一定照筆畫排好", "C": "不一定，兩次可能不一樣"},
+     "hint": "影片裡熊把同一支 dates.py 跑了兩次，兩次印出來一樣嗎？",
+     "explain": "set 沒有順序。字串放進 set 的位置，每次執行 Python 都可能不一樣（官方文件：字串的雜湊值每次執行都會加上一個猜不到的亂數），所以同一支程式跑兩次，印出來的先後可能不同。要固定的順序，用 sorted。"},
+    {"id": "q2", "title": "{3, 1, 2} 印出 {1, 2, 3}", "accept": ["B"],
+     "choices": {"A": "set 會幫數字排好", "B": "只是剛好看起來排好，set 沒有保證順序", "C": "這支程式寫錯了"},
+     "hint": "換成 {30, 120, 85} 試試看，印出來還是由小到大嗎？",
+     "explain": "小的整數放進 set，常常剛好排成由小到大，可是那只是剛好：{30, 120, 85} 在 Python 3.13 印出 {120, 85, 30}。官方文件說 Python 從來沒有保證 set 的順序。"},
+    {"id": "q3", "title": "sorted(set) 交回什麼", "accept": ["A"],
+     "choices": {"A": "一個排好的 list（方括號）", "B": "一個排好的 set（大括號）", "C": "None"},
+     "hint": "sorted 不管你給它什麼，交回的都是同一種東西。1-13 學過，那是什麼？",
+     "explain": "sorted 交回一個新的、排好的 list（官方文件：Return a new sorted list）。給它 set 也一樣，拿到的是方括號的 list，順序就固定下來了。"},
+    {"id": "q4", "title": "set 的 sort()", "accept": ["B"],
+     "choices": {"A": "nums 變成 {30, 85, 120}", "B": "出現錯誤訊息（AttributeError：set 沒有 sort）", "C": "印出 None"},
+     "hint": "sort() 是誰的工具？set 有順序可以排嗎？",
+     "explain": "sort() 是 list 才有的工具，set 沒有順序，所以沒有 sort：nums.sort() 會出現 AttributeError: 'set' object has no attribute 'sort'。要排好就用 sorted(nums)，拿到一個 list。"}
+  ]
+}

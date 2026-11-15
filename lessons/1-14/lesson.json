@@ -1,0 +1,7 @@
+{
+  "id": "1-14",
+  "title": "tuple、set 與拆包",
+  "minutes": 50,
+  "fast_minutes": 10,
+  "after_start": "接下來，用 VS Code 打開帳本的 lessons/1-14：\n  1. 第一圈：predict.txt 先別跑、預測 4 題；record.py 把一筆帳拆成三個名字；swap.py 用一行把 a 和 b 交換；kinds.py 用 set 算有幾種分類、兩個月都有的、只有 11 月有的\n  2. 第二圈：請家教考你一筆帳該用 tuple 還是 list，記在 tutor.md（自評）；set_quiz.txt 四題（set 的順序）\n  3. 第三圈：checks_months.py 用註解和 assert 寫下需求，呼叫課程寫好的 both_months()（months.py 不用改）\n做完回到課程資料夾打：uv run check.py 1-14"
+}
