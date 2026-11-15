@@ -1886,12 +1886,15 @@ class ChaffCheck(Check):
                     r.detail = f"溜過去了：{m['hint']}" if reveal else f"溜過去了。（先寫滿 {self.min} {unit}，再告訴你溜過去的是哪一種錯）"
                     slipped.append(m["hint"])
             caught = len(self.mutants) - len(slipped)
+            stuck_caught = [k for k, r in enumerate(mutant_rs, start=1) if r.ok and f"m{k}" in self._stuck_names]
+            stuck_lines = ([f"  其中 {len(stuck_caught)} 個卡在迴圈裡停不下來：",   # 1-10：看得到 check 的逾時（每行 ≤68 欄）
+                            f"  check 等了 {self.version_timeout():.0f} 秒，把它停下來，算你抓到。"]
+                           if stuck_caught and self.spec.get("stuck_note") else [])
+            # 1-11 修：1-10 把 stuck_note 那段插在 if not slipped 和 elif reveal 中間，全部抓到時又多印一行「抓到 3 個壞版本，還有 0 個溜過去：」；
+            # 改回原本的三選一，逾時那兩行接在後面（1-10 兩種情況印出來的字跟原本一樣）
             if not slipped:
                 self.ctx.summaries.append(f"你的{CHAFF_NOUN.get(self.mode, '檢查')}把 {len(self.mutants)} 個壞版本全部抓到了。")
-            stuck_caught = [k for k, r in enumerate(mutant_rs, start=1) if r.ok and f"m{k}" in self._stuck_names]
-            if stuck_caught and self.spec.get("stuck_note"):   # 1-10：看得到 check 的逾時（每行 ≤68 欄）
-                self.ctx.summaries.append(f"  其中 {len(stuck_caught)} 個卡在迴圈裡停不下來：")
-                self.ctx.summaries.append(f"  check 等了 {self.version_timeout():.0f} 秒，把它停下來，算你抓到。")
+                self.ctx.summaries.extend(stuck_lines)
             elif reveal:
                 # 每行壓在 68 欄內（VHS 錄影 70 欄、Terminal.app 預設 80 欄都不折行）：提示一條一行
                 self.ctx.summaries.append(f"你的{CHAFF_NOUN.get(self.mode, '檢查')}抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去：")

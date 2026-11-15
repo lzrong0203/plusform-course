@@ -89,6 +89,16 @@ class TableFacts(unittest.TestCase):
         self.assertEqual(part(out, "m2").note, "被第 3 行抓到")   # 第 3 天晚餐 330
         self.assertEqual(part(out, "m3").note, "被第 2 行抓到")   # 21 列
         self.assertIn("你的檢查把 3 個壞版本全部抓到了。", out.summaries)
+        self.assertFalse(any("還有 0 個溜過去" in x for x in out.summaries), out.summaries)   # 1-10 留下的重複總結（1-11 修）
+
+    def test_all_caught_summary_is_one_line_in_other_lessons_too(self):
+        """1-1 的 expected_text 全部抓到：只印「全部抓到了」一行（1-10 插進 stuck_note 時讓它多印一行「還有 0 個溜過去：」）。"""
+        les = grader.load_lesson("1-1", COURSE)
+        spec = next(c for c in les.checks if c["type"] == "chaff")
+        tf = COURSE / "lessons" / "1-1" / spec["teacher_file"]
+        out = grader.evaluate(les, L, overrides={spec["student_file"]: tf}, only=[spec])
+        self.assertTrue(all(r.ok for r in out.results), [(r.id, r.detail) for r in out.results])
+        self.assertEqual([x for x in out.summaries if "壞版本" in x], ["你的預期輸出把 3 個壞版本全部抓到了。"])
 
     def test_bear_rows_only_lets_the_daily_reset_slip(self):
         out = r3(BEAR_ROWS)
