@@ -1,0 +1,356 @@
+{
+ "note": "1-12 矯正包的對照表（course/production/1-12/tapes/tools/make_remedial.py 產生，不手改）：錯的題目（items）→ 主題（topics）→ 原課章節的時間碼與練習檔。時間碼取自各課說明欄的章節（影片從那個時間開始看那一章）；練習檔在 practice/，交卷沒過時 check.py 把用得到的複製到帳本的 lessons/1-12/practice/。卷 A、卷 B 共用（每一題考的概念一樣，題目 id 也一樣）。只管第一部分（考卷）；第二、三部分沒有矯正包（照一般課的提示改到全過）。",
+ "topics": {
+  "while_cont": {
+   "name": "while 跑幾圈、continue 跳過這一圈下面的那幾行",
+   "where": [
+    {
+     "lesson": "1-10",
+     "title": "while 迴圈",
+     "time": "6:59",
+     "chapter": "第①圈 break 和 continue"
+    },
+    {
+     "lesson": "1-10",
+     "title": "while 迴圈",
+     "time": "1:17",
+     "chapter": "第①圈 while：迴圈跑幾次"
+    }
+   ],
+   "practice": "p_while.py",
+   "how": "先在紙上寫下每一行印出什麼，再跑"
+  },
+  "nested": {
+   "name": "兩層迴圈：內層跑完一整圈，外層才往下一個；print 縮在哪一層就屬於哪一層",
+   "where": [
+    {
+     "lesson": "1-11",
+     "title": "for、range、enumerate 與兩層迴圈",
+     "time": "5:52",
+     "chapter": "第①圈 enumerate 編號、兩層迴圈"
+    }
+   ],
+   "practice": "p_nested.py",
+   "how": "先在紙上寫下一共印出幾行、每一行是什麼，再跑"
+  },
+  "elif": {
+   "name": "if、elif 沒有 else：都不成立就什麼都不做；enumerate 的編號從 start 開始",
+   "where": [
+    {
+     "lesson": "1-9",
+     "title": "if／elif／else：預算燈號與 BMI",
+     "time": "2:26",
+     "chapter": "第①圈 預算燈號：elif 從上往下看"
+    },
+    {
+     "lesson": "1-11",
+     "title": "for、range、enumerate 與兩層迴圈",
+     "time": "5:52",
+     "chapter": "第①圈 enumerate 編號、兩層迴圈"
+    }
+   ],
+   "practice": "p_elif.py",
+   "how": "先在紙上寫下每一行印出什麼，再跑"
+  },
+  "slice": {
+   "name": "切片拿到的是字串、int() 變成整數、// 除完只留整數",
+   "where": [
+    {
+     "lesson": "1-5",
+     "title": "字串：索引、切片、方法、f-string",
+     "time": "1:14",
+     "chapter": "第①圈 索引、切片，先猜 d[::-1]"
+    },
+    {
+     "lesson": "1-4",
+     "title": "數字與運算：分帳的零頭",
+     "time": "1:45",
+     "chapter": "第①圈 /、//、%、**，先猜 -7 // 2"
+    }
+   ],
+   "practice": "p_slice.py",
+   "how": "先在紙上寫下每一行印出什麼，再跑"
+  },
+  "traceback": {
+   "name": "錯誤訊息從最下面一行看起：冒號前面是哪一種錯，往上看是第幾行",
+   "where": [
+    {
+     "lesson": "1-7",
+     "title": "讀懂錯誤訊息：Traceback 從最下面看",
+     "time": "1:14",
+     "chapter": "第①圈 錯誤訊息的五行、一行都不跑的錯"
+    }
+   ],
+   "practice": "p_traceback.py",
+   "how": "先跑，寫下最後一行的錯誤種類和第幾行，修好再跑"
+  },
+  "input_int": {
+   "name": "input 交回的一定是字串；打 q 的那一次，也會被交給 int()",
+   "where": [
+    {
+     "lesson": "1-10",
+     "title": "while 迴圈",
+     "time": "3:14",
+     "chapter": "第①圈 記到打 q 為止、果凍兔停不下來（Control C）"
+    },
+    {
+     "lesson": "1-6",
+     "title": "input、型別轉換，第一次認識函式呼叫",
+     "time": "3:40",
+     "chapter": "第①圈 input 交回字串、熊的記帳程式"
+    }
+   ],
+   "practice": "p_q.py",
+   "how": "先跑，打 q 看會怎樣，修好再跑"
+  },
+  "parsons": {
+   "name": "縮排決定哪幾行在迴圈裡：只做一次的放最外面，每一圈要做的縮在 while 底下，break 縮在 if 底下",
+   "where": [
+    {
+     "lesson": "1-10",
+     "title": "while 迴圈",
+     "time": "6:59",
+     "chapter": "第①圈 break 和 continue"
+    }
+   ],
+   "practice": "p_parsons.py",
+   "how": "照檔案最上面的說明排好、縮好，再跑"
+  },
+  "err_syntax": {
+   "name": "SyntaxError：寫法 Python 看不懂（像 while、if 那一行少了冒號），一行都不跑",
+   "where": [
+    {
+     "lesson": "1-7",
+     "title": "讀懂錯誤訊息：Traceback 從最下面看",
+     "time": "1:14",
+     "chapter": "第①圈 錯誤訊息的五行、一行都不跑的錯"
+    }
+   ],
+   "practice": "p_syntax.py",
+   "how": "先跑，看最後一行和第幾行，修好一個再跑"
+  },
+  "err_name": {
+   "name": "NameError：這個名字還沒有（打錯字，或還沒設定就先用）；要改的可能在別的地方",
+   "where": [
+    {
+     "lesson": "1-7",
+     "title": "讀懂錯誤訊息：Traceback 從最下面看",
+     "time": "3:40",
+     "chapter": "第①圈 跑到才當掉的錯、錯在別的地方"
+    }
+   ],
+   "practice": "p_name.py",
+   "how": "先跑，往上找這個名字是在哪一行設的，修好再跑"
+  },
+  "count_pos": {
+   "name": "count 加 1 要放在 break、continue 的下面：真的記了一筆才加",
+   "where": [
+    {
+     "lesson": "1-10",
+     "title": "while 迴圈",
+     "time": "8:39",
+     "chapter": "第②圈 帶我寫：跟家教寫最多記 10 筆"
+    },
+    {
+     "lesson": "1-10",
+     "title": "while 迴圈",
+     "time": "6:59",
+     "chapter": "第①圈 break 和 continue"
+    }
+   ],
+   "practice": "p_count.py",
+   "how": "先在紙上寫下會印出一共幾筆，再跑、再修"
+  },
+  "loop_q": {
+   "name": "一直問、打 q 就停：while True 加 if … break",
+   "where": [
+    {
+     "lesson": "1-10",
+     "title": "while 迴圈",
+     "time": "3:14",
+     "chapter": "第①圈 記到打 q 為止、果凍兔停不下來（Control C）"
+    }
+   ],
+   "practice": "p_loop.py",
+   "how": "寫好再跑，一開始就打 q 也試一次"
+  },
+  "subtotal": {
+   "name": "小計：每一個小計從 0 開始、放在迴圈外面；每一圈用 if、elif、else 加進對的那一個",
+   "where": [
+    {
+     "lesson": "1-11",
+     "title": "for、range、enumerate 與兩層迴圈",
+     "time": "3:14",
+     "chapter": "第①圈 一週七天的花費：累加、計數、找最大值"
+    },
+    {
+     "lesson": "1-9",
+     "title": "if／elif／else：預算燈號與 BMI",
+     "time": "2:26",
+     "chapter": "第①圈 預算燈號：elif 從上往下看"
+    }
+   ],
+   "practice": "p_subtotal.py",
+   "how": "寫好再跑，對照檔案最上面寫的結果"
+  },
+  "light": {
+   "name": "預算燈號：低於 80% 綠燈；80% 到 100%（剛好 100% 也算）黃燈；超過紅燈",
+   "where": [
+    {
+     "lesson": "1-9",
+     "title": "if／elif／else：預算燈號與 BMI",
+     "time": "2:26",
+     "chapter": "第①圈 預算燈號：elif 從上往下看"
+    }
+   ],
+   "practice": "p_light.py",
+   "how": "先在紙上寫下四個金額各印出什麼，再跑、再修"
+  },
+  "split": {
+   "name": "分帳：每人先付 total // people，零頭是 total % people",
+   "where": [
+    {
+     "lesson": "1-4",
+     "title": "數字與運算：分帳的零頭",
+     "time": "3:51",
+     "chapter": "第①圈 先算哪一個、寫分帳程式"
+    }
+   ],
+   "practice": "p_split.py",
+   "how": "先在紙上寫下印出什麼，再跑、再修"
+  }
+ },
+ "items": {
+  "trace-t1": {
+   "label": "預測第 1 題",
+   "topics": [
+    "while_cont"
+   ]
+  },
+  "trace-t2": {
+   "label": "預測第 2 題",
+   "topics": [
+    "while_cont"
+   ]
+  },
+  "trace-t3": {
+   "label": "預測第 3 題",
+   "topics": [
+    "nested"
+   ]
+  },
+  "trace-t4": {
+   "label": "預測第 4 題",
+   "topics": [
+    "nested"
+   ]
+  },
+  "trace-t5": {
+   "label": "預測第 5 題",
+   "topics": [
+    "elif"
+   ]
+  },
+  "trace-t6": {
+   "label": "預測第 6 題",
+   "topics": [
+    "slice"
+   ]
+  },
+  "trace-t7": {
+   "label": "錯誤訊息第 7 題",
+   "topics": [
+    "traceback"
+   ]
+  },
+  "trace-t8": {
+   "label": "錯誤訊息第 8 題",
+   "topics": [
+    "traceback"
+   ]
+  },
+  "trace-t9": {
+   "label": "錯誤訊息第 9 題",
+   "topics": [
+    "input_int"
+   ]
+  },
+  "pz-order": {
+   "label": "拼圖：每一行用上、縮排對",
+   "topics": [
+    "parsons"
+   ]
+  },
+  "pz-run": {
+   "label": "拼圖：跑出來的結果",
+   "topics": [
+    "parsons"
+   ]
+  },
+  "fix-run": {
+   "label": "修好：跑不起來",
+   "topics": [
+    "traceback"
+   ],
+   "by_error": {
+    "SyntaxError": [
+     "err_syntax"
+    ],
+    "IndentationError": [
+     "err_syntax"
+    ],
+    "NameError": [
+     "err_name"
+    ]
+   }
+  },
+  "fix-out": {
+   "label": "修好：打 q 也算一筆",
+   "topics": [
+    "count_pos"
+   ]
+  },
+  "fix-edge": {
+   "label": "修好：空白的一行",
+   "topics": [
+    "count_pos"
+   ]
+  },
+  "ledger-q": {
+   "label": "v0.1：一開始就打 q",
+   "topics": [
+    "loop_q"
+   ]
+  },
+  "ledger-sum": {
+   "label": "v0.1：三個小計",
+   "topics": [
+    "subtotal"
+   ]
+  },
+  "ledger-green": {
+   "label": "v0.1：綠燈",
+   "topics": [
+    "light"
+   ]
+  },
+  "ledger-yellow": {
+   "label": "v0.1：剛好 100% 的燈號",
+   "topics": [
+    "light"
+   ]
+  },
+  "ledger-red": {
+   "label": "v0.1：紅燈",
+   "topics": [
+    "light"
+   ]
+  },
+  "ledger-split": {
+   "label": "v0.1：分帳的零頭",
+   "topics": [
+    "split"
+   ]
+  }
+ }
+}

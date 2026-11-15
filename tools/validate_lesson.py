@@ -174,7 +174,7 @@ def check_concepts(rep: Report, lesson: grader.Lesson, order: list[str]) -> None
 
     scanned = 0
     bad_before = len(rep.problems)
-    for folder in ("reference", "mutants", "start", "start_timed", "answers", "practice"):   # start_timed：1-7 起的計時題；practice：1-C1 起的矯正包練習
+    for folder in ("reference", "mutants", "start", "start_timed", "start_later", "answers", "practice"):   # start_timed：1-7 起的計時題；practice：1-C1 起的矯正包練習；start_later：1-12 起交卷後才放進帳本的起點檔
         files = sorted((d / folder).glob("*")) if (d / folder).is_dir() else []
         for f in files:
             if f.suffix == ".py":
@@ -441,6 +441,8 @@ def validate_lesson(lid: str, root: Path, use_env: bool, temp: dict) -> Report:
 
         # ---- 4. 起點檔裡的範例檢查，在正確版上要成立 ----
         start = d / "start" / Path(spec["student_file"]).name
+        if not start.is_file():   # 1-12 起：交卷以後才放進帳本的起點檔
+            start = d / "start_later" / Path(spec["student_file"]).name
         if start.is_file():
             ov2 = {spec["student_file"]: start}
             if spec.get("inputs_file"):   # 1-6 的 inputs_text：起點的 inputs.txt
@@ -448,14 +450,14 @@ def validate_lesson(lid: str, root: Path, use_env: bool, temp: dict) -> Report:
             _c2, chk2 = grader.build(lesson, ledger, env=env, overrides=ov2, only=[spec])
             p2 = chk2[0].parse()
             if p2.problem:
-                rep.bad(f"起點檔 start/{start.name} 讀不懂：{p2.problem}")
+                rep.bad(f"起點檔 {start.parent.name}/{start.name} 讀不懂：{p2.problem}")
             elif p2.checks:
                 st2, _ = chk2[0].statuses(p2.checks, p2.marks)
                 wrong = [(c, s) for c, s in zip(p2.checks, st2["reference"]) if s.get("status") != "pass"]
                 if wrong:
-                    rep.bad(f"起點檔 start/{start.name} 的範例檢查在正確版上不成立：{chk2[0].describe_ref_failure(*wrong[0])}")
+                    rep.bad(f"起點檔 {start.parent.name}/{start.name} 的範例檢查在正確版上不成立：{chk2[0].describe_ref_failure(*wrong[0])}")
                 else:
-                    rep.ok(f"起點檔 start/{start.name} 的 {len(p2.checks)} 條範例檢查在正確版上都成立")
+                    rep.ok(f"起點檔 {start.parent.name}/{start.name} 的 {len(p2.checks)} 條範例檢查在正確版上都成立")
 
         if spec.get("special"):
             key = json.loads((d / spec["special"]).read_text(encoding="utf-8"))

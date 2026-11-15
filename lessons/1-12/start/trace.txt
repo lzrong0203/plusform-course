@@ -1,0 +1,90 @@
+# Lv1 上關卡　第一部分（讀程式）：預測輸出與讀錯誤訊息（9 題）
+# 全程關掉 AI。先不要跑程式，用眼睛從第一行往下追；可以在紙上畫追蹤表：
+# 一圈迴圈寫一列，寫下這一圈跑完以後，每個名字裡放的是什麼、印出了什麼。
+# 每一題在「答：」後面寫答案，存檔。不會的題目，也寫一個你覺得最可能的答案。
+
+第一段：
+  1  n = 0
+  2  total = 0
+  3  while n < 5:
+  4      n = n + 1
+  5      if n % 2 == 0:
+  6          continue
+  7      total = total + n
+  8  print(total)
+
+第 1 題：第 8 行印出什麼？
+答：
+
+第 2 題：第 7 行（total = total + n）一共做了幾次？
+答：
+
+第二段：
+  1  count = 0
+  2  for day in range(1, 4):
+  3      for meal in range(2):
+  4          count = count + 1
+  5      print("第", day, "天", count)
+
+第 3 題：這一段一共印出幾行？
+答：
+
+第 4 題：印出來的最後一行，最後面的數字是多少？
+答：
+
+第三段：
+  1  for i, cost in enumerate([120, 80, 250], start=1):
+  2      if cost > 200:
+  3          print(i, "紅燈")
+  4      elif cost >= 100:
+  5          print(i, "黃燈")
+  6  print("看完了")
+
+第 5 題：輪到 80 的那一圈，印出什麼？
+    A. 2 黃燈
+    B. 2 綠燈
+    C. 什麼都不印
+（寫 A、B 或 C）
+答：
+
+第四段：
+  1  line = "2026-11-20 午餐 130"
+  2  month = line[5:7]
+  3  price = int(line[-3:])
+  4  print(f"{month} 月 {price // 3} 元")
+
+第 6 題：第 4 行印出什麼？
+    A. 11 月 43 元
+    B. 11 月 43.333333333333336 元
+    C. -1 月 43 元
+（寫 A、B 或 C）
+答：
+
+第五段：讀錯誤訊息。熊寫了 spend.py，跑的時候打了 120、按 Enter，就跳出下面的錯誤訊息。
+  1  total = 0
+  2  while True:
+  3      text = input("金額，打 q 結束：")
+  4      if text == "q":
+  5          break
+  6      total = total + text
+  7  print("一共", total, "元")
+
+錯誤訊息：
+  Traceback (most recent call last):
+    File "/Users/bear/code/ledger/spend.py", line 6, in <module>
+      total = total + text
+              ~~~~~~^~~~~~
+  TypeError: unsupported operand type(s) for +: 'int' and 'str'
+
+第 7 題：這是哪一種錯誤？（寫最下面一行冒號前面的英文）
+答：
+
+第 8 題：錯誤出現在程式的第幾行？（寫數字）
+答：
+
+第 9 題：怎麼改，打 120、85、q 就會印出「一共 205 元」？
+    A. 把第 6 行改成 total = total + int(text)
+    B. 把第 3 行改成 text = int(input("金額，打 q 結束："))
+    C. 把第 1 行改成 total = "0"
+（寫 A、B 或 C）
+答：

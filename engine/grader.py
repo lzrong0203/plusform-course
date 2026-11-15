@@ -16,6 +16,7 @@ check.py（學員端）和 tools/validate_lesson.py（老師端）共用這一�
   script_match  學員改過的腳本，在假的資料夾裡跑起來要跟安全版一樣
   git_commits   帳本是 git 存放庫，而且至少有幾個存檔點（commit）
   parsons       拼圖（Parsons，1-11 起）：把打亂的程式行排回去、自己縮排；行都要是題目給的（不能改字、多寫、少寫），排好跑出來要跟範例一樣
+  filled        自評的表單寫了沒（1-12 起）：每個標籤（例如「家教問：」「我的回答：」）後面都寫了字就算交了，內容不改對錯
 
 學員寫的檔案一律用 utf-8-sig 讀（Windows 記事本會在最前面加看不見的 BOM），
 讀不懂（例如存成 Big5）就給白話的說明，不噴 Traceback。
@@ -73,6 +74,10 @@ def normalize_id(raw: str, course: dict) -> str:
     m = re.fullmatch(r"(\d+)-[cC](\d+)[-_ ]?([bB])", text)
     if m:
         return f"{int(m.group(1))}-C{m.group(2)}B"
+    # 關卡的平行卷（1-12 起）：1-12B、1-12b、1-12-B 都當成 1-12B（卷 B 放在 lessons/1-12/B/）
+    m = re.fullmatch(r"(\d+)-0*(\d+)[-_ ]?([bB])", text)
+    if m:
+        return f"{int(m.group(1))}-{int(m.group(2))}B"
     return text
 
 
@@ -114,11 +119,12 @@ class LessonNotFound(Exception):
     pass
 
 
-PAPER_ID = re.compile(r"(\d+-C\d+)([B-Z])")
+PAPER_ID = re.compile(r"(\d+-(?:C\d+|\d+))([B-Z])")
 
 
 def paper_folder(lesson_id: str, root: Path = COURSE_ROOT) -> Path | None:
-    """檢核站的平行卷（1-C1 起）：1-C1B 放在 lessons/1-C1/B/（不在課表裡，回顧題、課表順序都照原本的 1-C1）。"""
+    """檢核站的平行卷（1-C1 起）：1-C1B 放在 lessons/1-C1/B/（不在課表裡，回顧題、課表順序都照原本的 1-C1）。
+    1-12 起的關卡也有卷 B：1-12B 放在 lessons/1-12/B/。"""
     m = PAPER_ID.fullmatch(lesson_id)
     if not m:
         return None
@@ -450,6 +456,7 @@ DEFAULT_GROUP = {
     "script_match": "官方測試",
     "git_commits": "官方測試",
     "parsons": "官方測試",
+    "filled": "自評",
 }
 
 
@@ -905,6 +912,55 @@ class ParsonsCheck(Check):
             mine = "\n".join("    " + ln.rstrip() for ln in p.stdout.splitlines() if ln.strip()) or "    （什麼都沒印）"
             run_r.detail = ("排好跑出來跟範例不一樣。\n  範例：\n" + "\n".join("    " + w for w in want)
                             + f"\n  你的（{len(got)} 行）：\n" + mine + hint)
+
+
+# ---------------- filled（自評的表單寫了沒，2026-11-15，1-12 起；只對寫了 type filled 的 checks.json 生效） ----------------
+
+class FilledCheck(Check):
+    """自評的表單（例如 1-12 第二部分的 tutor.md）：每個標籤都要出現 count 次，每一次後面都要寫了字（至少 min_chars 個字，空白不算）。
+    標籤後面的字可以寫在同一行，也可以往下接著寫，寫到下一個標籤、# 開頭的行或「- [」開頭的勾選行為止。
+    只看寫了沒，內容不改對錯（自評，總企劃第七節：自評只記錄、不擋升級；交了才算）。
+    spec：file、labels（例如 ["家教問：", "我的回答："]）、count、min_chars（預設 2）、desc、missing_hint、item（第幾題的叫法，預設「第 {n} 題」）。"""
+
+    def run(self, results):
+        r = results[0]
+        rel = self.spec["file"]
+        path = self.ctx.student(rel)
+        if not path.is_file():
+            r.detail = self.ctx.missing(rel, self.spec.get("missing_hint"))
+            return
+        labels = [unicodedata.normalize("NFKC", x) for x in self.spec["labels"]]
+        count = int(self.spec.get("count", 1))
+        need = int(self.spec.get("min_chars", 2))
+        item = self.spec.get("item", "第 {n} 題")
+        lines = [unicodedata.normalize("NFKC", ln) for ln in read_student_text(path).splitlines()]
+        found: dict[str, list[str]] = {lab: [] for lab in labels}
+        current = None
+        for raw in lines:
+            text = raw.strip()
+            hit = next((lab for lab in labels if text.startswith(lab)), None)
+            if hit is not None:
+                current = hit
+                found[hit].append(text[len(hit):])
+            elif text.startswith("#") or text.startswith("- ["):
+                current = None
+            elif current is not None:
+                found[current][-1] += text
+        name = Path(rel).name
+        for n in range(1, count + 1):
+            for lab, shown in zip(labels, self.spec["labels"]):
+                where = item.format(n=n)
+                if len(found[lab]) < n:
+                    r.detail = f"{name} 裡找不到{where}的「{shown}」：這幾個標籤不要刪掉，在後面寫就好。"
+                    return
+                body = "".join(found[lab][n - 1].split()).strip("？?。.…")
+                if len(body) < need:
+                    r.detail = f"{name}：{where}的「{shown}」後面還空着。寫完存檔，再打一次。" + (
+                        f"\n  提示：{self.spec['hint']}" if self.spec.get("hint") else "")
+                    return
+        r.ok = True
+        if self.spec.get("note"):
+            r.note = self.spec["note"]
 
 
 # ---------------- call ----------------
@@ -2101,6 +2157,7 @@ CHECKERS = {
     "script_match": ScriptMatchCheck,
     "git_commits": GitCheck,
     "parsons": ParsonsCheck,
+    "filled": FilledCheck,
 }
 
 

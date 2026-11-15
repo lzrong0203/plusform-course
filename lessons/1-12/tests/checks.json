@@ -1,0 +1,231 @@
+{
+ "note": "Lv1 上關卡（卷 A）的檢查。第一部分是考卷（關掉 AI，參考 45 分鐘，只記錄），20 題、第一次交卷過 16 題以上算過（lesson.json pass_at）：讀程式 14 題（trace.txt 預測輸出 6 題＋讀錯誤訊息 3 題、parsons.py 拼圖 2 題、fix.py 修好 3 題：起點跳 SyntaxError（while 少冒號）、再跳 NameError（錯在第 2 行的 totl）、跑得起來以後打 q 和空白的一行都被算成一筆），從零寫 6 題（ledger.py 帳本 v0.1：輸入到 q、三分類小計、預算燈號三種、分帳零頭，check 餵 stdin，每次最多 5 秒）。讀程式和從零寫是 14 比 6（70／30，仿 UCSD CS1-LLM 期末考的配比調整，Lv1 沒有可以用 AI 的段落）。input 的提示字不換行、會黏在下一行前面，所以從零寫一律用 expect_regex 找字。gate_part 的兩項不算考卷：第二部分 tutor.md（filled，自評，寫了就算交了）、第三部分替 share() 寫 assert（chaff 的 assert 模式，抓到 3 個壞版本）；它們的起點檔在 start_later/，第一次交卷以後才放進帳本。卷 B 在 B/，題目 id 跟卷 A 一樣，矯正包對照表共用。",
+ "checks": [
+  {
+   "type": "answers",
+   "id": "trace",
+   "file": "lessons/1-12/trace.txt",
+   "key": "answers/trace.json",
+   "group": "讀程式",
+   "stage": "讀程式"
+  },
+  {
+   "type": "parsons",
+   "id": "pz",
+   "file": "lessons/1-12/parsons.py",
+   "group": "讀程式",
+   "stage": "讀程式",
+   "timeout": 5,
+   "lines": [
+    "print(\"第\", week, \"週存到\", saved, \"元\")",
+    "saved = saved + 150",
+    "week = 0",
+    "if saved >= 500:",
+    "while True:",
+    "break",
+    "saved = 0",
+    "week = week + 1"
+   ],
+   "expect_exact": [
+    "第 4 週存到 600 元"
+   ],
+   "desc_order": "拼圖：八行都用上、沒有改字，排好以後 Python 讀得懂",
+   "desc_run": "拼圖：排好跑出來是「第 4 週存到 600 元」",
+   "hint": "saved = 0、week = 0 只做一次，放在最外面；每一週要做的（week 加 1、saved 加 150、檢查夠了沒）縮在 while 底下；break 縮在 if 底下；最後才印一次。",
+   "missing_hint": "parsons.py 應該在帳本的 lessons/1-12/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-12。"
+  },
+  {
+   "type": "run",
+   "id": "fix-run",
+   "file": "lessons/1-12/fix.py",
+   "group": "讀程式",
+   "stage": "讀程式",
+   "desc": "fix.py 跑得起來（打 120、85、q），印出一共幾筆、合計多少",
+   "stdin": "120\n85\nq\n",
+   "timeout": 5,
+   "expect_contains": [
+    "一共",
+    "合計"
+   ],
+   "hint": "錯誤訊息從最下面一行看起：冒號前面是哪一種錯？往上看是第幾行？NameError 說找不到的名字，往上找它是在哪一行設的。修好一個，存檔，再跑一次。",
+   "missing_hint": "fix.py 應該在帳本的 lessons/1-12/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-12。",
+   "stuck_hint": "迴圈要有停下來的時候：打 q 的那一圈要 break。"
+  },
+  {
+   "type": "run",
+   "id": "fix-out",
+   "file": "lessons/1-12/fix.py",
+   "group": "讀程式",
+   "stage": "讀程式",
+   "desc": "fix.py 印出來的兩行跟題目一樣（一共 2 筆、合計 205 元）",
+   "stdin": "120\n85\nq\n",
+   "timeout": 5,
+   "expect_contains": [
+    "一共 2 筆",
+    "合計 205 元"
+   ],
+   "expect_not_contains": [
+    "一共 3 筆"
+   ],
+   "hint": "打了 120、85 兩筆，卻印出一共 3 筆：打 q 的那一次也被算進去了。count 加 1 的那一行，要放在 break 的下面（1-10）。",
+   "hint_on_crash": false
+  },
+  {
+   "type": "run",
+   "id": "fix-edge",
+   "file": "lessons/1-12/fix.py",
+   "group": "讀程式",
+   "stage": "讀程式",
+   "desc": "中間多按一下 Enter（打 120、空白的一行、85、q）也是一共 2 筆、合計 205 元",
+   "stdin": "120\n\n85\nq\n",
+   "timeout": 5,
+   "expect_contains": [
+    "一共 2 筆",
+    "合計 205 元"
+   ],
+   "expect_not_contains": [
+    "一共 3 筆",
+    "一共 4 筆"
+   ],
+   "hint": "空白的一行不算一筆：continue 會跳過它下面的那幾行，所以 count 加 1 要放在 continue 的下面（1-10）。",
+   "hint_on_crash": false
+  },
+  {
+   "type": "run",
+   "id": "ledger-q",
+   "file": "lessons/1-12/ledger.py",
+   "group": "從零寫 v0.1",
+   "stage": "從零寫 v0.1",
+   "desc": "ledger.py：一開始就打 q（預算 1000、三個人分）→ 三個小計、合計都是 0 元",
+   "stdin": "1000\nq\n3\n",
+   "timeout": 5,
+   "expect_regex": [
+    "餐飲\\s*0\\s*元",
+    "交通\\s*0\\s*元",
+    "其他\\s*0\\s*元",
+    "合計\\s*0\\s*元"
+   ],
+   "hint": "照規格的順序問：先問預算，再一直問分類（打 q 就 break），最後問幾個人分。一開始就打 q，迴圈一次都不做，小計都是 0。改完記得存檔再跑。",
+   "missing_hint": "ledger.py 應該在帳本的 lessons/1-12/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-12。",
+   "stuck_hint": "打 q 的時候要停下來：if kind == \"q\": break。自己試跑停不下來，按 Ctrl+C。",
+   "eof_hint": "打 q 的時候要停下來：if kind == \"q\": break。"
+  },
+  {
+   "type": "run",
+   "id": "ledger-sum",
+   "file": "lessons/1-12/ledger.py",
+   "group": "從零寫 v0.1",
+   "stage": "從零寫 v0.1",
+   "desc": "ledger.py：交通 80、餐飲 150、書 200、餐飲 90 → 餐飲 240、交通 80、其他 200、合計 520 元",
+   "stdin": "1000\n交通\n80\n餐飲\n150\n書\n200\n餐飲\n90\nq\n2\n",
+   "timeout": 5,
+   "expect_regex": [
+    "餐飲\\s*240\\s*元",
+    "交通\\s*80\\s*元",
+    "其他\\s*200\\s*元",
+    "合計\\s*520\\s*元"
+   ],
+   "hint": "三個小計各用一個名字、都從 0 開始、放在迴圈外面；每一圈用 if／elif／else 看分類，加進對的那一個（金額先用 int() 變成整數）。",
+   "stuck_hint": "打 q 的時候要停下來：if kind == \"q\": break。",
+   "eof_hint": "照規格的順序問：分類、金額，一圈問兩次；打 q 那一圈只問分類就停。"
+  },
+  {
+   "type": "run",
+   "id": "ledger-green",
+   "file": "lessons/1-12/ledger.py",
+   "group": "從零寫 v0.1",
+   "stage": "從零寫 v0.1",
+   "desc": "ledger.py：合計 520、預算 1000（52%）→ 綠燈",
+   "stdin": "1000\n交通\n80\n餐飲\n150\n書\n200\n餐飲\n90\nq\n2\n",
+   "timeout": 5,
+   "expect_contains": [
+    "綠燈"
+   ],
+   "expect_not_contains": [
+    "黃燈",
+    "紅燈"
+   ],
+   "hint": "合計低於預算的 80% 是綠燈：total < budget * 0.8（或先算 ratio = total / budget，再看 ratio < 0.8）。"
+  },
+  {
+   "type": "run",
+   "id": "ledger-yellow",
+   "file": "lessons/1-12/ledger.py",
+   "group": "從零寫 v0.1",
+   "stage": "從零寫 v0.1",
+   "desc": "ledger.py：合計剛好 1000、預算 1000（剛好 100%）→ 黃燈",
+   "stdin": "1000\n餐飲\n600\n文具\n400\nq\n4\n",
+   "timeout": 5,
+   "expect_contains": [
+    "黃燈"
+   ],
+   "expect_not_contains": [
+    "綠燈",
+    "紅燈"
+   ],
+   "hint": "剛好花到預算還不算超過，是黃燈：想想 < 和 <= 差在哪裡（1-8、1-9）。"
+  },
+  {
+   "type": "run",
+   "id": "ledger-red",
+   "file": "lessons/1-12/ledger.py",
+   "group": "從零寫 v0.1",
+   "stage": "從零寫 v0.1",
+   "desc": "ledger.py：合計 1001、預算 1000（超過）→ 紅燈",
+   "stdin": "1000\n餐飲\n500\n交通\n501\nq\n3\n",
+   "timeout": 5,
+   "expect_contains": [
+    "紅燈"
+   ],
+   "expect_not_contains": [
+    "綠燈",
+    "黃燈"
+   ],
+   "hint": "超過預算才是紅燈：前面的 if、elif 都不成立，走 else。"
+  },
+  {
+   "type": "run",
+   "id": "ledger-split",
+   "file": "lessons/1-12/ledger.py",
+   "group": "從零寫 v0.1",
+   "stage": "從零寫 v0.1",
+   "desc": "ledger.py：合計 1001、三個人分 → 每人 333 元，零頭 2 元",
+   "stdin": "1000\n餐飲\n500\n交通\n501\nq\n3\n",
+   "timeout": 5,
+   "expect_regex": [
+    "每人\\s*333\\s*元\\W*零頭\\s*2\\s*元"
+   ],
+   "hint": "每人先付的用 //（除完只留整數），零頭用 %（除完剩多少），1-4 教過。用 / 會變成有小數點的數字。印出來照這個樣子：每人 333 元，零頭 2 元。"
+  },
+  {
+   "type": "filled",
+   "id": "tutor",
+   "file": "lessons/1-12/tutor.md",
+   "gate_part": "第二部分",
+   "group": "第二部分",
+   "labels": [
+    "家教問：",
+    "我的回答："
+   ],
+   "count": 3,
+   "min_chars": 4,
+   "desc": "tutor.md：家教問的三個問題、你的三個回答都寫了（自評：內容不改對錯）",
+   "hint": "家教問什麼照抄；回答自己想、自己打，答不出來就照實寫「我不確定，我猜……」。",
+   "missing_hint": "tutor.md 在第一部分交卷以後，才會放進帳本的 lessons/1-12/。先把第一部分寫完、交卷：uv run check.py 1-12。"
+  },
+  {
+   "type": "chaff",
+   "id": "r3",
+   "mode": "assert",
+   "student_file": "lessons/1-12/checks_share.py",
+   "module": "share",
+   "reference": "reference/share.py",
+   "mutants": "mutants/mutants.json",
+   "teacher_file": "answers/checks_share.py",
+   "min_checks": 5,
+   "no_marks": true,
+   "gate_part": "第三部分",
+   "group": "第三部分"
+  }
+ ]
+}

@@ -1,0 +1,25 @@
+{
+  "id": "1-12",
+  "title": "Lv1 上關卡：帳本 v0.1",
+  "minutes": 45,
+  "fast_minutes": 10,
+  "checkpoint": true,
+  "noun": "關卡",
+  "pass_at": 16,
+  "stages": ["讀程式", "從零寫 v0.1"],
+  "answer_files": ["trace.txt", "parsons.py", "fix.py", "ledger.py"],
+  "papers": ["B"],
+  "remedial": "remedial.json",
+  "remedial_show": 3,
+  "practice": "practice",
+  "gate": true,
+  "gate_days": 7,
+  "level_name": "Lv1 上 看得懂（上）",
+  "gate_parts": [
+    {"part": "第一部分", "title": "考卷（關掉 AI）"},
+    {"part": "第二部分", "title": "家教問三題", "self_check": true},
+    {"part": "第三部分", "title": "分帳的 assert"}
+  ],
+  "later_dir": "start_later",
+  "after_start": "關卡開始了。第一部分是考卷：全程關掉 AI，參考 45 分鐘（只記錄）。\n  作答檔：帳本的 lessons/1-12/（trace.txt、parsons.py、fix.py、ledger.py）\n寫完回到課程資料夾打：uv run check.py 1-12（交卷）"
+}
