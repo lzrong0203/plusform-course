@@ -194,14 +194,18 @@ class Answers(unittest.TestCase):
         self.assertIn("名字", out.results[0].detail)
 
     def test_rule_in_other_words(self):
-        for rule in ("少掉的 0.1 加給金額最高的那一類", "四捨五入的差額，算到最多的分類", "把誤差補到最大類"):
+        for rule in ("少掉的 0.1 加給金額最高的那一類", "四捨五入的差額，算到最多的分類", "把誤差補到最大類",
+                     # 1-15 第一輪驗收：原本被擋的合理寫法
+                     "最大的那一類用 100 減掉其他類", "少掉的 0.1 加到餐飲", "誤差給最大的一類，其他（包括最小的）不變"):
             answer("req_fix.txt", ["B", rule, "53.4%"])
             out = ev(["fix"])
             self.assertTrue(all(r.ok for r in out.results), (rule, [(r.id, r.detail) for r in out.results]))
             start()
 
     def test_rule_with_smallest_or_without_whom_fails(self):
-        for rule in ("誤差歸到最小的一類", "加總不用是 100", "最大"):
+        for rule in ("誤差歸到最小的一類", "加總不用是 100", "最大",
+                     # 1-15 第一輪驗收：原本被放過的錯寫法（說反、平均分、沒定規則）
+                     "最大的一類不要動，誤差平均分", "誤差不能歸到最大的一類", "加總最多差 0.1 也算 100%"):
             answer("req_fix.txt", ["B", rule, "53.4"])
             out = ev(["fix"])
             self.assertFalse(out.results[1].ok, rule)
