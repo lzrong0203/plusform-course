@@ -1,0 +1,20 @@
+{
+  "note": "1-15 第②圈：dict 的三個工具（隨片測驗，對答 3 題）。影片裡熊第一步寫 sum(totals)，家教問他 sum 加的是什麼；熊自己跑一次，看到 TypeError。",
+  "normalize": "text",
+  "how": "A、B 或 C",
+  "strict_choice": true,
+  "questions": [
+    {"id": "q1", "title": "sum(totals)", "accept": ["B"],
+     "choices": {"A": "印出 280", "B": "出現錯誤訊息（TypeError）", "C": "印出 2"},
+     "hint": "把 dict 交給 sum，sum 一個一個拿出來加的，是鍵還是值？",
+     "explain": "dict 一個一個拿出來的是鍵。sum(totals) 會去加 \"餐飲\"、\"交通\" 這兩個字，所以出現 TypeError: unsupported operand type(s) for +: 'int' and 'str'。要加值，寫 sum(totals.values())，是 280。"},
+    {"id": "q2", "title": "for k in totals", "accept": ["A"],
+     "choices": {"A": "鍵：餐飲、交通", "B": "值：205、75", "C": "鍵和值：餐飲 205、交通 75"},
+     "hint": "跟上一題一樣：直接拿 dict 跑 for，一圈拿到的是什麼？",
+     "explain": "for k in totals 拿到的是鍵，照放進去的順序：餐飲、交通。要值用 totals.values()，鍵和值一起用 totals.items()。"},
+    {"id": "q3", "title": "同時拿鍵和值", "accept": ["C"],
+     "choices": {"A": "totals.keys()", "B": "totals.values()", "C": "totals.items()"},
+     "hint": "哪一個一圈給一組（鍵, 值）？",
+     "explain": "items() 一圈給一組 (鍵, 值)，for kind, amount in totals.items(): 拿出來的同時拆包（1-14）。keys() 只有鍵、values() 只有值。"}
+  ]
+}

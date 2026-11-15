@@ -644,6 +644,10 @@ class AnswersCheck(Check):
                 r.ok = norm_answer(letter, kind, home) in accepted
             elif q.get("keep_spaces"):   # 1-12 起（Codex 審卷 B）：「1 2」跟「12」是不一樣的輸出，中間的空白不拿掉
                 r.ok = spaced_answer(given) in {spaced_answer(a) for a in q["accept"]}
+            elif q.get("keywords"):   # 1-15 起（只對寫了 keywords 的題目）：自己寫一句話，每一組關鍵字至少要有一個、reject 裡的一個都不能有
+                flat = norm_answer(given, "text")
+                r.ok = (all(any(norm_answer(k, "text") in flat for k in group) for group in q["keywords"])
+                        and not any(norm_answer(k, "text") in flat for k in q.get("reject", [])))
             else:
                 r.ok = norm_answer(given, kind, home) in accepted
             if not r.ok:
@@ -1650,6 +1654,10 @@ class ChaffCheck(Check):
             stub = self.stub(f"s{mk.line}", f"第 {mk.line} 行標了「{mk.kind}」")
             stub.special = True
             out.append(stub)
+        # 1-15 起（只對寫了 min_req_marks 的 checks.json 生效）：至少要有幾行標「需求有問題」；還沒有就多一題沒過的（題數跟標了以後一樣）
+        need_req = int(self.spec.get("min_req_marks", 0))
+        if need_req and len([m for m in parsed.marks if m.kind == "需求有問題"]) < need_req:
+            out.append(self.stub("sreq", f"至少 {need_req} 行標「需求有問題」"))
         return out
 
     # ----- 每個版本各跑一次（各自一個程序） -----
@@ -2020,6 +2028,8 @@ class ChaffCheck(Check):
                     r.ok, r.detail, r.note = judge_case_mark(mk, self._cases[mk.line][0], self.spec["func"], key, mark_status.get(mk.line, {}))
                 else:
                     r.ok, r.detail, r.note = judge_mark(mk, key, mark_status.get(mk.line, {}))
+        if "sreq" in by_id:   # 1-15 起（min_req_marks）：提示寫在 checks.json 的 req_mark_hint（每行 ≤68 欄）
+            by_id["sreq"].detail = self.spec.get("req_mark_hint", "還沒有一行標「需求有問題」：把需求卡每一條都寫成 assert 跑跑看。")
         if "smin" in by_id:
             by_id["smin"].detail = ("還沒有一組標「已知會當掉」：找一個連正確版都轉不了的金額，\n"
                                     "  在那一行最後加上「# 已知會當掉」（右邊可以不寫）。")
@@ -2079,8 +2089,31 @@ def judge_case_mark(mk: Mark, inp, func: str, key: dict, ref: dict) -> tuple[boo
                    "\n  把標記拿掉，當成一般的案例就好。"), ""
 
 
+def judge_src_mark(mk: Mark, rules: list[dict], ref: dict) -> tuple[bool, str, str]:
+    """1-15 起：「需求有問題」照這一行的程式比對（special.json 規則的 src：每一個正規式都要對得到拿掉空白的程式），
+    而且這一行在正確版上真的不成立（不是當掉），才算對。只有 special.json 寫了 src 規則的課會走到這裡。"""
+    code = "".join(ast.unparse(mk.stmt).split())
+    hit = next((r for r in rules if all(re.search(p, code) for p in (r["src"] if isinstance(r["src"], list) else [r["src"]]))), None)
+    status, err = ref.get("status"), ref.get("error", "")
+    if ref.get("skipped") or ref.get("not_run"):
+        return False, f"第 {mk.line} 行標了「需求有問題」，可是前面的程式先出錯了，這一行沒有跑到。先修好前面的錯。", ""
+    if status == "error" and not ref.get("stuck"):
+        return False, (f"第 {mk.line} 行標了「需求有問題」，方向對了一半：正確版跑這一行會當掉（{err}），"
+                       "這比較像「已知會當掉」。"), ""
+    if hit is None:
+        return False, (f"第 {mk.line} 行標了「需求有問題」，可是這一條需求卡寫得很清楚。"
+                       "\n  把標記拿掉，當成一般的檢查就好。"), ""
+    if status == "pass":
+        return False, (f"第 {mk.line} 行標了「需求有問題」，可是這一行在正確版上成立，看不出問題。"
+                       + (f"\n  {hit['pass_hint']}" if hit.get("pass_hint") else "")), ""
+    return True, "", hit.get("explain", "")
+
+
 def judge_mark(mk: Mark, key: dict, ref: dict) -> tuple[bool, str, str]:
     """對特殊作答。「已知會當掉」看正確版真的跑這一行會不會當掉；「需求有問題」照 special.json 的規則。"""
+    src_rules = [r for r in key.get("rules", []) if r.get("src") and r.get("kind") == "需求有問題"]
+    if src_rules and mk.kind == "需求有問題":   # 1-15 起：照這一行的程式比對（只對寫了 src 規則的 special.json 生效）
+        return judge_src_mark(mk, src_rules, ref)
     func = key.get("func")
     calls = [
         n for n in ast.walk(mk.stmt.test)

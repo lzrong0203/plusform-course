@@ -1,0 +1,27 @@
+# 1-15 第②圈：dict 的三個工具（隨片測驗）。在「答：」後面寫 A、B 或 C，存檔。
+# 三題都用這一行：
+#   totals = {"餐飲": 205, "交通": 75}
+
+第 1 題：
+#   print(sum(totals))
+# 會怎樣？
+#   A. 印出 280
+#   B. 出現錯誤訊息（TypeError）
+#   C. 印出 2
+答：
+
+第 2 題：
+#   for k in totals:
+#       print(k)
+# 印出什麼？
+#   A. 鍵：餐飲、交通
+#   B. 值：205、75
+#   C. 鍵和值：餐飲 205、交通 75
+答：
+
+第 3 題：
+# 要在 for 裡同時拿到鍵和值（for kind, amount in ...），要寫哪一個？
+#   A. totals.keys()
+#   B. totals.values()
+#   C. totals.items()
+答：

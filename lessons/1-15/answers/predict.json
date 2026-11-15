@@ -1,0 +1,26 @@
+{
+  "note": "1-15 第①圈：dict 預測（對答 5 題）。norm_answer 會做 NFKC、拿掉空白與前後的引號、英文不分大小寫；第 2～4 題用選擇題（錯誤訊息、None、dict 印出來的樣子寫法太多種）。",
+  "normalize": "text",
+  "how": "第 1、5 題寫印出來的字（例如：205），第 2～4 題寫 A、B 或 C",
+  "strict_choice": true,
+  "questions": [
+    {"id": "p1", "title": "totals[\"交通\"] 印出什麼", "accept": ["75"],
+     "hint": "dict 用鍵拿值：方括號裡放的是名字 \"交通\"，不是第幾個。",
+     "explain": "totals[\"交通\"] 用鍵 \"交通\" 找到它的值 75。dict 不用數第幾個，直接用名字找。"},
+    {"id": "p2", "title": "totals[\"醫療\"] 會怎樣", "accept": ["C"],
+     "hint": "totals 裡有 \"醫療\" 這個鍵嗎？用方括號拿一個沒有的鍵，Python 會怎麼說？",
+     "explain": "totals 裡沒有 \"醫療\" 這個鍵，用方括號拿會出現 KeyError: '醫療'（找不到這個鍵）。不會自己變成 0 或 None。要查不到時有預設值，用 totals.get(\"醫療\", 0)。",
+     "choices": {"A": "印出 0", "B": "印出 None", "C": "出現錯誤訊息（KeyError）"}},
+    {"id": "p3", "title": "totals.get(\"醫療\", 0) 會怎樣", "accept": ["A"],
+     "hint": "get 的第二個值，是查不到的時候要交回的東西。",
+     "explain": "get(鍵, 0)：查得到就交回值，查不到就交回第二個值 0，不會出現錯誤訊息。沒寫第二個值（totals.get(\"醫療\")）查不到時交回 None。get 只是查，不會把 \"醫療\" 放進 totals。",
+     "choices": {"A": "印出 0", "B": "印出 None", "C": "出現錯誤訊息（KeyError）"}},
+    {"id": "p4", "title": "totals[\"交通\"] = 80 以後印出什麼", "accept": ["B"],
+     "hint": "dict 的鍵可以重複嗎？已經有的鍵再放一次，是多一格還是換掉？",
+     "explain": "dict 的鍵不會重複。已經有 \"交通\" 這個鍵，totals[\"交通\"] = 80 是把它的值換成 80，位置不變：{'餐飲': 205, '交通': 80}。沒有的鍵才會多一格（加在最後面）。",
+     "choices": {"A": "{'餐飲': 205, '交通': 75, '交通': 80}", "B": "{'餐飲': 205, '交通': 80}", "C": "{'交通': 80, '餐飲': 205}"}},
+    {"id": "p5", "title": "entries[1][\"item\"] 印出什麼", "accept": ["公車"],
+     "hint": "先看 entries[1]：list 從 0 開始數，第 1 個是哪一筆？再用鍵 \"item\" 拿那一筆的值。",
+     "explain": "entries 是一個 list，每一格是一筆帳的 dict。entries[1] 是第二筆 {\"item\": \"公車\", \"amount\": 30}，再用 [\"item\"] 拿到 公車。"}
+  ]
+}

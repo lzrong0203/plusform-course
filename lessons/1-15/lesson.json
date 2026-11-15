@@ -1,0 +1,7 @@
+{
+  "id": "1-15",
+  "title": "dict：用名字找資料",
+  "minutes": 50,
+  "fast_minutes": 10,
+  "after_start": "接下來，用 VS Code 打開帳本的 lessons/1-15：\n  1. 第一圈：predict.txt 先別跑、預測 5 題；totals.py 算各分類的小計和筆數；light.py 把預算燈號改成 dict 對照表\n  2. 第二圈：請家教帶你寫各分類占了幾 %（每一步你先說），程式放 percent.py、過程記在 lead.md（自評）；dict_quiz.txt 三題\n  3. 第三圈：checks_share.py 用註解和 assert 寫下需求，呼叫課程寫好的 shares()（share.py 不用改）；需求有問題的那一條，到 req_fix.txt 補規則\n做完回到課程資料夾打：uv run check.py 1-15"
+}

@@ -1,0 +1,26 @@
+{
+  "note": "回顧題：學員通過這課以後，往後第 2 課和第 5 課的 check 會各帶一題。",
+  "questions": [
+    {
+      "id": "r1",
+      "q": "totals = {\"餐飲\": 205, \"交通\": 75}\nprint(totals.get(\"娛樂\", 0))\n印出什麼？（寫印出來的字）",
+      "accept": ["0"],
+      "hint": "totals 裡有 \"娛樂\" 嗎？get 的第二個值是查不到時交回的。",
+      "explain": "\"娛樂\" 不在 totals 裡，get 交回第二個值 0，不會出現 KeyError。用 totals[\"娛樂\"] 才會出現 KeyError。"
+    },
+    {
+      "id": "r2",
+      "q": "counts = {}\nfor kind in [\"餐飲\", \"交通\", \"餐飲\"]:\n    counts[kind] = counts.get(kind, 0) + 1\nprint(counts[\"餐飲\"])\n印出多少？（寫數字）",
+      "accept": ["2"],
+      "hint": "第一次遇到餐飲，get 交回 0，加 1；第二次遇到呢？",
+      "explain": "第一次遇到餐飲：get 交回 0，counts[\"餐飲\"] 變成 1；第二次遇到：get 交回 1，變成 2。這就是用 dict 計數的寫法。"
+    },
+    {
+      "id": "r3",
+      "q": "totals = {\"餐飲\": 205, \"交通\": 75}\n要同時拿到鍵和值，for 後面要接哪一個？\nA. totals\nB. totals.values()\nC. totals.items()\n（寫 A、B 或 C）",
+      "accept": ["C"],
+      "explain": "items() 一圈給一組 (鍵, 值)：for kind, amount in totals.items():。直接寫 totals 拿到的是鍵，values() 只有值。",
+      "choices": {"A": "totals", "B": "totals.values()", "C": "totals.items()"}
+    }
+  ]
+}

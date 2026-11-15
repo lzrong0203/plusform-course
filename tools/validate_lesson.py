@@ -396,6 +396,15 @@ def validate_lesson(lid: str, root: Path, use_env: bool, temp: dict) -> Report:
             rep.bad(f"正確版沒通過老師的標準檢查：{ch.describe_ref_failure(*bad_ref[0])}")
         else:
             rep.ok(f"正確版通過老師的標準檢查（{spec['teacher_file']}）")
+        # 1-15 起（只對 special.json 寫了 src 規則的課）：老師的檢查裡標了「需求有問題」的行，要被判成對的
+        skey = json.loads((d / spec["special"]).read_text(encoding="utf-8")) if spec.get("special") else {}
+        if any(r.get("src") for r in skey.get("rules", [])):
+            for mk in parsed.marks:
+                ok_mk, why_mk, _n = grader.judge_mark(mk, skey, _marks.get(mk.line, {}))
+                if ok_mk:
+                    rep.ok(f"老師的標準檢查第 {mk.line} 行標了「{mk.kind}」，判成對的")
+                else:
+                    rep.bad(f"老師的標準檢查第 {mk.line} 行標了「{mk.kind}」，可是判成錯的：{why_mk}")
 
         target = spec.get("target")
         target_tests = [s for s in official if target and s["file"] == target]
