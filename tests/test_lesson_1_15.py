@@ -30,7 +30,7 @@ DATA = 't = {"餐飲": 160, "交通": 100, "娛樂": 40}\nr = shares(t)\n'
 BEAR_BODY = (IMP + "\n" + DATA +
              "# 每一類＝小計 ÷ 全部 × 100，留到小數一位\nassert r == {\"餐飲\": 53.3, \"交通\": 33.3, \"娛樂\": 13.3}\n"
              "# 不能動到原本的 totals\nassert t == {\"餐飲\": 160, \"交通\": 100, \"娛樂\": 40}\n"
-             "# 花 0 元的分類也要有\nassert shares({\"餐飲\": 50, \"醫療\": 0}) == {\"餐飲\": 100.0, \"醫療\": 0.0}\n"
+             "# 花 0 元的分類也要有\nz = shares({\"餐飲\": 50, \"醫療\": 0})\nassert z == {\"餐飲\": 100.0, \"醫療\": 0.0}\n"
              "# 加總要顯示 100%\n")
 BEAR_V1 = BEAR_BODY + "assert round(sum(r.values()), 1) == 100\n"
 BEAR_V2 = BEAR_BODY + "assert round(sum(r.values()), 1) == 100  # 需求有問題\n"
