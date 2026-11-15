@@ -248,19 +248,19 @@
    ]
   },
   "write-low": {
-   "label": "手寫：第 1 個金額",
+   "label": "手寫：最低那一段",
    "topics": [
     "write"
    ]
   },
   "write-mid": {
-   "label": "手寫：第 2 個金額（剛好在邊界）",
+   "label": "手寫：中間那一段（含剛好在邊界）",
    "topics": [
     "edge"
    ]
   },
   "write-top": {
-   "label": "手寫：第 3 個金額（剛好在邊界）",
+   "label": "手寫：最高那一段（含剛好在邊界）",
    "topics": [
     "if"
    ]

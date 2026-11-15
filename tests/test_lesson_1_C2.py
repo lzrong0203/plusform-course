@@ -114,6 +114,17 @@ class Grading(unittest.TestCase):
         self.assertEqual(out.total, 12)
         self.assertTrue(all(r.ok for r in out.results), [(r.id, r.detail) for r in out.results])
 
+    def test_paper_b_write_catches_equal_only(self):
+        fresh_start("1-C2B")
+        ref = (D / "B/reference/write.py").read_text(encoding="utf-8")
+        write(L / "lessons/1-C2B/write.py", ref.replace("amount >= 2000", "amount == 2000").replace("amount >= 800", "amount == 800"))
+        out = ev("1-C2B", ["write-low", "write-mid", "write-top"])
+        self.assertEqual([r.ok for r in out.results], [True, False, False])
+        write(L / "lessons/1-C2B/write.py", ref.replace("amount >= 800", "amount > 800"))
+        out = ev("1-C2B", ["write-low", "write-mid", "write-top"])
+        self.assertEqual([r.ok for r in out.results], [True, False, True])
+        self.assertIn("餵給它的輸入：800", part(out, "write-mid").detail)
+
     def test_trace_spacing_choices_and_common_mistakes(self):
         answer("1-C2", ["11 月 21 日", "珍奶一共1,300元", "b. 5025 和 75", "False, True", "送一張貼紙", "A. 打九折、謝謝光臨"])
         out = ev("1-C2", ["trace"])
@@ -126,6 +137,12 @@ class Grading(unittest.TestCase):
         r = part(ev("1-C2", ["trace"]), "trace-t3")
         self.assertFalse(r.ok)
         self.assertIn("A、B 或 C", r.detail)
+        # strict_choice（Codex 審卷 B）：同時寫兩個字母不算選了正確的那一個
+        answer("1-C2", RIGHT_A[:2] + ["B 或 C"] + RIGHT_A[3:5] + ["C 或 A"])
+        out = ev("1-C2", ["trace"])
+        self.assertFalse(part(out, "trace-t3").ok)
+        self.assertIn("只能選一個", part(out, "trace-t3").detail)
+        self.assertFalse(part(out, "trace-t6").ok)
 
     def test_fix_meets_two_error_messages_then_the_edge(self):
         out = ev("1-C2", ["fix-run", "fix-out", "fix-edge"])   # 起點：input 交回字串，budget - price 跳 TypeError
@@ -165,6 +182,12 @@ class Grading(unittest.TestCase):
         write(L / "lessons/1-C2/write.py", wrong_order)   # 「滿 1000」那條寫在後面：永遠輪不到
         out = ev("1-C2", ["write-low", "write-mid", "write-top"])
         self.assertEqual([r.ok for r in out.results], [True, True, False])
+        equal_only = WRITE_A.replace("amount >= 1000", "amount == 1000").replace("amount >= 500", "amount == 500")
+        write(L / "lessons/1-C2/write.py", equal_only)   # 兩個 >= 都寫成 ==：只放邊界值的話會全對（Codex 審卷 B）
+        out = ev("1-C2", ["write-low", "write-mid", "write-top"])
+        self.assertEqual([r.ok for r in out.results], [True, False, False])
+        self.assertIn("餵給它的輸入：800", part(out, "write-mid").detail)
+        self.assertIn("餵給它的輸入：1500", part(out, "write-top").detail)
         write(L / "lessons/1-C2/write.py", 'print("運費 60 元，一共 710 元")\n')   # 把例子寫死
         out = ev("1-C2", ["write-low", "write-mid", "write-top"])
         self.assertEqual([r.ok for r in out.results], [False, False, False])
@@ -240,7 +263,7 @@ class Flow(unittest.TestCase):
         self.assertIn("這次沒過。矯正包在帳本的 lessons/1-C2/矯正包.md：", out)
         self.assertIn("  預測第 3 題 → 1-6 影片 3:40 起", out)
         self.assertIn("  修好：剛好花完 → 1-8 影片 1:16 起", out)
-        self.assertIn("  手寫：第 2 個金額（剛好在邊界） → 1-8 影片 1:16 起", out)
+        self.assertIn("  手寫：中間那一段（含剛好在邊界） → 1-8 影片 1:16 起", out)
         self.assertIn("練完，明天以後考卷 B：uv run check.py start 1-C2B", out)
         for line in out.splitlines():   # 影片錄的是這一段：70 欄寫得完（中文算兩欄）
             self.assertLessEqual(sum(2 if ord(c) > 0x2E7F else 1 for c in line), 70, line)

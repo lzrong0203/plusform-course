@@ -10,7 +10,8 @@ check.py（學員端）和 tools/validate_lesson.py（老師端）共用這一�
   python_pin    帳本把 Python 釘在指定版本（.python-version）
   uv_python     帳本用的是自己 .venv 裡的 Python，不是系統 Python
   run           在帳本的環境裡跑學員的程式（stdin 由這裡餵），比對印出來的字；swap＝先把一行換掉再跑（1-C1 第三部分：
-                金額換了也要算得對）；當掉時 Result.data["error"] 記錯誤種類（1-C1 矯正包用）
+                金額換了也要算得對）；當掉時 Result.data["error"] 記錯誤種類（1-C1 矯正包用）；runs＝同一題換幾組輸入各跑一次，
+                全部對才算對（1-C2 第三部分：邊界和區間中間的金額放同一題）
   call          呼叫學員寫的函式，比對回傳值
   chaff         wheat/chaff：學員寫的檢查要在正確版全過、在每個壞版本至少錯一條
   script_match  學員改過的腳本，在假的資料夾裡跑起來要跟安全版一樣
@@ -782,6 +783,24 @@ class RunCheck(Check):
         return self.ctx.missing(rel, hint)
 
     def run(self, results):
+        # 1-C2 起（Codex 審卷 B）：runs＝同一題跑好幾次，每次換一組 stdin／expect_contains／expect_not_contains（蓋過這一題自己的），
+        # 全部對才算這一題對，錯的那一次寫進說明。用來把「剛好在邊界」和「區間中間」的金額放在同一題（== 寫成 >= 才抓得到）。
+        # 只對寫了 runs 的題目生效；沒寫的照舊跑一次。
+        runs = self.spec.get("runs")
+        if not runs:
+            return self.run_once(results)
+        base = self.spec
+        try:
+            for extra in runs:
+                self.spec = {**base, **extra}
+                results[0].ok = False
+                self.run_once(results)
+                if not results[0].ok:
+                    return
+        finally:
+            self.spec = base
+
+    def run_once(self, results):
         r = results[0]
         rel = self.spec["file"]
         path = self.ctx.student(rel)

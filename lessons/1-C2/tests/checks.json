@@ -1,45 +1,147 @@
 {
-  "note": "1-C2 檢核站 2（卷 A）：關掉 AI，25 分鐘（只記錄、不擋）。一共 12 題，第一次交卷過 10 題以上算過（lesson.json pass_at）。第一部分預測輸出 6 題（對答）；第二部分修好 fix.py 3 題（check 餵 珍奶、65元：跑得起來，中間會遇到兩個錯誤訊息 TypeError、ValueError；印出來三行都對；再餵 紅茶、300元：剛好花完也要印「還在預算內」）；第三部分手寫 write.py 3 題（check 餵三個金額：120、剛好 500、剛好 1000，各算一題；程式要用 input 問金額、if／elif／else 判斷）。input 的提示字不換行，會黏在第一行前面，所以都用 expect_contains 比對整行（照 1-6、1-9）。錯的題目照 remedial.json 指回原課章節的時間碼與練習。",
-  "checks": [
-    {"type": "answers", "id": "trace", "file": "lessons/1-C2/trace.txt", "key": "answers/trace.json", "group": "第一部分 預測輸出", "stage": "第一部分 預測輸出"},
-    {"type": "run", "id": "fix-run", "file": "lessons/1-C2/fix.py", "group": "第二部分 修好", "stage": "第二部分 修好",
-     "desc": "fix.py 跑得起來（品項 珍奶、價錢 65元），印出還剩多少",
-     "stdin": "珍奶\n65元\n",
-     "expect_contains": ["還剩"],
-     "hint": "錯誤訊息從最下面一行看起：它說是哪一種錯？引號裡的值是程式實際拿到的東西。錯誤出現的那一行，不一定是要改的那一行。修好一個，存檔，再跑一次。",
-     "missing_hint": "fix.py 應該在帳本的 lessons/1-C2/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-C2。"},
-    {"type": "run", "id": "fix-out", "file": "lessons/1-C2/fix.py", "group": "第二部分 修好", "stage": "第二部分 修好",
-     "desc": "fix.py 印出來的三行跟題目一模一樣（珍奶 65 元、還剩 235 元、還在預算內）",
-     "stdin": "珍奶\n65元\n",
-     "expect_contains": ["珍奶 65 元", "還剩 235 元", "還在預算內"],
-     "expect_not_contains": ["超過預算"],
-     "hint": "跑得起來以後，跟最上面註解的三行一行一行比。價錢印成「65元 元」的話，是「元」還沒拿掉：拿價錢的那一行，先 replace 再 int()。",
-     "hint_on_crash": false},
-    {"type": "run", "id": "fix-edge", "file": "lessons/1-C2/fix.py", "group": "第二部分 修好", "stage": "第二部分 修好",
-     "desc": "剛好花完（品項 紅茶、價錢 300元）也印出「還在預算內」",
-     "stdin": "紅茶\n300元\n",
-     "expect_contains": ["紅茶 300 元", "還剩 0 元", "還在預算內"],
-     "expect_not_contains": ["超過預算"],
-     "hint": "題目說剛好花完也算在預算內：還剩 0 元的時候，if 那一行的比較成立嗎？想想 > 和 >= 差在哪裡。",
-     "hint_on_crash": false},
-    {"type": "run", "id": "write-low", "file": "lessons/1-C2/write.py", "group": "第三部分 手寫", "stage": "第三部分 手寫",
-     "desc": "write.py：金額 120（不到 500）→ 運費 100 元，一共 220 元",
+ "note": "1-C2 檢核站 2（卷 A）：關掉 AI，25 分鐘（只記錄、不擋）。一共 12 題，第一次交卷過 10 題以上算過（lesson.json pass_at）。第一部分預測輸出 6 題（對答）；第二部分修好 fix.py 3 題（check 餵 珍奶、65元：跑得起來，中間會遇到兩個錯誤訊息 TypeError、ValueError；印出來三行都對；再餵 紅茶、300元：剛好花完也要印「還在預算內」）；第三部分手寫 write.py 3 題（規則的三段各一題，每一題用 runs 餵兩個金額、都對才算：不到 500＝120、499；500 到 999＝剛好 500、800；1000 以上＝剛好 1000、1500。只有邊界值的話，把 >= 寫成 == 也會全對（Codex 審卷 B），所以每一段都加區間中間的金額。題目不強制提示字和 if／elif／else 的寫法，只看印出來的那一行）。input 的提示字不換行，會黏在第一行前面，所以都用 expect_contains 比對整行（照 1-6、1-9）。錯的題目照 remedial.json 指回原課章節的時間碼與練習。",
+ "checks": [
+  {
+   "type": "answers",
+   "id": "trace",
+   "file": "lessons/1-C2/trace.txt",
+   "key": "answers/trace.json",
+   "group": "第一部分 預測輸出",
+   "stage": "第一部分 預測輸出"
+  },
+  {
+   "type": "run",
+   "id": "fix-run",
+   "file": "lessons/1-C2/fix.py",
+   "group": "第二部分 修好",
+   "stage": "第二部分 修好",
+   "desc": "fix.py 跑得起來（品項 珍奶、價錢 65元），印出還剩多少",
+   "stdin": "珍奶\n65元\n",
+   "expect_contains": [
+    "還剩"
+   ],
+   "hint": "錯誤訊息從最下面一行看起：它說是哪一種錯？引號裡的值是程式實際拿到的東西。錯誤出現的那一行，不一定是要改的那一行。修好一個，存檔，再跑一次。",
+   "missing_hint": "fix.py 應該在帳本的 lessons/1-C2/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-C2。"
+  },
+  {
+   "type": "run",
+   "id": "fix-out",
+   "file": "lessons/1-C2/fix.py",
+   "group": "第二部分 修好",
+   "stage": "第二部分 修好",
+   "desc": "fix.py 印出來的三行跟題目一模一樣（珍奶 65 元、還剩 235 元、還在預算內）",
+   "stdin": "珍奶\n65元\n",
+   "expect_contains": [
+    "珍奶 65 元",
+    "還剩 235 元",
+    "還在預算內"
+   ],
+   "expect_not_contains": [
+    "超過預算"
+   ],
+   "hint": "跑得起來以後，跟最上面註解的三行一行一行比。價錢印成「65元 元」的話，是「元」還沒拿掉：拿價錢的那一行，先 replace 再 int()。",
+   "hint_on_crash": false
+  },
+  {
+   "type": "run",
+   "id": "fix-edge",
+   "file": "lessons/1-C2/fix.py",
+   "group": "第二部分 修好",
+   "stage": "第二部分 修好",
+   "desc": "剛好花完（品項 紅茶、價錢 300元）也印出「還在預算內」",
+   "stdin": "紅茶\n300元\n",
+   "expect_contains": [
+    "紅茶 300 元",
+    "還剩 0 元",
+    "還在預算內"
+   ],
+   "expect_not_contains": [
+    "超過預算"
+   ],
+   "hint": "題目說剛好花完也算在預算內：還剩 0 元的時候，if 那一行的比較成立嗎？想想 > 和 >= 差在哪裡。",
+   "hint_on_crash": false
+  },
+  {
+   "type": "run",
+   "id": "write-low",
+   "file": "lessons/1-C2/write.py",
+   "group": "第三部分 手寫",
+   "stage": "第三部分 手寫",
+   "desc": "write.py：不到 500 那一段（金額 120、499）→ 運費 100 元",
+   "expect_not_contains": [
+    "運費 60 元",
+    "運費 0 元"
+   ],
+   "hint": "先用 input 問金額，再用 int() 變成整數；不到 500 的走 else。印出來照這個樣子：運費 100 元，一共 220 元。改完記得存檔再跑。",
+   "missing_hint": "write.py 應該在帳本的 lessons/1-C2/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-C2。",
+   "runs": [
+    {
      "stdin": "120\n",
-     "expect_contains": ["運費 100 元，一共 220 元"],
-     "expect_not_contains": ["運費 60 元", "運費 0 元"],
-     "hint": "先用 input 問金額，再用 int() 變成整數；不到 500 的走 else。印出來照這個樣子：運費 100 元，一共 220 元。改完記得存檔再跑。",
-     "missing_hint": "write.py 應該在帳本的 lessons/1-C2/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-C2。"},
-    {"type": "run", "id": "write-mid", "file": "lessons/1-C2/write.py", "group": "第三部分 手寫", "stage": "第三部分 手寫",
-     "desc": "write.py：金額剛好 500 → 運費 60 元，一共 560 元",
+     "expect_contains": [
+      "運費 100 元，一共 220 元"
+     ]
+    },
+    {
+     "stdin": "499\n",
+     "expect_contains": [
+      "運費 100 元，一共 599 元"
+     ]
+    }
+   ]
+  },
+  {
+   "type": "run",
+   "id": "write-mid",
+   "file": "lessons/1-C2/write.py",
+   "group": "第三部分 手寫",
+   "stage": "第三部分 手寫",
+   "desc": "write.py：500 到 999 那一段（金額剛好 500、800）→ 運費 60 元",
+   "expect_not_contains": [
+    "運費 100 元",
+    "運費 0 元"
+   ],
+   "hint": "「滿 500 元（剛好 500 也算）」：剛好 500 和 800 都要是運費 60 元。比較要寫成「大於或等於」（>=），不是 >，也不是只問一不一樣（==）。",
+   "runs": [
+    {
      "stdin": "500\n",
-     "expect_contains": ["運費 60 元，一共 560 元"],
-     "expect_not_contains": ["運費 100 元", "運費 0 元"],
-     "hint": "「滿 500 元（剛好 500 也算）」：剛好 500 的時候，你寫的比較成立嗎？想想 > 和 >= 差在哪裡。"},
-    {"type": "run", "id": "write-top", "file": "lessons/1-C2/write.py", "group": "第三部分 手寫", "stage": "第三部分 手寫",
-     "desc": "write.py：金額剛好 1000 → 運費 0 元，一共 1000 元",
+     "expect_contains": [
+      "運費 60 元，一共 560 元"
+     ]
+    },
+    {
+     "stdin": "800\n",
+     "expect_contains": [
+      "運費 60 元，一共 860 元"
+     ]
+    }
+   ]
+  },
+  {
+   "type": "run",
+   "id": "write-top",
+   "file": "lessons/1-C2/write.py",
+   "group": "第三部分 手寫",
+   "stage": "第三部分 手寫",
+   "desc": "write.py：1000 以上那一段（金額剛好 1000、1500）→ 運費 0 元",
+   "expect_not_contains": [
+    "運費 60 元",
+    "運費 100 元"
+   ],
+   "hint": "if／elif 從上往下看，第一個成立的才做：1000 也滿 500，所以「滿 1000」那一條要寫在前面；剛好 1000 和 1500 都算滿 1000（>=，不是 ==）。",
+   "runs": [
+    {
      "stdin": "1000\n",
-     "expect_contains": ["運費 0 元，一共 1000 元"],
-     "expect_not_contains": ["運費 60 元", "運費 100 元"],
-     "hint": "if／elif 從上往下看，第一個成立的才做：1000 也滿 500，所以「滿 1000」那一條要寫在前面。剛好 1000 也算滿 1000。"}
-  ]
+     "expect_contains": [
+      "運費 0 元，一共 1000 元"
+     ]
+    },
+    {
+     "stdin": "1500\n",
+     "expect_contains": [
+      "運費 0 元，一共 1500 元"
+     ]
+    }
+   ]
+  }
+ ]
 }

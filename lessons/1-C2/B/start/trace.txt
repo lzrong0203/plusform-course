@@ -31,11 +31,11 @@
 答：
 
 第三段：
-  1  spent = 450
+  1  spent = 500
   2  budget = 500
   3  day = "日"
   4  weekend = day == "六" or day == "日"
-  5  print(spent >= budget, weekend and spent < budget)
+  5  print(spent < budget, weekend and spent <= budget)
 
 第 4 題：第 5 行印出什麼？
 答：
