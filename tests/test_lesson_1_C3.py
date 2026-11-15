@@ -11,6 +11,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import unittest
 from pathlib import Path
@@ -46,6 +47,11 @@ BODY = {
     "sorted": ("totals = {}\nfor kind, amount in records:\n    totals[kind] = totals.get(kind, 0) + amount\nfor kind in sorted(totals):\n"
                "    print(kind, totals[kind], \"元\")\n"),
     "keyerror": "totals = {}\nfor kind, amount in records:\n    totals[kind] = totals[kind] + amount\nfor kind in totals:\n    print(kind, totals[kind], \"元\")\n",
+    # Codex 審卷 B 抓到的兩種：只算前五筆（原本每一組最多五筆）、用 set 決定印的順序（照 hash 的種子有時剛好對）
+    "first_five": ("totals = {}\nfor kind, amount in records[:5]:\n    totals[kind] = totals.get(kind, 0) + amount\n"
+                   "for kind, total in totals.items():\n    print(kind, total, \"元\")\n"),
+    "set_order": ("totals = {}\nfor kind, amount in records:\n    totals[kind] = totals.get(kind, 0) + amount\nfor kind in set(totals):\n"
+                  "    print(kind, totals[kind], \"元\")\n"),
 }
 
 
@@ -193,6 +199,7 @@ class Grading(unittest.TestCase):
         self.assertEqual(grade(BODY["first_record"]), [True, True, False])    # 一筆都沒有時拿第 0 筆：只有邊界那組抓得到
         self.assertEqual(grade(BODY["sorted"]), [False, False, False])         # 題目要照第一次出現的順序
         self.assertEqual(grade(BODY["keyerror"]), [False, False, False])
+        self.assertEqual(grade(BODY["first_five"]), [True, True, False])     # 七筆那一組才抓得到（Codex 審卷 B）
         write(L / "lessons/1-C3/write.py", DATA_A + BODY["overwrite"])
         r = part(ev("1-C3", ["write-sum"]), "write-sum")
         self.assertIn("早餐 45 元", r.detail)   # 中間那組（題目的帳）就錯了
@@ -210,10 +217,51 @@ class Grading(unittest.TestCase):
     def test_paper_b_write_catches_the_same_mistakes(self):
         fresh_start("1-C3B")
         data = 'pays = [("現金", 120), ("悠遊卡", 30), ("現金", 85), ("信用卡", 990), ("悠遊卡", 45)]\n'
-        for name, want in (("if_in", [True, True, True]), ("overwrite", [True, False, False]), ("print_in_loop", [True, False, False]),
-                           ("first_record", [True, True, False]), ("sorted", [False, False, False])):
+        hard = ('a = 0\nb = 0\nc = 0\nfor way, amount in pays:\n    if way == "現金":\n        a = a + amount\n    elif way == "悠遊卡":\n'
+                '        b = b + amount\n    else:\n        c = c + amount\nprint("現金", a, "元")\nprint("悠遊卡", b, "元")\nprint("信用卡", c, "元")\n')
+        for name, want in (("if_in", [True, True, True]), ("list_kinds", [True, True, True]), ("overwrite", [True, False, False]),
+                           ("print_in_loop", [True, False, False]), ("first_record", [True, True, False]), ("sorted", [False, False, False]),
+                           ("keyerror", [False, False, False]), ("first_five", [True, True, False])):
             write(L / "lessons/1-C3B/write.py", data + BODY[name].replace("records", "pays"))
             self.assertEqual(oks(ev("1-C3B", WRITE_IDS)), want, name)
+        write(L / "lessons/1-C3B/write.py", data + hard)
+        self.assertEqual(oks(ev("1-C3B", WRITE_IDS)), [False, False, False])
+
+    def test_set_order_never_gets_all_three_with_a_fixed_seed(self):
+        # 用 set 決定印的順序：每一類只有一筆、沒看過的分類那兩組是同樣四個鍵、第一次出現的順序相反，種子固定時至少錯一組（Codex 審卷 B）
+        old = os.environ.get("PYTHONHASHSEED")
+        try:
+            for lid, var, data in (("1-C3", "records", DATA_A), ("1-C3B", "pays", 'pays = [("現金", 120), ("悠遊卡", 30), ("現金", 85), ("信用卡", 990), ("悠遊卡", 45)]\n')):
+                fresh_start(lid)
+                write(L / "lessons" / lid / "write.py", data + BODY["set_order"].replace("records", var))
+                for seed in ("0", "128", "177", "254"):
+                    os.environ["PYTHONHASHSEED"] = seed   # child_env 照抄 os.environ：每一次跑學員程式都用同一個種子
+                    self.assertFalse(all(oks(ev(lid, WRITE_IDS))), (lid, seed))
+        finally:
+            if old is None:
+                os.environ.pop("PYTHONHASHSEED", None)
+            else:
+                os.environ["PYTHONHASHSEED"] = old
+
+    def test_paper_b_trace_and_parsons_common_mistakes(self):
+        fresh_start("1-C3B")
+        answer("1-C3B", ["[50,80,200,35]", "[80, 35]", "3  4", "a. None [15, 15, 25, 180]", "3 120 0", "C"])
+        self.assertEqual(oks(ev("1-C3B", ["trace"])), [True] * 6)
+        # 以為 z = x 是複製、以為 copy 以後還連在一起、set 沒去重複、以為 sort() 交回排好的、以為 get 查不到會出錯、以為改 dict 會改到 list
+        answer("1-C3B", ["[80, 200, 35]", "[50, 80, 35]", "4 4", "B", "3 150 0", "A"])
+        self.assertEqual(oks(ev("1-C3B", ["trace"])), [False] * 6)
+        answer("1-C3B", RIGHT_B[:2] + ["34"] + RIGHT_B[3:4] + ["31200"] + ["C 或 A"])
+        out = ev("1-C3B", ["trace"])
+        self.assertEqual([part(out, x).ok for x in ("trace-t3", "trace-t5", "trace-t6")], [False, False, False])
+        pz = (D / "B/reference/parsons.py").read_text(encoding="utf-8")
+        write(L / "lessons/1-C3B/parsons.py", pz)
+        self.assertEqual(oks(ev("1-C3B", ["pz"])), [True, True])
+        write(L / "lessons/1-C3B/parsons.py", pz.replace("        taxi.append(f)", "    taxi.append(f)"))
+        out = ev("1-C3B", ["pz"])
+        self.assertEqual(oks(out), [True, False])
+        self.assertIn("一共 4 趟 100 元以上", part(out, "pz-run").detail)
+        write(L / "lessons/1-C3B/parsons.py", pz.replace("f >= 100", "f > 100"))
+        self.assertEqual(oks(ev("1-C3B", ["pz"])), [False, False])
 
     def test_remedial_key_matches_every_check(self):
         rem = json.loads((D / "remedial.json").read_text(encoding="utf-8"))
