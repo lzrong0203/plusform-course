@@ -3,5 +3,5 @@
   "title": "while 迴圈",
   "minutes": 45,
   "fast_minutes": 10,
-  "after_start": "接下來，用 VS Code 打開帳本的 lessons/1-10：\n  1. 第一圈：loops.txt 追 4 題迴圈跑幾次；record.py 寫一支記到打 q 為止的記帳程式\n  2. 第二圈：用「帶我寫」跟家教把 max10.py 改成最多記 10 筆；lead_quiz.txt 三題；lead.md 記下你說了什麼（自評）\n  3. 第三圈：inputs.txt 和 expected.txt，替 AI 寫的記帳程式準備輸入和預期輸出\n做完回到課程資料夾打：uv run check.py 1-10"
+  "after_start": "接下來，用 VS Code 打開帳本，作業在 lessons/1-10（終端機留在帳本資料夾）：\n  1. 第一圈：loops.txt 追 4 題迴圈跑幾次；record.py 寫一支記到打 q 為止的記帳程式\n  2. 第二圈：用「帶我寫」跟家教把 max10.py 改成最多記 10 筆；lead_quiz.txt 三題；lead.md 記下你說了什麼（自評）\n  3. 第三圈：inputs.txt 和 expected.txt，替 AI 寫的記帳程式準備輸入和預期輸出\n做完回到課程資料夾打：uv run check.py 1-10"
 }
