@@ -1120,13 +1120,19 @@ def cmd_exam_gate(lesson: grader.Lesson, ledger: Path, opts: dict) -> int:
 
     if sub:
         base_info = prog["lessons"].get(base.id, {})
-        if base_info.get("first_pass"):   # 第一部分早就過了：這次只看第二、三部分
+        if base_info.get("first_pass"):   # 第一部分早就過了：成績不變，照樣印這份卷訂正的結果（Codex 第一輪：16～19 題過了的人也要能訂正）
             via = base_info.get("passed_via", "A")
             psub = prog["lessons"].get(base.id + ("" if via == "A" else via), {}).get("submitted", {})
             score = f"（{psub['passed']}／{psub['total']}）" if psub else ""
             print(f"{exam_part}：{mmdd(base_info['first_pass'])} 卷 {via} 交卷就過了{score}。")
-            records.append("attempts", {"time": now_iso, "lesson": lesson.id, "predicted": None, "passed": None,
-                                        "total": None, "failed": [], "gate": True})
+            outcome = grader.evaluate(exam, ledger)
+            failed = [r for r in outcome.results if not r.ok]
+            print(f"  卷 {paper_of(lesson)} 訂正：這次過了 {outcome.passed}／{outcome.total} 題" + ("，全部都對！" if not failed else "。"))
+            for r in failed if opts["all"] else failed[:1]:
+                print(f"  ✗ {'' if opts['all'] else '第一個沒過的：'}{r.desc}")
+                print("    " + r.detail.replace("\n", "\n  "))
+            records.append("attempts", {"time": now_iso, "lesson": lesson.id, "predicted": None, "passed": outcome.passed,
+                                        "total": outcome.total, "failed": [r.id for r in failed], "redo": True})
             ok = True
         else:   # 還沒過：這次是訂正，成績照第一次交卷算
             outcome = grader.evaluate(exam, ledger)

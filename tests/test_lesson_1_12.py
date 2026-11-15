@@ -439,6 +439,8 @@ class Flow(unittest.TestCase):
         self.assertIn("level_up", prog["lessons"]["1-12"])
         r = self.run_(["1-12", "--no-review"], "2026-11-22T10:00:00+08:00")
         self.assertIn("第一部分：11/21 卷 B 交卷就過了（18／20）。", r.stdout)
+        self.assertIn("  卷 A 訂正：這次過了 17／20 題。", r.stdout)   # 第一部分過了也照樣印訂正的結果（成績不變）
+        self.assertIn("✗ 第一個沒過的：對答第 2 題", r.stdout)
         self.assertIn("（Lv1 上 看得懂（上）在 11/21 就過關了。）", r.stdout)
         r = self.run_(["status"], "2026-11-22T10:01:00+08:00")
         self.assertIn("✓ 1-12 Lv1 上關卡：帳本 v0.1　11/21 通過；卷 A 11/20 交卷 15／20（沒過）；卷 B 11/21 交卷 18／20", r.stdout)
@@ -460,6 +462,7 @@ class Flow(unittest.TestCase):
         write(L / "lessons/1-12/checks_share.py", text("answers/checks_share.py"))
         r = self.run_(["1-12", "--no-review"], "2026-11-20T19:00:00+08:00")
         self.assertIn("第一部分：11/20 卷 A 交卷就過了（20／20）。", r.stdout)
+        self.assertIn("  卷 A 訂正：這次過了 20／20 題，全部都對！", r.stdout)
         self.assertIn("三部分都過了！練習天數 1／7 天，再練 6 天就升級", r.stdout)
         r = self.run_(["start", "1-12B"], DAY2)
         self.assertIn("卷 B 不用考", r.stdout)
