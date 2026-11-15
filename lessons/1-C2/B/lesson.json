@@ -1,0 +1,15 @@
+{
+  "id": "1-C2B",
+  "title": "檢核站 2（卷 B）",
+  "paper_of": "1-C2",
+  "paper": "B",
+  "minutes": 25,
+  "fast_minutes": 6,
+  "checkpoint": true,
+  "pass_at": 10,
+  "stages": ["第一部分 預測輸出", "第二部分 修好", "第三部分 手寫"],
+  "answer_files": ["trace.txt", "fix.py", "write.py"],
+  "remedial": "../remedial.json",
+  "practice": "../practice",
+  "after_start": "卷 B 開始了，全程關掉 AI。參考時間 25 分鐘（只記錄，不擋你）。\n  作答檔：帳本的 lessons/1-C2B/（trace.txt、fix.py、write.py）\n做完回到課程資料夾打：uv run check.py 1-C2B（交卷）"
+}

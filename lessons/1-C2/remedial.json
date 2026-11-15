@@ -1,0 +1,269 @@
+{
+ "note": "1-C2 矯正包的對照表（course/production/1-C2/tapes/tools/make_remedial.py 產生，不手改）：錯的題目（items）→ 主題（topics）→ 原課章節的時間碼與練習檔。時間碼取自各課說明欄的章節（影片從那個時間開始看那一章）；練習檔在 practice/，交卷沒過時 check.py 把用得到的複製到帳本的 lessons/1-C2/practice/。卷 A、卷 B 共用（每一題考的概念一樣，題目 id 也一樣）。",
+ "topics": {
+  "slice": {
+   "name": "索引與切片：從 0 開始數、負的從後面數、切到結束那一格之前",
+   "where": [
+    {
+     "lesson": "1-5",
+     "title": "字串：索引、切片、方法、f-string",
+     "time": "1:14",
+     "chapter": "第①圈 索引、切片，先猜 d[::-1]"
+    }
+   ],
+   "practice": "p_slice.py",
+   "how": "先在紙上寫下每一行印出什麼，再跑"
+  },
+  "strmethod": {
+   "name": "strip、split、replace、f-string 的千分位",
+   "where": [
+    {
+     "lesson": "1-5",
+     "title": "字串：索引、切片、方法、f-string",
+     "time": "3:26",
+     "chapter": "第①圈 strip、split、f-string，中文字對齊"
+    }
+   ],
+   "practice": "p_str.py",
+   "how": "先在紙上寫下每一行印出什麼，再跑"
+  },
+  "input": {
+   "name": "input 交回的一定是字串；要算，先用 int() 變成整數",
+   "where": [
+    {
+     "lesson": "1-6",
+     "title": "input、型別轉換，第一次認識函式呼叫",
+     "time": "3:40",
+     "chapter": "第①圈 input 交回字串、熊的記帳程式"
+    }
+   ],
+   "practice": "p_input.py",
+   "how": "先在紙上寫下三行各印出什麼，再跑"
+  },
+  "compare": {
+   "name": "比較的結果是 True 或 False；and、or、not",
+   "where": [
+    {
+     "lesson": "1-8",
+     "title": "比較、邏輯與 assert",
+     "time": "1:16",
+     "chapter": "第①圈 比較，先猜四行"
+    },
+    {
+     "lesson": "1-8",
+     "title": "比較、邏輯與 assert",
+     "time": "4:04",
+     "chapter": "第①圈 and、or、not、真假值"
+    }
+   ],
+   "practice": "p_compare.py",
+   "how": "先在紙上寫下每一行是 True 還是 False，再跑"
+  },
+  "if": {
+   "name": "if、elif、else：從上往下看，第一個成立的才做；沒縮排的那一行一定會做",
+   "where": [
+    {
+     "lesson": "1-9",
+     "title": "if／elif／else：預算燈號與 BMI",
+     "time": "2:26",
+     "chapter": "第①圈 預算燈號：elif 從上往下看"
+    },
+    {
+     "lesson": "1-9",
+     "title": "if／elif／else：預算燈號與 BMI",
+     "time": "1:22",
+     "chapter": "第①圈 if 和 else"
+    }
+   ],
+   "practice": "p_if.py",
+   "how": "先在紙上寫下會印出哪幾行，改了數字再寫一次，再跑"
+  },
+  "err_type": {
+   "name": "TypeError：字串和數字不能一起算；錯誤出現的那一行，不一定是要改的那一行",
+   "where": [
+    {
+     "lesson": "1-7",
+     "title": "讀懂錯誤訊息：Traceback 從最下面看",
+     "time": "3:40",
+     "chapter": "第①圈 跑到才當掉的錯、錯在別的地方"
+    },
+    {
+     "lesson": "1-6",
+     "title": "input、型別轉換，第一次認識函式呼叫",
+     "time": "3:40",
+     "chapter": "第①圈 input 交回字串、熊的記帳程式"
+    }
+   ],
+   "practice": "p_type_error.py",
+   "how": "先跑，看最後一行說哪兩種東西不能一起算，往上找值是哪一行拿到的，修好再跑"
+  },
+  "err_value": {
+   "name": "ValueError：int() 看不懂的字，先用 replace 拿掉",
+   "where": [
+    {
+     "lesson": "1-6",
+     "title": "input、型別轉換，第一次認識函式呼叫",
+     "time": "6:41",
+     "chapter": "第②圈 ValueError 是什麼意思？自己修"
+    }
+   ],
+   "practice": "p_value_error.py",
+   "how": "先跑，看最後一行引號裡的值，修好再跑"
+  },
+  "err_syntax": {
+   "name": "SyntaxError、IndentationError：寫法 Python 看不懂，一行都不跑",
+   "where": [
+    {
+     "lesson": "1-7",
+     "title": "讀懂錯誤訊息：Traceback 從最下面看",
+     "time": "1:14",
+     "chapter": "第①圈 錯誤訊息的五行、一行都不跑的錯"
+    }
+   ],
+   "practice": "p_syntax.py",
+   "how": "先跑，看最後一行和第幾行，修好一個再跑"
+  },
+  "err_name": {
+   "name": "NameError：這個名字還沒有（打錯字，或還沒設定就先用）",
+   "where": [
+    {
+     "lesson": "1-7",
+     "title": "讀懂錯誤訊息：Traceback 從最下面看",
+     "time": "3:40",
+     "chapter": "第①圈 跑到才當掉的錯、錯在別的地方"
+    }
+   ],
+   "practice": "p_name.py",
+   "how": "先跑，往上找這個名字是在哪一行設的，修好再跑"
+  },
+  "edge": {
+   "name": "剛好等於的那一種：> 和 >=、< 和 <= 差在哪裡",
+   "where": [
+    {
+     "lesson": "1-8",
+     "title": "比較、邏輯與 assert",
+     "time": "1:16",
+     "chapter": "第①圈 比較，先猜四行"
+    },
+    {
+     "lesson": "1-9",
+     "title": "if／elif／else：預算燈號與 BMI",
+     "time": "10:46",
+     "chapter": "第③圈 用 assert 驗收 BMI 分級（邊界 24）"
+    }
+   ],
+   "practice": "p_edge.py",
+   "how": "先在紙上寫下三個分數各印出什麼，再跑、再修"
+  },
+  "write": {
+   "name": "從零寫：input 問金額、int() 轉整數、if／elif／else、照樣子印出來",
+   "where": [
+    {
+     "lesson": "1-9",
+     "title": "if／elif／else：預算燈號與 BMI",
+     "time": "4:11",
+     "chapter": "第①圈 果凍兔把順序寫反、熊自己寫"
+    },
+    {
+     "lesson": "1-6",
+     "title": "input、型別轉換，第一次認識函式呼叫",
+     "time": "3:40",
+     "chapter": "第①圈 input 交回字串、熊的記帳程式"
+    }
+   ],
+   "practice": "p_write.py",
+   "how": "照註解寫，寫好用四個數字各跑一次"
+  }
+ },
+ "items": {
+  "trace-t1": {
+   "label": "預測第 1 題",
+   "topics": [
+    "slice"
+   ]
+  },
+  "trace-t2": {
+   "label": "預測第 2 題",
+   "topics": [
+    "strmethod"
+   ]
+  },
+  "trace-t3": {
+   "label": "預測第 3 題",
+   "topics": [
+    "input"
+   ]
+  },
+  "trace-t4": {
+   "label": "預測第 4 題",
+   "topics": [
+    "compare"
+   ]
+  },
+  "trace-t5": {
+   "label": "預測第 5 題",
+   "topics": [
+    "if"
+   ]
+  },
+  "trace-t6": {
+   "label": "預測第 6 題",
+   "topics": [
+    "if"
+   ]
+  },
+  "fix-run": {
+   "label": "修好：跑不起來",
+   "topics": [
+    "err_type"
+   ],
+   "by_error": {
+    "TypeError": [
+     "err_type"
+    ],
+    "ValueError": [
+     "err_value"
+    ],
+    "SyntaxError": [
+     "err_syntax"
+    ],
+    "IndentationError": [
+     "err_syntax"
+    ],
+    "NameError": [
+     "err_name"
+    ]
+   }
+  },
+  "fix-out": {
+   "label": "修好：印出來的不一樣",
+   "topics": [
+    "strmethod"
+   ]
+  },
+  "fix-edge": {
+   "label": "修好：剛好花完",
+   "topics": [
+    "edge"
+   ]
+  },
+  "write-low": {
+   "label": "手寫：第 1 個金額",
+   "topics": [
+    "write"
+   ]
+  },
+  "write-mid": {
+   "label": "手寫：第 2 個金額（剛好在邊界）",
+   "topics": [
+    "edge"
+   ]
+  },
+  "write-top": {
+   "label": "手寫：第 3 個金額（剛好在邊界）",
+   "topics": [
+    "if"
+   ]
+  }
+ }
+}

@@ -1,0 +1,117 @@
+{
+ "note": "1-C2 檢核站 2（卷 B）：卷 A 第一次交卷以後、隔天以後才能開始（check.py start 1-C2B）。題型、題數、判分跟卷 A 一樣（12 題，第一次交卷過 10 題以上算過），每一題考的概念跟卷 A 同一題一樣（answers/trace.json 的 note）。第二部分 check 餵 蛋餅、45元，再餵 便當、180元（剛好花到 300）；第三部分餵 300、剛好 800、剛好 2000。",
+ "checks": [
+  {
+   "type": "answers",
+   "id": "trace",
+   "file": "lessons/1-C2B/trace.txt",
+   "key": "answers/trace.json",
+   "group": "第一部分 預測輸出",
+   "stage": "第一部分 預測輸出"
+  },
+  {
+   "type": "run",
+   "id": "fix-run",
+   "file": "lessons/1-C2B/fix.py",
+   "group": "第二部分 修好",
+   "stage": "第二部分 修好",
+   "desc": "fix.py 跑得起來（品項 蛋餅、價錢 45元），印出這週花了多少",
+   "stdin": "蛋餅\n45元\n",
+   "expect_contains": [
+    "這週花了"
+   ],
+   "hint": "錯誤訊息從最下面一行看起：它說是哪一種錯？引號裡的值是程式實際拿到的東西。錯誤出現的那一行，不一定是要改的那一行。修好一個，存檔，再跑一次。",
+   "missing_hint": "fix.py 應該在帳本的 lessons/1-C2B/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-C2B。"
+  },
+  {
+   "type": "run",
+   "id": "fix-out",
+   "file": "lessons/1-C2B/fix.py",
+   "group": "第二部分 修好",
+   "stage": "第二部分 修好",
+   "desc": "fix.py 印出來的三行跟題目一模一樣（蛋餅 45 元、這週花了 165 元、還在預算內）",
+   "stdin": "蛋餅\n45元\n",
+   "expect_contains": [
+    "蛋餅 45 元",
+    "這週花了 165 元",
+    "還在預算內"
+   ],
+   "expect_not_contains": [
+    "超過預算"
+   ],
+   "hint": "跑得起來以後，跟最上面註解的三行一行一行比。價錢印成「45元 元」的話，是「元」還沒拿掉：拿價錢的那一行，先 replace 再 int()。",
+   "hint_on_crash": false
+  },
+  {
+   "type": "run",
+   "id": "fix-edge",
+   "file": "lessons/1-C2B/fix.py",
+   "group": "第二部分 修好",
+   "stage": "第二部分 修好",
+   "desc": "剛好花到預算（品項 便當、價錢 180元）也印出「還在預算內」",
+   "stdin": "便當\n180元\n",
+   "expect_contains": [
+    "便當 180 元",
+    "這週花了 300 元",
+    "還在預算內"
+   ],
+   "expect_not_contains": [
+    "超過預算"
+   ],
+   "hint": "題目說剛好花到 300 也算在預算內：花了 300 元的時候，if 那一行的比較成立嗎？想想 < 和 <= 差在哪裡。",
+   "hint_on_crash": false
+  },
+  {
+   "type": "run",
+   "id": "write-low",
+   "file": "lessons/1-C2B/write.py",
+   "group": "第三部分 手寫",
+   "stage": "第三部分 手寫",
+   "desc": "write.py：金額 300（不到 800）→ 折 0 元，要付 300 元",
+   "stdin": "300\n",
+   "expect_contains": [
+    "折 0 元，要付 300 元"
+   ],
+   "expect_not_contains": [
+    "折 50 元",
+    "折 200 元"
+   ],
+   "hint": "先用 input 問金額，再用 int() 變成整數；不到 800 的走 else。印出來照這個樣子：折 0 元，要付 300 元。改完記得存檔再跑。",
+   "missing_hint": "write.py 應該在帳本的 lessons/1-C2B/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-C2B。"
+  },
+  {
+   "type": "run",
+   "id": "write-mid",
+   "file": "lessons/1-C2B/write.py",
+   "group": "第三部分 手寫",
+   "stage": "第三部分 手寫",
+   "desc": "write.py：金額剛好 800 → 折 50 元，要付 750 元",
+   "stdin": "800\n",
+   "expect_contains": [
+    "折 50 元，要付 750 元"
+   ],
+   "expect_not_contains": [
+    "折 0 元",
+    "折 200 元"
+   ],
+   "hint": "「滿 800 元（剛好 800 也算）」：剛好 800 的時候，你寫的比較成立嗎？想想 > 和 >= 差在哪裡。"
+  },
+  {
+   "type": "run",
+   "id": "write-top",
+   "file": "lessons/1-C2B/write.py",
+   "group": "第三部分 手寫",
+   "stage": "第三部分 手寫",
+   "desc": "write.py：金額剛好 2000 → 折 200 元，要付 1800 元",
+   "stdin": "2000\n",
+   "expect_contains": [
+    "折 200 元，要付 1800 元"
+   ],
+   "expect_not_contains": [
+    "折 50 元",
+    "折 0 元"
+   ],
+   "hint": "if／elif 從上往下看，第一個成立的才做：2000 也滿 800，所以「滿 2000」那一條要寫在前面。剛好 2000 也算滿 2000。"
+  }
+ ]
+}
