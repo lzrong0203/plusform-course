@@ -987,9 +987,8 @@ class EitherCheck(Check):
             first = next((r for r in results if not r.ok), None)
             if first is not None:
                 first.detail = self.spec["neither"]
-        others = "、".join(f"「{p['name']}」" for k, p in enumerate(paths) if k != pick)
-        if any(touched) or full:
-            self.ctx.summaries.append(f"{self.group}：照你做的「{paths[pick]['name']}」判（{others}不用做）。")
+        if any(touched) or full:   # 一行寫得完（終端機 70 欄；1-17 影片錄到這一行）
+            self.ctx.summaries.append(f"{self.group}：照你做的「{paths[pick]['name']}」判。")
 
 
 # ---------------- parsons（拼圖，2026-11-15，1-11 起；只對寫了 type parsons 的 checks.json 生效） ----------------
