@@ -406,6 +406,22 @@ def pick_choice(given: str, choices: dict) -> str | None:
     return None
 
 
+def other_choice(given: str, letter: str, choices: dict) -> bool:
+    """選擇題（strict_choice，1-12 起）：除了選到的那一個，還寫了別的選項字母（「B 或 C」「B、C」）。照抄選項文字的不算。"""
+    text = unicodedata.normalize("NFKC", given).strip()
+    rest = CHOICE_LEAD.sub("", text, count=1)
+    if "".join(rest.split()).lower() == "".join(unicodedata.normalize("NFKC", choices.get(letter, "")).split()).lower():
+        return False
+    others = {k.upper() for k in choices} - {letter}
+    return any(re.search(rf"(?<![A-Za-z]){o}(?![A-Za-z])", rest, re.IGNORECASE) for o in others)
+
+
+def spaced_answer(text: str) -> str:
+    """keep_spaces 的比法（1-12 起）：NFKC、拿掉前後的空白和引號、連續空白算一個、英文不分大小寫；中間的空白要一樣。"""
+    text = unicodedata.normalize("NFKC", text).strip().strip("`'\"「」『』").strip()
+    return " ".join(text.split()).lower()
+
+
 def or_list(items: list[str]) -> str:
     """["A", "B", "C"] → 「A、B 或 C」。"""
     if len(items) <= 1:
@@ -606,6 +622,7 @@ class AnswersCheck(Check):
         answers = read_answer_lines(path)
         kind = key.get("normalize", "text")
         home = key.get("home")
+        strict = bool(key.get("strict_choice"))   # 1-12 起（Codex 審卷 B）：「B 或 C」這種同時寫兩個選項的，不算選了 B
         for i, (r, q) in enumerate(zip(results, key["questions"]), start=1):
             # 1-C1 起：題目自己寫了 choices 就用它（同一個作答檔裡有的寫數字、有的選 A／B／C）；沒寫照舊用整份的
             choices = q.get("choices") or key.get("choices")
@@ -617,10 +634,15 @@ class AnswersCheck(Check):
             accepted = {norm_answer(a, kind, home) for a in q["accept"]}
             if choices:
                 letter = pick_choice(given, choices)
+                if letter is not None and strict and other_choice(given, letter, choices):
+                    r.detail = f"你寫「{given.strip()}」：這題只能選一個，寫一個字母（{how}）就好。"
+                    continue
                 if letter is None:
                     r.detail = f"你寫「{given.strip()}」。這題只要寫一個字母（{how}）就好。"
                     continue
                 r.ok = norm_answer(letter, kind, home) in accepted
+            elif q.get("keep_spaces"):   # 1-12 起（Codex 審卷 B）：「1 2」跟「12」是不一樣的輸出，中間的空白不拿掉
+                r.ok = spaced_answer(given) in {spaced_answer(a) for a in q["accept"]}
             else:
                 r.ok = norm_answer(given, kind, home) in accepted
             if not r.ok:
@@ -884,11 +906,14 @@ class ParsonsCheck(Check):
         if not problems:
             try:
                 ast.parse(source)
+                compile(source, path.name, "exec", dont_inherit=True)   # 1-12 起（Codex 審卷 B）：break 排到迴圈外面，ast.parse 讀得懂、compile 才會報錯
             except SyntaxError as exc:
                 bad = exc.text.strip() if exc.text else ""
                 if isinstance(exc, IndentationError) or "indent" in (exc.msg or ""):
                     problems.append(f"Python 讀到第 {exc.lineno} 行就說縮排不對（{type(exc).__name__}）：{bad}\n"
                                     "  for 那一行最後有冒號，下一行要往右縮四格；同一層的行要對齊。")
+                elif "outside loop" in (exc.msg or ""):
+                    problems.append(f"第 {exc.lineno} 行的 {bad} 不在迴圈裡（{exc.msg}）：break、continue 要縮在 while 或 for 底下。")
                 else:
                     problems.append(f"第 {exc.lineno} 行有語法錯誤（{exc.msg}）：{bad}")
         order_r.ok = not problems

@@ -48,33 +48,34 @@
 答：
 
 第四段：
-  1  line = "2026-12-05 晚餐 250"
+  1  line = "2026-12-15 晚餐 250"
   2  day = line[8:10]
   3  price = int(line[-3:])
   4  print(f"{day} 日 {price // 4} 元")
 
 第 6 題：第 4 行印出什麼？
-    A. 5 日 62 元
-    B. 05 日 62 元
-    C. 05 日 62.5 元
+    A. 15 日 62.5 元
+    B. 15 日 62 元
+    C. -1 日 62 元
 （寫 A、B 或 C）
 答：
 
-第五段：讀錯誤訊息。熊寫了 pocket.py，跑的時候打了 120、按 Enter，再打 q、按 Enter，就跳出下面的錯誤訊息。
-  1  total = 0
-  2  while True:
-  3      text = input("金額，打 q 結束：")
-  4      total = total + int(text)
+第五段：讀錯誤訊息。熊寫了 cups.py，跑的時候打了 2、按 Enter，就跳出下面的錯誤訊息。
+  1  print("記錄今天喝了幾杯水")
+  2  count = 0
+  3  while True:
+  4      text = input("杯數，打 q 結束：")
   5      if text == "q":
   6          break
-  7  print("一共", total, "元")
+  7      count = count + text
+  8  print("一共", count, "杯")
 
 錯誤訊息：
   Traceback (most recent call last):
-    File "/Users/bear/code/ledger/pocket.py", line 4, in <module>
-      total = total + int(text)
-                      ~~~^^^^^^
-  ValueError: invalid literal for int() with base 10: 'q'
+    File "/Users/bear/code/ledger/cups.py", line 7, in <module>
+      count = count + text
+              ~~~~~~^~~~~~
+  TypeError: unsupported operand type(s) for +: 'int' and 'str'
 
 第 7 題：這是哪一種錯誤？（寫最下面一行冒號前面的英文）
 答：
@@ -82,9 +83,9 @@
 第 8 題：錯誤出現在程式的第幾行？（寫數字）
 答：
 
-第 9 題：怎麼改，打 120、85、q 就會印出「一共 205 元」？
-    A. 把第 4 行搬到第 5、6 行（if 和 break）的下面
-    B. 把第 4 行改成 total = total + text
-    C. 把第 3 行改成 text = int(input("金額，打 q 結束："))
+第 9 題：怎麼改，打 2、3、q 就會印出「一共 5 杯」？
+    A. 把第 4 行改成 text = int(input("杯數，打 q 結束："))
+    B. 把第 2 行改成 count = "0"
+    C. 把第 7 行改成 count = count + int(text)
 （寫 A、B 或 C）
 答：

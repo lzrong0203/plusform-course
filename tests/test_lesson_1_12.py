@@ -28,7 +28,7 @@ L = BASE / "ledger 帳本"   # 路徑有空白和中文
 D = COURSE / "lessons" / "1-12"
 DAY1, DAY1_LATE, DAY2 = "2026-11-20T18:00:00+08:00", "2026-11-20T23:30:00+08:00", "2026-11-21T19:00:00+08:00"
 RIGHT_A = ["9", "3", "3", "6", "C", "A", "TypeError", "6", "A"]
-RIGHT_B = ["12", "4", "2", "8", "A", "B", "ValueError", "4", "A"]
+RIGHT_B = ["12", "4", "2", "8", "A", "B", "TypeError", "7", "C"]
 RABBIT_A = ["9", "5", "3", "6", "C", "A", "TypeError", "6", "B"]   # 第 2 題以為 continue 不會跳過、第 9 題以為改 input 那一行就好
 
 
@@ -162,6 +162,29 @@ class Grading(unittest.TestCase):
         r = part(out, "trace-t9")
         self.assertIn("提示：B 的話，打 q 的時候", r.detail)
 
+    def test_numbers_keep_spaces_and_one_choice_only(self):
+        # Codex 審卷 B：「1 2」跟「12」是不一樣的輸出（keep_spaces）；「B 或 C」不算選了 B（strict_choice）
+        fresh_start("1-12B")
+        answer("1-12B", ["1 2", "4", "2", "8", "A 或 B", "B、C", "TypeError", "7", "C. 把第 7 行改成 count = count + int(text)"])
+        out = ev("1-12B", ["trace"])
+        self.assertEqual([r.ok for r in out.results], [False, True, True, True, False, False, True, True, True], [r.detail for r in out.results])
+        self.assertIn("這題只能選一個", part(out, "trace-t5").detail)
+        answer("1-12B", RIGHT_B[:5] + ["(B)", "TypeError", "第 7 行", "c"])
+        out = ev("1-12B", ["trace"])
+        self.assertTrue(all(r.ok for r in out.results), [r.detail for r in out.results])
+
+    def test_parsons_break_outside_loop_is_not_in_order(self):
+        # Codex 審卷 B：print 放進 if、break 排到最外面，行數、縮排都對，ast 讀得懂，可是 compile 會說 'break' outside loop
+        bad = "saved = 0\nweek = 0\nwhile True:\n    week = week + 1\n    saved = saved + 150\n    if saved >= 500:\n        print(\"第\", week, \"週存到\", saved, \"元\")\nbreak\n"
+        write(L / "lessons/1-12/parsons.py", bad)
+        out = ev("1-12", ["pz"])
+        self.assertEqual([r.ok for r in out.results], [False, False])
+        self.assertIn("不在迴圈裡", out.results[0].detail)
+        write(L / "lessons/1-12/parsons.py", text("reference/parsons.py").replace(
+            '        break\nprint("第", week, "週存到", saved, "元")\n', '        print("第", week, "週存到", saved, "元")\n        break\n'))
+        out = ev("1-12", ["pz"])
+        self.assertEqual([r.ok for r in out.results], [True, True], [r.detail for r in out.results])   # 印在 break 前面也對（排法不只一種）
+
     def test_fix_meets_two_error_messages_then_the_two_counting_mistakes(self):
         start = text("start/fix.py")
         out = ev("1-12", ["fix-run", "fix-out", "fix-edge"])   # 起點：while True 少冒號
@@ -185,22 +208,29 @@ class Grading(unittest.TestCase):
         self.assertIn("餵給它的輸入：120、、85、q", part(out, "fix-edge").detail)
 
     def test_ledger_boundaries_and_split(self):
+        ids = ["ledger-q", "ledger-sum", "ledger-y80", "ledger-y100", "ledger-red", "ledger-split"]
         write(L / "lessons/1-12/ledger.py", rabbit_ledger(text("reference/ledger.py")))
-        out = ev("1-12", ["ledger-q", "ledger-sum", "ledger-green", "ledger-yellow", "ledger-red", "ledger-split"])
+        out = ev("1-12", ids)
         self.assertEqual([r.ok for r in out.results], [True, True, True, False, True, False], [r.detail for r in out.results])
-        self.assertIn("紅燈", part(out, "ledger-yellow").detail)
-        self.assertIn("333.6666666666667", part(out, "ledger-split").detail)
-        wrong = text("reference/ledger.py").replace("    if kind == \"q\":\n        break\n", "")   # 沒有 break：q 被當成分類、要金額
+        self.assertIn("紅燈", part(out, "ledger-y100").detail)
+        self.assertIn("250.75", part(out, "ledger-split").detail)
+        # Codex 審卷 B：剛好 80% 寫成 <=、預算寫死 1000、人數寫死 3，各自至少錯一題
+        ref = text("reference/ledger.py")
+        for wrong, fails in ((ref.replace("if ratio < 0.8:", "if ratio <= 0.8:"), "ledger-y80"),
+                             (ref.replace("ratio = total / budget", "ratio = total / 1000"), "ledger-y80"),
+                             (ref.replace("ratio = total / budget", "ratio = total / 1000"), "ledger-red"),
+                             (ref.replace("total // people", "total // 3").replace("total % people", "total % 3"), "ledger-split")):
+            write(L / "lessons/1-12/ledger.py", wrong)
+            self.assertFalse(part(ev("1-12", [fails]), fails).ok, fails)
+        wrong = ref.replace("    if kind == \"q\":\n        break\n", "")   # 沒有 break：q 被當成分類、要金額
         write(L / "lessons/1-12/ledger.py", wrong)
-        r = part(ev("1-12", ["ledger-q"]), "ledger-q")
-        self.assertFalse(r.ok)
-        inside = text("reference/ledger.py").replace("food = 0\ntraffic = 0\nother = 0\nwhile True:\n",
-                                                     "while True:\n    food = 0\n    traffic = 0\n    other = 0\n")
+        self.assertFalse(part(ev("1-12", ["ledger-q"]), "ledger-q").ok)
+        inside = ref.replace("food = 0\ntraffic = 0\nother = 0\nwhile True:\n", "while True:\n    food = 0\n    traffic = 0\n    other = 0\n")
         write(L / "lessons/1-12/ledger.py", inside)   # 小計每一圈都從 0 重來：一開始就打 q 還是 0，可是打 q 那一圈也歸零
         out = ev("1-12", ["ledger-q", "ledger-sum"])
         self.assertTrue(part(out, "ledger-q").ok)
         self.assertFalse(part(out, "ledger-sum").ok)
-        self.assertIn("合計 0 元", part(out, "ledger-sum").detail)   # 打 q 那一圈也先歸零
+        self.assertIn("合計 0 元", part(out, "ledger-sum").detail)
 
     def test_tutor_form_is_filled_or_not(self):
         p = L / "lessons/1-12/tutor.md"

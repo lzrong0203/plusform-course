@@ -1,5 +1,5 @@
 {
- "note": "Lv1 上關卡（卷 B）的檢查：卷 A 交卷的隔天以後才能考。題型、題數、題目 id 跟卷 A 一樣（矯正包對照表共用 ../remedial.json），數字和情境換掉：fix.py 起點跳 SyntaxError（if 少冒號）、再跳 NameError（錯在第 2 行的 mony）、跑得起來以後打 q 和空白的一行都被算成一杯；ledger.py 的分類是飲食、娛樂、其他，預算 2000。只有第一部分（考卷），第二、三部分跟著卷 A（lessons/1-12/）。",
+ "note": "Lv1 上關卡（卷 B）的檢查：卷 A 交卷的隔天以後才能考。題型、題數、題目 id 跟卷 A 一樣（矯正包對照表共用 ../remedial.json），數字和情境換掉：fix.py 起點跳 SyntaxError（if 少冒號）、再跳 NameError（要改的是設定 mony = 0 的那一行）、跑得起來以後打 q 和空白的一行都被算成一杯；ledger.py 的分類是飲食、娛樂、其他，預算 2000。只有第一部分（考卷），第二、三部分跟著卷 A（lessons/1-12/）。",
  "checks": [
   {
    "type": "answers",
@@ -87,7 +87,7 @@
     "一共 3 杯",
     "一共 4 杯"
    ],
-   "hint": "空白的一行不算一筆：continue 會跳過它下面的那幾行，所以 count 加 1 要放在 continue 的下面（1-10）。",
+   "hint": "空白的一行不算一杯：continue 會跳過它下面的那幾行，所以 count 加 1 要放在 continue 的下面（1-10）。",
    "hint_on_crash": false
   },
   {
@@ -96,19 +96,26 @@
    "file": "lessons/1-12B/ledger.py",
    "group": "從零寫 v0.1",
    "stage": "從零寫 v0.1",
-   "desc": "ledger.py：一開始就打 q（預算 2000、四個人分）→ 三個小計、合計都是 0 元",
-   "stdin": "2000\nq\n4\n",
-   "timeout": 5,
+   "desc": "ledger.py：一開始就打 q（預算 900）→ 三個小計、合計都是 0 元，綠燈",
+   "stdin": "900\nq\n3\n",
    "expect_regex": [
     "飲食\\s*0\\s*元",
     "娛樂\\s*0\\s*元",
     "其他\\s*0\\s*元",
     "合計\\s*0\\s*元"
    ],
-   "hint": "照規格的順序問：先問預算，再一直問分類（打 q 就 break），最後問幾個人分。一開始就打 q，迴圈一次都不做，小計都是 0。改完記得存檔再跑。",
-   "missing_hint": "ledger.py 應該在帳本的 lessons/1-12B/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-12B。",
+   "expect_contains": [
+    "綠燈"
+   ],
+   "expect_not_contains": [
+    "黃燈",
+    "紅燈"
+   ],
+   "hint": "照規格的順序問：先問預算，再一直問分類（打 q 就 break），最後問幾個人分。進到迴圈就遇到 q，一筆都沒記：小計都是 0，合計 0 元是預算的 0%，綠燈。改完記得存檔再跑。",
    "stuck_hint": "打 q 的時候要停下來：if kind == \"q\": break。自己試跑停不下來，按 Ctrl+C。",
-   "eof_hint": "打 q 的時候要停下來：if kind == \"q\": break。"
+   "eof_hint": "打 q 的時候要停下來：if kind == \"q\": break。",
+   "missing_hint": "ledger.py 應該在帳本的 lessons/1-12B/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-12B。",
+   "timeout": 5
   },
   {
    "type": "run",
@@ -118,7 +125,6 @@
    "stage": "從零寫 v0.1",
    "desc": "ledger.py：娛樂 300、飲食 250、房租 500、飲食 150 → 飲食 400、娛樂 300、其他 500、合計 1200 元",
    "stdin": "2000\n娛樂\n300\n飲食\n250\n房租\n500\n飲食\n150\nq\n4\n",
-   "timeout": 5,
    "expect_regex": [
     "飲食\\s*400\\s*元",
     "娛樂\\s*300\\s*元",
@@ -127,35 +133,17 @@
    ],
    "hint": "三個小計各用一個名字、都從 0 開始、放在迴圈外面；每一圈用 if／elif／else 看分類，加進對的那一個（金額先用 int() 變成整數）。",
    "stuck_hint": "打 q 的時候要停下來：if kind == \"q\": break。",
-   "eof_hint": "照規格的順序問：分類、金額，一圈問兩次；打 q 那一圈只問分類就停。"
+   "eof_hint": "照規格的順序問：分類、金額，一圈問兩次；打 q 那一圈只問分類就停。",
+   "timeout": 5
   },
   {
    "type": "run",
-   "id": "ledger-green",
+   "id": "ledger-y80",
    "file": "lessons/1-12B/ledger.py",
    "group": "從零寫 v0.1",
    "stage": "從零寫 v0.1",
-   "desc": "ledger.py：合計 1200、預算 2000（60%）→ 綠燈",
-   "stdin": "2000\n娛樂\n300\n飲食\n250\n房租\n500\n飲食\n150\nq\n4\n",
-   "timeout": 5,
-   "expect_contains": [
-    "綠燈"
-   ],
-   "expect_not_contains": [
-    "黃燈",
-    "紅燈"
-   ],
-   "hint": "合計低於預算的 80% 是綠燈：total < budget * 0.8（或先算 ratio = total / budget，再看 ratio < 0.8）。"
-  },
-  {
-   "type": "run",
-   "id": "ledger-yellow",
-   "file": "lessons/1-12B/ledger.py",
-   "group": "從零寫 v0.1",
-   "stage": "從零寫 v0.1",
-   "desc": "ledger.py：合計剛好 2000、預算 2000（剛好 100%）→ 黃燈",
-   "stdin": "2000\n飲食\n1500\n娛樂\n500\nq\n2\n",
-   "timeout": 5,
+   "desc": "ledger.py：合計剛好 1200、預算 1500（剛好 80%）→ 黃燈",
+   "stdin": "1500\n飲食\n700\n書\n500\nq\n2\n",
    "expect_contains": [
     "黃燈"
    ],
@@ -163,7 +151,26 @@
     "綠燈",
     "紅燈"
    ],
-   "hint": "剛好花到預算還不算超過，是黃燈：想想 < 和 <= 差在哪裡（1-8、1-9）。"
+   "hint": "剛好 80% 不算「低於 80%」，是黃燈：想想 < 和 <= 差在哪裡。燈號要用打進來的預算算（每一組的預算不一樣），不能寫死一個數字。",
+   "timeout": 5
+  },
+  {
+   "type": "run",
+   "id": "ledger-y100",
+   "file": "lessons/1-12B/ledger.py",
+   "group": "從零寫 v0.1",
+   "stage": "從零寫 v0.1",
+   "desc": "ledger.py：合計剛好 2000、預算 2000（剛好 100%）→ 黃燈",
+   "stdin": "2000\n飲食\n1500\n娛樂\n500\nq\n2\n",
+   "expect_contains": [
+    "黃燈"
+   ],
+   "expect_not_contains": [
+    "綠燈",
+    "紅燈"
+   ],
+   "hint": "剛好花到預算還不算超過，是黃燈：想想 < 和 <= 差在哪裡（1-8、1-9）。",
+   "timeout": 5
   },
   {
    "type": "run",
@@ -171,9 +178,8 @@
    "file": "lessons/1-12B/ledger.py",
    "group": "從零寫 v0.1",
    "stage": "從零寫 v0.1",
-   "desc": "ledger.py：合計 2001、預算 2000（超過）→ 紅燈",
-   "stdin": "2000\n書\n1001\n飲食\n1000\nq\n4\n",
-   "timeout": 5,
+   "desc": "ledger.py：合計 801、預算 800（超過）→ 紅燈",
+   "stdin": "800\n娛樂\n400\n飲食\n401\nq\n4\n",
    "expect_contains": [
     "紅燈"
    ],
@@ -181,7 +187,8 @@
     "綠燈",
     "黃燈"
    ],
-   "hint": "超過預算才是紅燈：前面的 if、elif 都不成立，走 else。"
+   "hint": "超過預算才是紅燈：前面的 if、elif 都不成立，走 else。燈號要用打進來的預算算，不能寫死一個數字。",
+   "timeout": 5
   },
   {
    "type": "run",
@@ -189,13 +196,13 @@
    "file": "lessons/1-12B/ledger.py",
    "group": "從零寫 v0.1",
    "stage": "從零寫 v0.1",
-   "desc": "ledger.py：合計 2001、四個人分 → 每人 500 元，零頭 1 元",
-   "stdin": "2000\n書\n1001\n飲食\n1000\nq\n4\n",
-   "timeout": 5,
+   "desc": "ledger.py：合計 2003、五個人分 → 每人 400 元，零頭 3 元",
+   "stdin": "2000\n飲食\n1000\n娛樂\n1003\nq\n5\n",
    "expect_regex": [
-    "每人\\s*500\\s*元\\W*零頭\\s*1\\s*元"
+    "每人\\s*400\\s*元\\W*零頭\\s*3\\s*元"
    ],
-   "hint": "每人先付的用 //（除完只留整數），零頭用 %（除完剩多少），1-4 教過。用 / 會變成有小數點的數字。印出來照這個樣子：每人 500 元，零頭 1 元。"
+   "hint": "每人先付的用 //（除完只留整數），零頭用 %（除完剩多少），1-4 教過；人數要用打進來的數字。用 / 會變成有小數點的數字。印出來照這個樣子：每人 400 元，零頭 3 元。",
+   "timeout": 5
   }
  ]
 }

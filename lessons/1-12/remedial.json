@@ -7,13 +7,13 @@
     {
      "lesson": "1-10",
      "title": "while 迴圈",
-     "time": "6:59",
+     "time": "7:09",
      "chapter": "第①圈 break 和 continue"
     },
     {
      "lesson": "1-10",
      "title": "while 迴圈",
-     "time": "1:17",
+     "time": "1:18",
      "chapter": "第①圈 while：迴圈跑幾次"
     }
    ],
@@ -109,7 +109,7 @@
     {
      "lesson": "1-10",
      "title": "while 迴圈",
-     "time": "6:59",
+     "time": "7:09",
      "chapter": "第①圈 break 和 continue"
     }
    ],
@@ -148,13 +148,13 @@
     {
      "lesson": "1-10",
      "title": "while 迴圈",
-     "time": "8:39",
+     "time": "8:53",
      "chapter": "第②圈 帶我寫：跟家教寫最多記 10 筆"
     },
     {
      "lesson": "1-10",
      "title": "while 迴圈",
-     "time": "6:59",
+     "time": "7:09",
      "chapter": "第①圈 break 和 continue"
     }
    ],
@@ -328,13 +328,13 @@
     "subtotal"
    ]
   },
-  "ledger-green": {
-   "label": "v0.1：綠燈",
+  "ledger-y80": {
+   "label": "v0.1：剛好 80% 的燈號",
    "topics": [
     "light"
    ]
   },
-  "ledger-yellow": {
+  "ledger-y100": {
    "label": "v0.1：剛好 100% 的燈號",
    "topics": [
     "light"
