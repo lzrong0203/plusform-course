@@ -1,0 +1,26 @@
+{
+  "note": "回顧題：學員通過這課以後，往後第 2 課和第 5 課的 check 會各帶一題。",
+  "questions": [
+    {
+      "id": "r1",
+      "q": "def half(n):\n    print(n / 2)\n\ny = half(10)\nprint(y)\n第二行印出什麼？\nA. 5.0\nB. None\nC. 10\n（寫 A、B 或 C）",
+      "accept": ["B"],
+      "explain": "half 只有 print、沒有 return，交回的是 None：第一行是函式裡印的 5.0，第二行印 y，是 None。",
+      "choices": {"A": "5.0", "B": "None", "C": "10"}
+    },
+    {
+      "id": "r2",
+      "q": "def add(book):\n    book.append(9)\n\na = [1]\nadd(a)\nprint(a)\n印出什麼？\nA. [1]\nB. [9]\nC. [1, 9]\n（寫 A、B 或 C）",
+      "accept": ["C"],
+      "explain": "book 和 a 指着同一個 list，book.append(9) 改的是盒子裡面，外面的 a 也看得到：[1, 9]。",
+      "choices": {"A": "[1]", "B": "[9]", "C": "[1, 9]"}
+    },
+    {
+      "id": "r3",
+      "q": "交給 AI 寫函式之前，docstring 裡最少要寫哪三樣？\nA. 輸入、輸出、例子\nB. 作者、日期、版本\nC. 只要函式的名字\n（寫 A、B 或 C）",
+      "accept": ["A"],
+      "explain": "輸入（交進來什麼）、輸出（交回什麼）、例子（一次真的呼叫和它交回的值）；特別的情況（例如空的 list）也寫進去，再寫成 assert 驗收。",
+      "choices": {"A": "輸入、輸出、例子", "B": "作者、日期、版本", "C": "只要函式的名字"}
+    }
+  ]
+}

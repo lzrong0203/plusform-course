@@ -20,6 +20,8 @@ check.py（學員端）和 tools/validate_lesson.py（老師端）共用這一�
   filled        自評的表單寫了沒（1-12 起）：每個標籤（例如「家教問：」「我的回答：」）後面都寫了字就算交了，內容不改對錯
   either        兩條路選一條（1-17 起）：每條路是一串上面這些檢查、題數一樣；照學員做的那一條判（answer.py 的測試，或選擇題版）
                 （run 在 1-17 另加兩個只對寫了它的題目生效的欄位：loose＝比的時候空格不算；ast_require＝規定用推導式／迴圈＋append 寫）
+  func_shape    學員寫的函式長得對不對（1-18 起；只看程式的樣子、不跑）：有沒有 def 那個名字、docstring 有沒有寫輸入／輸出／例子、
+                有沒有用 return 交回一個值（只 print 不 return，外面拿到的是 None）
 
 學員寫的檔案一律用 utf-8-sig 讀（Windows 記事本會在最前面加看不見的 BOM），
 讀不懂（例如存成 Big5）就給白話的說明，不噴 Traceback。
@@ -476,6 +478,7 @@ DEFAULT_GROUP = {
     "git_commits": "官方測試",
     "parsons": "官方測試",
     "filled": "自評",
+    "func_shape": "官方測試",
 }
 
 
@@ -1121,6 +1124,82 @@ class FilledCheck(Check):
         r.ok = True
         if self.spec.get("note"):
             r.note = self.spec["note"]
+
+
+# ---------------- func_shape（函式長得對不對，2026-11-15，1-18 起；只對寫了 type func_shape 的 checks.json 生效） ----------------
+
+def _doc_sections(doc: str, labels: list[str]) -> dict[str, str]:
+    """docstring 裡每個標籤（「輸入：」「輸出：」「例子：」）後面寫的字：同一行後面的，加上往下到下一個標籤為止的每一行。"""
+    found: dict[str, str] = {}
+    current = None
+    for raw in doc.splitlines():
+        text = unicodedata.normalize("NFKC", raw).strip()
+        hit = next((lab for lab in labels if text.startswith(lab)), None)
+        if hit is not None:
+            current = hit
+            found[hit] = found.get(hit, "") + text[len(hit):]
+        elif current is not None:
+            found[current] += " " + text
+    return found
+
+
+class FuncShapeCheck(Check):
+    """1-18 起：學員寫的函式長得對不對（只看程式的樣子，不跑；跑出來對不對交給 call、run）。
+    spec：file、func（def 的名字）、desc；
+      docstring＝標籤清單（例如 ["輸入：", "輸出：", "例子："]）：def 下面要有 docstring，每個標籤後面都寫了字（至少 2 個字，空白不算）；
+      example＝true：「例子：」後面要寫到一次呼叫（func( 開頭的寫法，例如 by_category([...]) 是 {...}）；
+      must_return＝true：函式裡要有 return 一個值（只有 print、或 return 後面沒東西，外面拿到的都是 None）。"""
+
+    def run(self, results):
+        r = results[0]
+        s = self.spec
+        rel, func = s["file"], s["func"]
+        path = self.ctx.student(rel)
+        name = Path(rel).name
+        if not path.is_file():
+            r.detail = self.ctx.missing(rel, s.get("missing_hint"))
+            return
+        src = read_student_text(path)
+        try:
+            tree = ast.parse(src)
+        except SyntaxError as exc:
+            r.detail = f"你的 {name} 第 {exc.lineno} 行有語法錯誤（{exc.msg}），先修好它。"
+            return
+        fn = next((n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == func), None)
+        if fn is None:
+            r.detail = f"{name} 裡找不到 def {func}(…)：函式寫在最外層（def 前面不空格），名字照題目寫 {func}。"
+            return
+        labels = [unicodedata.normalize("NFKC", x) for x in s.get("docstring", [])]
+        if labels:
+            doc = ast.get_docstring(fn)
+            if not doc:
+                r.detail = (f"{func} 還沒有 docstring：在 def 那一行的下一行，用三個引號（\"\"\"）寫說明，"
+                            f"要有{'、'.join(s['docstring'])}。")
+                return
+            sec = _doc_sections(doc, labels)
+            for lab, shown in zip(labels, s["docstring"]):
+                if lab not in sec:
+                    r.detail = f"{func} 的 docstring 裡找不到「{shown}」：一行寫一個，標籤後面接着寫。"
+                    return
+                body = "".join(sec[lab].split()).strip("？?。.…")
+                if len(body) < 2:
+                    r.detail = f"{func} 的 docstring：「{shown}」後面還空着。" + (f"\n  提示：{s['hint']}" if s.get("hint") else "")
+                    return
+            ex = next((lab for lab, shown in zip(labels, s["docstring"]) if "例子" in shown), None)
+            if s.get("example") and ex is not None and f"{func}(" not in "".join(sec[ex].split()):
+                r.detail = f"{func} 的 docstring：「例子」要寫一次真的呼叫，例如 {func}(…) 是 …（輸入什麼、交回什麼）。"
+                return
+        if s.get("must_return"):
+            def gives(n: ast.Return) -> bool:
+                return n.value is not None and not (isinstance(n.value, ast.Constant) and n.value.value is None)
+            if not any(isinstance(n, ast.Return) and gives(n) for n in ast.walk(fn)):
+                prints = any(isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id == "print" for n in ast.walk(fn))
+                r.detail = (f"{func} 裡沒有 return：算好的值要用 return 交回去。"
+                            + ("print 只會印在終端機給人看，呼叫的地方拿到的是 None。" if prints else "沒有 return，呼叫的地方拿到的是 None。"))
+                return
+        r.ok = True
+        if s.get("note"):
+            r.note = s["note"]
 
 
 # ---------------- call ----------------
@@ -2350,6 +2429,7 @@ CHECKERS = {
     "parsons": ParsonsCheck,
     "filled": FilledCheck,
     "either": EitherCheck,
+    "func_shape": FuncShapeCheck,
 }
 
 

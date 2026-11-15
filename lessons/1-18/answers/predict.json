@@ -1,0 +1,20 @@
+{
+ "note": "1-18 第①圈：先猜函式（對答 3 題，都是選擇題）。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {"id": "p1", "title": "只 print 不 return", "accept": ["B"],
+   "choices": {"A": "10 和 10", "B": "10 和 None", "C": "None 和 10"},
+   "hint": "x = double(5) 這一行，函式裡的 print 先印什麼？double 有沒有 return？沒有 return，交回的是什麼？",
+   "explain": "呼叫 double(5) 時，函式裡的 print 先印出 10；double 沒有 return，交回的是 None，所以 x 是 None，第二行印 None。print 只是印在終端機，外面拿不到。"},
+  {"id": "p2", "title": "list 交進函式被改", "accept": ["C"],
+   "choices": {"A": "[1, 2, 3]", "B": "出現錯誤訊息", "C": "[1, 2]"},
+   "hint": "呼叫 drop(a) 時，函式裡的 items 和外面的 a 指着幾個盒子？pop 改的是名字，還是盒子裡面？",
+   "explain": "items 和 a 指着同一個 list（同一個盒子），items.pop() 改的是盒子裡面，所以外面的 a 也少了最後一筆：[1, 2]。沒有 return 也不會出錯，只是交回 None（這裡沒拿去用）。"},
+  {"id": "p3", "title": "函式裡換盒子", "accept": ["A"],
+   "choices": {"A": "[1, 2]", "B": "[]", "C": "None"},
+   "hint": "items = [] 是改盒子裡面，還是把名牌 items 換到一個新的盒子？外面的 a 還指着哪一個？",
+   "explain": "items = [] 是做出一個新的空 list，只把函式裡的名牌 items 換過去（1-16 的換盒子）；外面的 a 還指着原本的盒子，所以還是 [1, 2]。"}
+ ]
+}

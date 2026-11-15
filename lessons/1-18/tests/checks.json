@@ -1,0 +1,250 @@
+{
+ "note": "1-18 的檢查：第①圈 predict.txt（只 print 不 return、list 交進函式被改、函式裡換盒子，選擇題 3 題）、total.py（func_shape：有 def total、有 return；call 直接呼叫 total，含空的 list 要交回 0；run 跑整支、再把 nov 換掉跑一次）、add.py（func_shape：有 def add_entry；run 跑兩次，第二次把 nov 換掉：外面的 list 要被函式改到）；第②圈 names_quiz.txt（函式的名字和拆法 4 題），tutor.md 是自評、不檢查；第③圈 by_category.py（func_shape：docstring 要有輸入／輸出／例子、例子寫到一次呼叫、要 return；call 直接測函式，含空的 list）、checks_by_category.py（chaff 的 assert 模式：學員的 assert 跑課程的正確版和 3 個 AI 寫錯的版本：只 print 不 return、同一類沒加起來、空的 list 交回 None）、green（學員自己的 assert 在自己的 by_category.py 上全部成立）；docstring.md 是自評檢核表、不檢查。grader 新加 type func_shape（只對寫了它的課生效）。",
+ "checks": [
+  {
+   "type": "answers",
+   "id": "predict",
+   "file": "lessons/1-18/predict.txt",
+   "key": "answers/predict.json",
+   "group": "第一圈"
+  },
+  {
+   "type": "func_shape",
+   "id": "total-def",
+   "file": "lessons/1-18/total.py",
+   "func": "total",
+   "must_return": true,
+   "group": "第一圈",
+   "desc": "total.py：寫了 def total(amounts)，用 return 交回合計",
+   "missing_hint": "total.py 應該在帳本的 lessons/1-18/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-18。"
+  },
+  {
+   "type": "call",
+   "id": "total-1",
+   "file": "lessons/1-18/total.py",
+   "module": "total",
+   "func": "total",
+   "args": [
+    [
+     120,
+     85,
+     300
+    ]
+   ],
+   "expect": 505,
+   "group": "第一圈",
+   "desc": "total([120, 85, 300]) 交回 505"
+  },
+  {
+   "type": "call",
+   "id": "total-2",
+   "file": "lessons/1-18/total.py",
+   "module": "total",
+   "func": "total",
+   "args": [
+    [
+     65,
+     200
+    ]
+   ],
+   "expect": 265,
+   "group": "第一圈",
+   "desc": "total([65, 200]) 交回 265"
+  },
+  {
+   "type": "call",
+   "id": "total-3",
+   "file": "lessons/1-18/total.py",
+   "module": "total",
+   "func": "total",
+   "args": [
+    []
+   ],
+   "expect": 0,
+   "group": "第一圈",
+   "desc": "total([]) 交回 0（空的 list，一筆都沒有）",
+   "hint": "s = 0 寫在 for 前面：一筆都沒有時，迴圈一次都不跑，交回的就是一開始的 0。"
+  },
+  {
+   "type": "run",
+   "id": "total-run",
+   "file": "lessons/1-18/total.py",
+   "group": "第一圈",
+   "desc": "total.py：用 total 印出兩個月的合計（nov 換成別的金額也印得對）",
+   "timeout": 5,
+   "runs": [
+    {
+     "expect_exact": [
+      "11 月合計 505 元",
+      "12 月合計 265 元"
+     ]
+    },
+    {
+     "swap": {
+      "find": "^[ \\t]*nov[ \\t]*=[ \\t]*\\[.*\\][ \\t]*(#.*)?$",
+      "to": "nov = [10, 20]",
+      "feed": "check 把你的 nov 換成 [10, 20]，再跑一次。",
+      "missing": "找不到 nov = [...] 這一行。nov 那一行要留著（check 會把它換成別的金額再跑一次）。"
+     },
+     "expect_exact": [
+      "11 月合計 30 元",
+      "12 月合計 265 元"
+     ]
+    }
+   ],
+   "hint": "下面兩行 print 改成呼叫 total，例如 print(\"11 月合計\", total(nov), \"元\")。",
+   "missing_hint": "total.py 應該在帳本的 lessons/1-18/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-18。"
+  },
+  {
+   "type": "func_shape",
+   "id": "add-def",
+   "file": "lessons/1-18/add.py",
+   "func": "add_entry",
+   "group": "第一圈",
+   "desc": "add.py：寫了 def add_entry(book, amount)",
+   "missing_hint": "add.py 應該在帳本的 lessons/1-18/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-18。"
+  },
+  {
+   "type": "run",
+   "id": "add-1",
+   "file": "lessons/1-18/add.py",
+   "group": "第一圈",
+   "desc": "add.py：呼叫兩次 add_entry 以後，印出 [120, 85, 300, 45]",
+   "timeout": 5,
+   "expect_exact": [
+    "[120, 85, 300, 45]"
+   ],
+   "hint": "add_entry 裡寫 book.append(amount)：book 和外面的 nov 指着同一個 list，加進 book，外面的 nov 也看得到。",
+   "missing_hint": "add.py 應該在帳本的 lessons/1-18/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-18。"
+  },
+  {
+   "type": "run",
+   "id": "add-2",
+   "file": "lessons/1-18/add.py",
+   "group": "第一圈",
+   "desc": "add.py：換成另一本帳本 other 也加得對（加進的是交進來的那一個 list）",
+   "timeout": 5,
+   "swap": {
+    "find": "^[ \\t]*add_entry\\(nov,[ \\t]*300\\)[ \\t]*(#.*)?$",
+    "to": "other = [10]\nadd_entry(other, 7)\nprint(other)\nadd_entry(nov, 300)",
+    "feed": "check 在 add_entry(nov, 300) 前面多加三行：other = [10]、add_entry(other, 7)、print(other)，再跑一次。",
+    "missing": "找不到 add_entry(nov, 300) 這一行。最下面四行不要改（check 會在前面多加幾行再跑一次）。"
+   },
+   "expect_exact": [
+    "[10, 7]",
+    "[120, 85, 300, 45]"
+   ],
+   "hint": "函式裡要加進交進來的 book（book.append(amount)），不要寫死 nov：交進 other，就要加進 other。"
+  },
+  {
+   "type": "answers",
+   "id": "names",
+   "file": "lessons/1-18/names_quiz.txt",
+   "key": "answers/names_quiz.json",
+   "group": "第二圈"
+  },
+  {
+   "type": "func_shape",
+   "id": "doc",
+   "file": "lessons/1-18/by_category.py",
+   "func": "by_category",
+   "group": "第三圈",
+   "docstring": [
+    "輸入：",
+    "輸出：",
+    "例子："
+   ],
+   "example": true,
+   "must_return": true,
+   "desc": "by_category.py：docstring 寫了輸入、輸出、例子，函式用 return 交回結果",
+   "hint": "照第③圈的寫法：輸入是一串 (分類, 金額)；輸出是 dict（分類 → 合計）；例子寫一次呼叫和它交回的值。",
+   "missing_hint": "by_category.py 應該在帳本的 lessons/1-18/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-18。"
+  },
+  {
+   "type": "call",
+   "id": "cat-1",
+   "file": "lessons/1-18/by_category.py",
+   "module": "by_category",
+   "func": "by_category",
+   "group": "第三圈",
+   "args": [
+    [
+     [
+      "餐",
+      120
+     ],
+     [
+      "車",
+      30
+     ],
+     [
+      "餐",
+      85
+     ]
+    ]
+   ],
+   "expect": {
+    "餐": 205,
+    "車": 30
+   },
+   "desc": "by_category([(\"餐\", 120), (\"車\", 30), (\"餐\", 85)]) 交回 {\"餐\": 205, \"車\": 30}"
+  },
+  {
+   "type": "call",
+   "id": "cat-2",
+   "file": "lessons/1-18/by_category.py",
+   "module": "by_category",
+   "func": "by_category",
+   "group": "第三圈",
+   "args": [
+    []
+   ],
+   "expect": {},
+   "desc": "by_category([]) 交回 {}（空的 list）",
+   "hint": "一筆都沒有時，交回空的 dict {}，不是 None。"
+  },
+  {
+   "type": "call",
+   "id": "cat-3",
+   "file": "lessons/1-18/by_category.py",
+   "module": "by_category",
+   "func": "by_category",
+   "group": "第三圈",
+   "args": [
+    [
+     [
+      "車",
+      30
+     ]
+    ]
+   ],
+   "expect": {
+    "車": 30
+   },
+   "desc": "by_category([(\"車\", 30)]) 交回 {\"車\": 30}"
+  },
+  {
+   "type": "chaff",
+   "id": "r3",
+   "mode": "assert",
+   "student_file": "lessons/1-18/checks_by_category.py",
+   "module": "by_category",
+   "reference": "reference/by_category.py",
+   "mutants": "mutants/mutants.json",
+   "teacher_file": "answers/checks_by_category.py",
+   "min_checks": 3,
+   "group": "第三圈"
+  },
+  {
+   "type": "run",
+   "id": "green",
+   "file": "lessons/1-18/checks_by_category.py",
+   "group": "第三圈",
+   "desc": "跑 checks_by_category.py：你的 assert 在你的 by_category.py 上全部成立（什麼都沒印）",
+   "timeout": 5,
+   "expect_exact": [],
+   "hint": "跳出 AssertionError，代表 by_category.py 還沒寫好，或 assert 右邊寫的答案算錯了。先自己跑 uv run lessons/1-18/checks_by_category.py 看是哪一條。",
+   "missing_hint": "checks_by_category.py 應該在帳本的 lessons/1-18/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-18。"
+  }
+ ]
+}

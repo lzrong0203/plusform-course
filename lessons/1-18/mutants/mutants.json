@@ -1,0 +1,24 @@
+{
+  "target": "by_category.py",
+  "note": "hint 是學員的 assert 沒抓到這個壞版本時，畫面上顯示的提示（每行壓在 68 欄內；中文字一個佔兩欄）。三個都是 AI 照 docstring 寫的時候可能出的錯（範例示意）：m1 算成每一類有幾筆（+ 1，不是 + amount）；m2 同一類的沒有加起來（後面的蓋掉前面的）；m3 空的 list 直接 return（交回 None，不是 {}）。起點檔的範例（同一類兩筆加起來）就抓到 m1、m2；m3 只有交空的 list 進去的那一條抓得到（影片第③圈的思考站）。",
+  "mutants": [
+    {
+      "id": "m1",
+      "file": "by_category_m1.py",
+      "hint": "交回的是金額加起來，還是有幾筆？（同一類兩筆的時候看一看）",
+      "what": "result.get(kind, 0) + 1：算的是每一類有幾筆，不是把金額加起來"
+    },
+    {
+      "id": "m2",
+      "file": "by_category_m2.py",
+      "hint": "同一類有兩筆的時候，有加起來嗎？",
+      "what": "result[kind] = amount：同一類後面的蓋掉前面的，沒有加起來"
+    },
+    {
+      "id": "m3",
+      "file": "by_category_m3.py",
+      "hint": "交一個空的 list 進去，交回的是 {} 嗎？",
+      "what": "空的 list 直接 return：交回 None，不是 {}"
+    }
+  ]
+}

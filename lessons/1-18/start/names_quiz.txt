@@ -1,0 +1,38 @@
+# 1-18 第②圈：函式的名字和拆法（4 題）
+# 在「答：」後面寫 A、B 或 C，存檔。
+
+第 1 題：
+#   def f(book):
+#       return sum(book)
+# 這個函式交回帳本的合計。哪個名字最能說清楚它在做什麼？
+#   A. f
+#   B. total
+#   C. data
+答：
+
+第 2 題：
+#   def do(book, amount):
+#       book.append(amount)
+#       print("合計", sum(book))
+#
+#   nov = [120, 85]
+#   x = do(nov, 50)
+# x 是什麼？
+#   A. None
+#   B. 255
+#   C. 出現錯誤訊息
+答：
+
+第 3 題：
+# 要記一筆帳、也要拿到合計（之後還要拿合計去比預算）。哪一種拆法比較好？
+#   A. 一個函式 do：加一筆，順便把合計 print 出來
+#   B. 兩個函式：add_entry 只加一筆，total 只用 return 交回合計
+#   C. 不寫函式，每次都把同一段程式再寫一次
+答：
+
+第 4 題：
+# 要寫一個函式，交回各分類的小計（dict：分類 → 合計）。哪個名字最好？
+#   A. stuff
+#   B. calc2
+#   C. by_category
+答：

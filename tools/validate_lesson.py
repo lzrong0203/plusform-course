@@ -306,7 +306,7 @@ def validate_lesson(lid: str, root: Path, use_env: bool, temp: dict) -> Report:
     check_concepts(rep, lesson, order)
 
     # ---- 3. 正確版通過官方測試；4. 起點程式不能一開始就全過 ----
-    official = [s for s in flat_checks(lesson.checks) if s["type"] in ("call", "run", "parsons")]   # parsons（1-11 起）：正確版要排得對、起點檔不能一開始就過
+    official = [s for s in flat_checks(lesson.checks) if s["type"] in ("call", "run", "parsons", "func_shape")]   # parsons（1-11 起）：正確版要排得對、起點檔不能一開始就過；func_shape（1-18 起）：正確版的函式長得對（docstring、return）、起點檔不能一開始就過
     covered = 0
     for spec in official:
         ref = d / "reference" / Path(spec["file"]).name

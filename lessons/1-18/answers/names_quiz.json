@@ -1,0 +1,24 @@
+{
+ "note": "1-18 第②圈：函式的名字和拆法（對答 4 題，都是選擇題）。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {"id": "n1", "title": "交回合計的函式叫什麼", "accept": ["B"],
+   "choices": {"A": "f", "B": "total", "C": "data"},
+   "hint": "別人只看到呼叫的那一行（例如 print(f(nov))），猜得出它在做什麼嗎？",
+   "explain": "名字要說出它做什麼：total(nov) 一看就知道是合計；f、data 看不出來，要打開函式讀完才知道。"},
+  {"id": "n2", "title": "do 交回什麼", "accept": ["A"],
+   "choices": {"A": "None", "B": "255", "C": "出現錯誤訊息"},
+   "hint": "do 裡面有 return 嗎？print 出來的合計，呼叫的地方拿得到嗎？",
+   "explain": "do 只有 print、沒有 return，交回的是 None。終端機上看得到「合計 255」，可是 x 拿到的是 None，之後要拿合計去比預算就拿不到。"},
+  {"id": "n3", "title": "加一筆和合計，怎麼拆", "accept": ["B"],
+   "choices": {"A": "一個函式加一筆又 print 合計", "B": "add_entry 只加一筆、total 只 return 合計", "C": "不寫函式，同一段再寫一次"},
+   "hint": "之後要拿合計去比預算：哪一種拆法，呼叫的地方拿得到合計？",
+   "explain": "一個函式只做一件事：add_entry 只加一筆，total 用 return 交回合計，合計就能拿去比預算、也能單獨測試。A 的合計只印在終端機（交回 None）；C 每改一次要改好幾個地方。"},
+  {"id": "n4", "title": "各分類小計的函式叫什麼", "accept": ["C"],
+   "choices": {"A": "stuff", "B": "calc2", "C": "by_category"},
+   "hint": "哪個名字，一看就知道它交回的是「照分類」算的東西？",
+   "explain": "by_category（照分類）說出它做什麼；stuff、calc2 看不出來在算什麼，也看不出跟分類有關。"}
+ ]
+}

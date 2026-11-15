@@ -1,0 +1,7 @@
+{
+  "id": "1-18",
+  "title": "函式（上）：def、參數、return",
+  "minutes": 50,
+  "fast_minutes": 10,
+  "after_start": "接下來，用 VS Code 打開帳本的 lessons/1-18：\n  1. 第一圈：predict.txt 先別跑、預測 3 題；total.py 把加總包成函式 total，用 return 交回；add.py 寫 add_entry，把一筆加進帳本\n  2. 第二圈：請家教審你的函式名稱和拆法，記在 tutor.md（自評）；names_quiz.txt 四題\n  3. 第三圈：在 by_category.py 的 docstring 寫輸入、輸出、例子，在 checks_by_category.py 寫 assert；函式內容交給 AI（或抄課程的凍結版），用 assert 驗收\n做完回到課程資料夾打：uv run check.py 1-18"
+}
