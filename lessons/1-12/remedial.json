@@ -13,7 +13,7 @@
     {
      "lesson": "1-10",
      "title": "while 迴圈",
-     "time": "1:18",
+     "time": "1:17",
      "chapter": "第①圈 while：迴圈跑幾次"
     }
    ],
@@ -26,7 +26,7 @@
     {
      "lesson": "1-11",
      "title": "for、range、enumerate 與兩層迴圈",
-     "time": "5:52",
+     "time": "5:57",
      "chapter": "第①圈 enumerate 編號、兩層迴圈"
     }
    ],
@@ -45,7 +45,7 @@
     {
      "lesson": "1-11",
      "title": "for、range、enumerate 與兩層迴圈",
-     "time": "5:52",
+     "time": "5:57",
      "chapter": "第①圈 enumerate 編號、兩層迴圈"
     }
    ],
@@ -180,7 +180,7 @@
     {
      "lesson": "1-11",
      "title": "for、range、enumerate 與兩層迴圈",
-     "time": "3:14",
+     "time": "3:22",
      "chapter": "第①圈 一週七天的花費：累加、計數、找最大值"
     },
     {
