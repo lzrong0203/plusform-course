@@ -1,0 +1,227 @@
+{
+ "note": "1-C3 矯正包的對照表（course/production/1-C3/tapes/tools/make_remedial.py 產生，不手改）：錯的題目（items）→ 主題（topics）→ 原課章節的時間碼與練習檔。時間碼取自各課說明欄的章節（影片從那個時間開始看那一章；讀 git HEAD 已經 commit 的版本）；練習檔在 practice/，交卷沒過時 check.py 把用得到的複製到帳本的 lessons/1-C3/practice/。卷 A、卷 B 共用（每一題考的概念一樣，題目 id 也一樣；卷 B 的「分類」是付款方式）。",
+ "topics": {
+  "ref": {
+   "name": "b = a 不是複製：兩個名字指著同一個 list，改一個、兩個都變",
+   "where": [
+    {
+     "lesson": "1-16",
+     "title": "可變與參照：為什麼你的 list 自己變了",
+     "time": "1:36",
+     "chapter": "第①圈 b = a 不是複製：名牌、id 和 is"
+    }
+   ],
+   "practice": "p_ref.py",
+   "how": "先在紙上畫格子、寫下每一行 print 印出什麼，再跑"
+  },
+  "copy": {
+   "name": "copy() 做出另一個 list；append、insert、remove、pop 只改它自己",
+   "where": [
+    {
+     "lesson": "1-16",
+     "title": "可變與參照：為什麼你的 list 自己變了",
+     "time": "3:32",
+     "chapter": "第①圈 複製一份：copy 和切片"
+    },
+    {
+     "lesson": "1-13",
+     "title": "list：一串帳目",
+     "time": "3:28",
+     "chapter": "第①圈 改內容：append、insert、remove、pop、in、sum"
+    }
+   ],
+   "practice": "p_copy.py",
+   "how": "先在紙上畫格子、寫下每一行 print 印出什麼，再跑"
+  },
+  "set": {
+   "name": "for 後面拆包、set 去掉重複",
+   "where": [
+    {
+     "lesson": "1-14",
+     "title": "tuple、set 與拆包",
+     "time": "5:12",
+     "chapter": "第①圈 set：去掉重複、交集與差集"
+    },
+    {
+     "lesson": "1-14",
+     "title": "tuple、set 與拆包",
+     "time": "3:19",
+     "chapter": "第①圈 拆包與交換：a, b = b, a"
+    }
+   ],
+   "practice": "p_set.py",
+   "how": "先在紙上畫格子、寫下每一行 print 印出什麼，再跑"
+  },
+  "sort": {
+   "name": "sort() 直接排好、交回 None；sorted() 交回排好的新 list",
+   "where": [
+    {
+     "lesson": "1-13",
+     "title": "list：一串帳目",
+     "time": "5:11",
+     "chapter": "第①圈 排序：sorted 和 sort，b = a.sort() 是什麼"
+    }
+   ],
+   "practice": "p_sort.py",
+   "how": "先在紙上畫格子、寫下每一行 print 印出什麼，再跑"
+  },
+  "dict": {
+   "name": "dict：用鍵拿值、同一個鍵再放一次是換掉、get 查不到交回預設值",
+   "where": [
+    {
+     "lesson": "1-15",
+     "title": "dict：用名字找資料",
+     "time": "3:19",
+     "chapter": "第①圈 查不到的鍵：KeyError 和 get"
+    },
+    {
+     "lesson": "1-15",
+     "title": "dict：用名字找資料",
+     "time": "1:36",
+     "chapter": "第①圈 dict：鍵和值、用名字拿、list 裡放 dict"
+    }
+   ],
+   "practice": "p_dict.py",
+   "how": "先在紙上畫格子、寫下每一行 print 印出什麼，再跑"
+  },
+  "comp": {
+   "name": "推導式：先看 for、再看 if、最後看最前面放進去的；zip 配成一對對",
+   "where": [
+    {
+     "lesson": "1-17",
+     "title": "看懂 AI 最愛的寫法（上）：推導式、zip",
+     "time": "1:41",
+     "chapter": "第①圈 迴圈折成一行、只留想要的"
+    },
+    {
+     "lesson": "1-17",
+     "title": "看懂 AI 最愛的寫法（上）：推導式、zip",
+     "time": "5:22",
+     "chapter": "第①圈 zip 配成一對對、長度不同、enumerate"
+    }
+   ],
+   "practice": "p_comp.py",
+   "how": "先在紙上畫格子、寫下每一行 print 印出什麼，再跑"
+  },
+  "indent": {
+   "name": "拼圖：只做一次的放最上面，for、if 底下要做的往右縮四格",
+   "where": [
+    {
+     "lesson": "1-11",
+     "title": "for、range、enumerate 與兩層迴圈",
+     "time": "6:02",
+     "chapter": "第①圈 enumerate 編號、兩層迴圈"
+    }
+   ],
+   "practice": "p_indent.py",
+   "how": "照檔案最上面的說明排好、存檔，再跑"
+  },
+  "loop": {
+   "name": "迴圈裡的 if 和 append：只有條件成立才做的，縮在 if 底下",
+   "where": [
+    {
+     "lesson": "1-17",
+     "title": "看懂 AI 最愛的寫法（上）：推導式、zip",
+     "time": "4:01",
+     "chapter": "第①圈 翻成白話、改回迴圈（同一條 assert）"
+    }
+   ],
+   "practice": "p_loop.py",
+   "how": "先在紙上寫下它現在印出什麼，再跑、再修"
+  },
+  "dict_one": {
+   "name": "從空的 dict 開始，一筆一筆放進去，再用 items() 一個鍵印一行",
+   "where": [
+    {
+     "lesson": "1-15",
+     "title": "dict：用名字找資料",
+     "time": "1:36",
+     "chapter": "第①圈 dict：鍵和值、用名字拿、list 裡放 dict"
+    }
+   ],
+   "practice": "p_items.py",
+   "how": "照檔案最上面的題目寫好，再跑"
+  },
+  "totals": {
+   "name": "依分類加總：同一類的金額要加進原本的合計（get(類, 0) + 金額），全部算完才印",
+   "where": [
+    {
+     "lesson": "1-15",
+     "title": "dict：用名字找資料",
+     "time": "4:15",
+     "chapter": "第①圈 各分類的小計、1-9 的燈號改成對照表"
+    }
+   ],
+   "practice": "p_totals.py",
+   "how": "照檔案最上面的題目寫好，換三組資料各跑一次"
+  }
+ },
+ "items": {
+  "trace-t1": {
+   "label": "追蹤第 1 題",
+   "topics": [
+    "ref"
+   ]
+  },
+  "trace-t2": {
+   "label": "追蹤第 2 題",
+   "topics": [
+    "copy"
+   ]
+  },
+  "trace-t3": {
+   "label": "追蹤第 3 題",
+   "topics": [
+    "set"
+   ]
+  },
+  "trace-t4": {
+   "label": "追蹤第 4 題",
+   "topics": [
+    "sort"
+   ]
+  },
+  "trace-t5": {
+   "label": "追蹤第 5 題",
+   "topics": [
+    "dict"
+   ]
+  },
+  "trace-t6": {
+   "label": "追蹤第 6 題",
+   "topics": [
+    "comp"
+   ]
+  },
+  "pz-order": {
+   "label": "拼圖：行和縮排",
+   "topics": [
+    "indent"
+   ]
+  },
+  "pz-run": {
+   "label": "拼圖：跑出來不一樣",
+   "topics": [
+    "loop"
+   ]
+  },
+  "write-one": {
+   "label": "手寫：每一類只有一筆",
+   "topics": [
+    "dict_one"
+   ]
+  },
+  "write-sum": {
+   "label": "手寫：同一類有好幾筆",
+   "topics": [
+    "totals"
+   ]
+  },
+  "write-new": {
+   "label": "手寫：沒看過的分類、一筆都沒有",
+   "topics": [
+    "totals"
+   ]
+  }
+ }
+}

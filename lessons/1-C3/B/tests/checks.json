@@ -1,0 +1,144 @@
+{
+ "note": "1-C3 檢核站 3（卷 B）：跟卷 A 同樣的題型、題數和題目 id（矯正包對照表共用），數字和情境換掉。第一部分追蹤 6 題；第二部分拼圖 2 題（暴力排過，只有一種結構印得出來）；第三部分手寫 write.py 3 題（依付款方式加總，runs 每題兩組帳：一組在中間的、一組在邊界的；swap 換掉 pays 那一行；expect_exact＋loose）。",
+ "checks": [
+  {
+   "type": "answers",
+   "id": "trace",
+   "file": "lessons/1-C3B/trace.txt",
+   "key": "answers/trace.json",
+   "group": "第一部分 追蹤",
+   "stage": "第一部分 追蹤"
+  },
+  {
+   "type": "parsons",
+   "id": "pz",
+   "file": "lessons/1-C3B/parsons.py",
+   "group": "第二部分 拼圖",
+   "stage": "第二部分 拼圖",
+   "timeout": 5,
+   "lines": [
+    "print(\"第\", i, \"趟\", f, \"元\")",
+    "fares = [15, 180, 25, 220]",
+    "taxi.append(f)",
+    "for i, f in enumerate(fares, start=1):",
+    "print(\"一共\", len(taxi), \"趟 100 元以上\")",
+    "taxi = []",
+    "if f >= 100:"
+   ],
+   "expect_exact": [
+    "第 2 趟 180 元",
+    "第 4 趟 220 元",
+    "一共 2 趟 100 元以上"
+   ],
+   "desc_order": "拼圖：七行都用上、沒有改字，排好以後 Python 讀得懂",
+   "desc_run": "拼圖：排好跑出來是第 2 趟、第 4 趟和「一共 2 趟 100 元以上」",
+   "hint": "fares 和 taxi = [] 只做一次，放在最上面；for 一趟一趟看；100 元以上的才印、才放進 taxi，這兩行都縮在 if 底下；一共幾趟只印一次，放最後、不縮排。",
+   "missing_hint": "parsons.py 應該在帳本的 lessons/1-C3B/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-C3B。"
+  },
+  {
+   "type": "run",
+   "file": "lessons/1-C3B/write.py",
+   "group": "第三部分 手寫",
+   "stage": "第三部分 手寫",
+   "timeout": 5,
+   "loose": true,
+   "id": "write-one",
+   "desc": "write.py：每一種只有一筆（三種各一筆；只有一筆）",
+   "hint": "從空的 dict 開始，把每一筆的付款方式和金額放進去；最後一種印一行，照第一次出現的順序。pays 換了，印出來的也要跟著變，不要把答案寫進 print。",
+   "missing_hint": "write.py 應該在帳本的 lessons/1-C3B/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-C3B。",
+   "runs": [
+    {
+     "expect_exact": [
+      "轉帳 500 元",
+      "現金 60 元",
+      "點數 20 元"
+     ],
+     "swap": {
+      "find": "^[ \\t]*pays[ \\t]*=[ \\t]*\\[.*\\][ \\t]*(#.*)?$",
+      "to": "pays = [(\"轉帳\", 500), (\"現金\", 60), (\"點數\", 20)]",
+      "feed": "check 把你的 pays 換成 [(\"轉帳\", 500), (\"現金\", 60), (\"點數\", 20)]，再跑一次。",
+      "missing": "找不到 pays = [...] 這一行。pays 那一行要留著、寫在同一行（check 會把它換成別的帳再跑）。"
+     }
+    },
+    {
+     "expect_exact": [
+      "現金 15 元"
+     ],
+     "swap": {
+      "find": "^[ \\t]*pays[ \\t]*=[ \\t]*\\[.*\\][ \\t]*(#.*)?$",
+      "to": "pays = [(\"現金\", 15)]",
+      "feed": "check 把你的 pays 換成 [(\"現金\", 15)]，再跑一次。",
+      "missing": "找不到 pays = [...] 這一行。pays 那一行要留著、寫在同一行（check 會把它換成別的帳再跑）。"
+     }
+    }
+   ]
+  },
+  {
+   "type": "run",
+   "file": "lessons/1-C3B/write.py",
+   "group": "第三部分 手寫",
+   "stage": "第三部分 手寫",
+   "timeout": 5,
+   "loose": true,
+   "id": "write-sum",
+   "desc": "write.py：同一種有好幾筆，要加起來（題目的 pays；三筆都是悠遊卡）",
+   "hint": "同一種又遇到一次，是把金額加進原本的合計，不是換掉：新的合計 = 原本的合計（第一次遇到時是 0）+ 這一筆的金額。dict 的 get(鍵, 0) 查不到交回 0（1-15）。全部算完才印。",
+   "runs": [
+    {
+     "expect_exact": [
+      "現金 205 元",
+      "悠遊卡 75 元",
+      "信用卡 990 元"
+     ]
+    },
+    {
+     "expect_exact": [
+      "悠遊卡 85 元"
+     ],
+     "swap": {
+      "find": "^[ \\t]*pays[ \\t]*=[ \\t]*\\[.*\\][ \\t]*(#.*)?$",
+      "to": "pays = [(\"悠遊卡\", 30), (\"悠遊卡\", 25), (\"悠遊卡\", 30)]",
+      "feed": "check 把你的 pays 換成 [(\"悠遊卡\", 30), (\"悠遊卡\", 25), (\"悠遊卡\", 30)]，再跑一次。",
+      "missing": "找不到 pays = [...] 這一行。pays 那一行要留著、寫在同一行（check 會把它換成別的帳再跑）。"
+     }
+    }
+   ]
+  },
+  {
+   "type": "run",
+   "file": "lessons/1-C3B/write.py",
+   "group": "第三部分 手寫",
+   "stage": "第三部分 手寫",
+   "timeout": 5,
+   "loose": true,
+   "id": "write-new",
+   "desc": "write.py：沒看過的付款方式、一筆都沒有",
+   "hint": "換成沒看過的付款方式也要算得對：用 pays 裡實際有的付款方式，不要把題目裡的名字寫死；同一種的金額要加起來；全部算完才印。",
+   "runs": [
+    {
+     "expect_exact": [
+      "轉帳 800 元",
+      "點數 50 元",
+      "禮券 100 元"
+     ],
+     "swap": {
+      "find": "^[ \\t]*pays[ \\t]*=[ \\t]*\\[.*\\][ \\t]*(#.*)?$",
+      "to": "pays = [(\"轉帳\", 500), (\"點數\", 20), (\"轉帳\", 300), (\"禮券\", 100), (\"點數\", 30)]",
+      "feed": "check 把你的 pays 換成 [(\"轉帳\", 500), (\"點數\", 20), (\"轉帳\", 300), (\"禮券\", 100), (\"點數\", 30)]，再跑一次。",
+      "missing": "找不到 pays = [...] 這一行。pays 那一行要留著、寫在同一行（check 會把它換成別的帳再跑）。"
+     }
+    },
+    {
+     "expect_exact": [],
+     "swap": {
+      "find": "^[ \\t]*pays[ \\t]*=[ \\t]*\\[.*\\][ \\t]*(#.*)?$",
+      "to": "pays = []",
+      "feed": "check 把你的 pays 換成 []（一筆都沒有），再跑一次。",
+      "missing": "找不到 pays = [...] 這一行。pays 那一行要留著、寫在同一行（check 會把它換成別的帳再跑）。"
+     },
+     "hint": "一筆都沒有的時候，什麼都不用印（for 一圈都不跑，dict 是空的）；不要先拿第 0 筆，空的 list 沒有第 0 筆。"
+    }
+   ]
+  }
+ ]
+}

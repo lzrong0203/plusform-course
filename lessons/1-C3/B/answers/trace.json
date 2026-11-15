@@ -1,0 +1,74 @@
+{
+ "note": "1-C3 第一部分（卷 B）：每一題考的跟卷 A 同一題一樣，數字和情境換掉。第一段：z = x 是同一個 list（insert）、y = x.copy() 是另一個（remove）；第二段：for 拆包、set 去掉重複、sort() 交回 None；第三段：zip、dict 改值、get 的預設值、推導式、改 dict 的值不會動到原本的 list。答案用 Python 3.13 實際跑過。選擇題 strict_choice、第 3、5 題 keep_spaces（照卷 A）。",
+ "normalize": "text",
+ "how": "答案（例如：[1, 2]）",
+ "strict_choice": true,
+ "questions": [
+  {
+   "id": "t1",
+   "title": "第一段第 6 行印出什麼",
+   "accept": [
+    "[50, 80, 200, 35]"
+   ],
+   "hint": "z = x 不是複製：z 和 x 指著同一個 list。y 是 copy() 做出來的另一個 list。",
+   "explain": "z = x 以後，z 和 x 是同一個 list，z.insert(0, 50) 改的就是 x；y 是 copy() 做出來的另一個 list，y.remove(200) 不會動到 x：[50, 80, 200, 35]。"
+  },
+  {
+   "id": "t2",
+   "title": "第一段第 7 行印出什麼",
+   "accept": [
+    "[80, 35]"
+   ],
+   "hint": "y 是在第 2 行複製的：那時候 x 裡有幾筆？後來的 insert 改的是哪一個？remove 刪掉的是哪一筆？",
+   "explain": "y 在第 2 行複製，那時候 x 是 [80, 200, 35]；z.insert(0, 50) 改的是 x 那一個，不會動到 y；y.remove(200) 刪掉等於 200 的那一筆：[80, 35]。"
+  },
+  {
+   "id": "t3",
+   "title": "第二段第 8 行印出什麼",
+   "accept": [
+    "3 4"
+   ],
+   "keep_spaces": true,
+   "hint": "set 會去掉重複的；fares 每一圈都 append 一筆。兩個值中間空一格。",
+   "explain": "ways 是 set，兩個「公車」只留一個，剩 公車、捷運、計程車 3 個；fares 每一圈加一筆，一共 4 筆：3 4。"
+  },
+  {
+   "id": "t4",
+   "title": "第二段第 9 行印出什麼",
+   "accept": [
+    "A"
+   ],
+   "choices": {
+    "A": "None [15, 15, 25, 180]",
+    "B": "[15, 15, 25, 180] [15, 15, 25, 180]",
+    "C": "None [15, 25, 15, 180]"
+   },
+   "hint": "sort() 直接把 fares 排好，它交回什麼？",
+   "explain": "fares.sort() 直接把 fares 排成 [15, 15, 25, 180]，交回的是 None，所以 low 是 None：None [15, 15, 25, 180]。"
+  },
+  {
+   "id": "t5",
+   "title": "第三段第 7 行印出什麼",
+   "accept": [
+    "3 120 0"
+   ],
+   "keep_spaces": true,
+   "hint": "zip 一對一對配：三餐配三筆。meal[\"午\"] 先是 150，再減 30；get 查不到的鍵，交回括號裡後面那個值。三個值中間各空一格。",
+   "explain": "zip 把三餐和三筆配成三對，meal 有 3 個鍵；meal[\"午\"] 從 150 改成 120；meal 裡沒有「宵夜」，get 交回 0：3 120 0。"
+  },
+  {
+   "id": "t6",
+   "title": "第三段第 9 行印出什麼",
+   "accept": [
+    "C"
+   ],
+   "choices": {
+    "A": "[120, 200]",
+    "B": "[60]",
+    "C": "[150, 200]"
+   },
+   "hint": "推導式先看 for：x 一個一個從 spend 拿。第 6 行改的是 meal，spend 有被改過嗎？",
+   "explain": "第 6 行改的是 meal 裡「午」的值，spend 這個 list 沒有動，還是 [60, 150, 200]；推導式留下 >= 100 的：[150, 200]。"
+  }
+ ]
+}

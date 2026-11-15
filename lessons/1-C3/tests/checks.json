@@ -1,0 +1,144 @@
+{
+ "note": "1-C3 檢核站 3（卷 A）：關掉 AI，25 分鐘（只記錄、不擋）。一共 11 題，第一次交卷過 9 題以上算過（lesson.json pass_at，八成以上）。第一部分追蹤 6 題（對答）；第二部分拼圖 2 題（parsons：七行都用上、Python 讀得懂；排好跑出來一樣。暴力排過全部排法，只有一種結構印得出來（if 底下兩行誰先誰後都可以），把 amounts 第一天改成 80 是為了擋掉一種巧合：over = [] 放進 if、append 放在 for 底下，原本的 [120, 80, 300, 95] 也會剛好印出 2 天）；第三部分手寫 write.py 3 題（依分類加總）：每一題用 runs 跑兩組帳、都對才算，一組在中間的、一組在邊界的（1-C2 起：只放邊界的話，寫錯的也可能剛好對）——每一類只有一筆（三類各一筆、只有一筆）、同一類有好幾筆（題目的帳、四筆都是午餐）、沒看過的分類與一筆都沒有（新分類有重複、[]）。帳用 swap 換掉 records 那一行（照 1-15 totals.py）；expect_exact＋loose（空格多少不算，1-17 起），照分類第一次出現的順序（dict 記得放進去的順序，1-15）。check 只看印出來的字，不檢查怎麼寫（用 dict、用 list 都可以）。錯的題目照 remedial.json 指回原課章節的時間碼與練習。",
+ "checks": [
+  {
+   "type": "answers",
+   "id": "trace",
+   "file": "lessons/1-C3/trace.txt",
+   "key": "answers/trace.json",
+   "group": "第一部分 追蹤",
+   "stage": "第一部分 追蹤"
+  },
+  {
+   "type": "parsons",
+   "id": "pz",
+   "file": "lessons/1-C3/parsons.py",
+   "group": "第二部分 拼圖",
+   "stage": "第二部分 拼圖",
+   "timeout": 5,
+   "lines": [
+    "over.append(a)",
+    "print(\"一共\", len(over), \"天超過 100 元\")",
+    "amounts = [80, 120, 95, 300]",
+    "if a > 100:",
+    "for i, a in enumerate(amounts, start=1):",
+    "print(\"第\", i, \"天\", a, \"元\")",
+    "over = []"
+   ],
+   "expect_exact": [
+    "第 2 天 120 元",
+    "第 4 天 300 元",
+    "一共 2 天超過 100 元"
+   ],
+   "desc_order": "拼圖：七行都用上、沒有改字，排好以後 Python 讀得懂",
+   "desc_run": "拼圖：排好跑出來是第 2 天、第 4 天和「一共 2 天超過 100 元」",
+   "hint": "amounts 和 over = [] 只做一次，放在最上面；for 一天一天看；超過 100 的才印、才放進 over，這兩行都縮在 if 底下；一共幾天只印一次，放最後、不縮排。",
+   "missing_hint": "parsons.py 應該在帳本的 lessons/1-C3/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-C3。"
+  },
+  {
+   "type": "run",
+   "file": "lessons/1-C3/write.py",
+   "group": "第三部分 手寫",
+   "stage": "第三部分 手寫",
+   "timeout": 5,
+   "loose": true,
+   "id": "write-one",
+   "desc": "write.py：每一類只有一筆（三類各一筆；只有一筆）",
+   "hint": "從空的 dict 開始，把每一筆的分類和金額放進去；最後一類印一行，照第一次出現的順序。records 換了，印出來的也要跟著變，不要把答案寫進 print。",
+   "missing_hint": "write.py 應該在帳本的 lessons/1-C3/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-C3。",
+   "runs": [
+    {
+     "expect_exact": [
+      "交通 30 元",
+      "醫療 500 元",
+      "娛樂 250 元"
+     ],
+     "swap": {
+      "find": "^[ \\t]*records[ \\t]*=[ \\t]*\\[.*\\][ \\t]*(#.*)?$",
+      "to": "records = [(\"交通\", 30), (\"醫療\", 500), (\"娛樂\", 250)]",
+      "feed": "check 把你的 records 換成 [(\"交通\", 30), (\"醫療\", 500), (\"娛樂\", 250)]，再跑一次。",
+      "missing": "找不到 records = [...] 這一行。records 那一行要留著、寫在同一行（check 會把它換成別的帳再跑）。"
+     }
+    },
+    {
+     "expect_exact": [
+      "文具 35 元"
+     ],
+     "swap": {
+      "find": "^[ \\t]*records[ \\t]*=[ \\t]*\\[.*\\][ \\t]*(#.*)?$",
+      "to": "records = [(\"文具\", 35)]",
+      "feed": "check 把你的 records 換成 [(\"文具\", 35)]，再跑一次。",
+      "missing": "找不到 records = [...] 這一行。records 那一行要留著、寫在同一行（check 會把它換成別的帳再跑）。"
+     }
+    }
+   ]
+  },
+  {
+   "type": "run",
+   "file": "lessons/1-C3/write.py",
+   "group": "第三部分 手寫",
+   "stage": "第三部分 手寫",
+   "timeout": 5,
+   "loose": true,
+   "id": "write-sum",
+   "desc": "write.py：同一類有好幾筆，要加起來（題目的 records；四筆都是午餐）",
+   "hint": "同一類又遇到一次，是把金額加進原本的合計，不是換掉：新的合計 = 原本的合計（第一次遇到時是 0）+ 這一筆的金額。dict 的 get(鍵, 0) 查不到交回 0（1-15）。全部算完才印。",
+   "runs": [
+    {
+     "expect_exact": [
+      "早餐 105 元",
+      "午餐 210 元",
+      "飲料 65 元"
+     ]
+    },
+    {
+     "expect_exact": [
+      "午餐 385 元"
+     ],
+     "swap": {
+      "find": "^[ \\t]*records[ \\t]*=[ \\t]*\\[.*\\][ \\t]*(#.*)?$",
+      "to": "records = [(\"午餐\", 120), (\"午餐\", 90), (\"午餐\", 75), (\"午餐\", 100)]",
+      "feed": "check 把你的 records 換成 [(\"午餐\", 120), (\"午餐\", 90), (\"午餐\", 75), (\"午餐\", 100)]，再跑一次。",
+      "missing": "找不到 records = [...] 這一行。records 那一行要留著、寫在同一行（check 會把它換成別的帳再跑）。"
+     }
+    }
+   ]
+  },
+  {
+   "type": "run",
+   "file": "lessons/1-C3/write.py",
+   "group": "第三部分 手寫",
+   "stage": "第三部分 手寫",
+   "timeout": 5,
+   "loose": true,
+   "id": "write-new",
+   "desc": "write.py：沒看過的分類、一筆都沒有",
+   "hint": "換成沒看過的分類也要算得對：用 records 裡實際有的分類，不要把題目裡的名字寫死；同一類的金額要加起來；全部算完才印。",
+   "runs": [
+    {
+     "expect_exact": [
+      "交通 50 元",
+      "醫療 580 元",
+      "娛樂 250 元"
+     ],
+     "swap": {
+      "find": "^[ \\t]*records[ \\t]*=[ \\t]*\\[.*\\][ \\t]*(#.*)?$",
+      "to": "records = [(\"交通\", 30), (\"醫療\", 500), (\"交通\", 20), (\"娛樂\", 250), (\"醫療\", 80)]",
+      "feed": "check 把你的 records 換成 [(\"交通\", 30), (\"醫療\", 500), (\"交通\", 20), (\"娛樂\", 250), (\"醫療\", 80)]，再跑一次。",
+      "missing": "找不到 records = [...] 這一行。records 那一行要留著、寫在同一行（check 會把它換成別的帳再跑）。"
+     }
+    },
+    {
+     "expect_exact": [],
+     "swap": {
+      "find": "^[ \\t]*records[ \\t]*=[ \\t]*\\[.*\\][ \\t]*(#.*)?$",
+      "to": "records = []",
+      "feed": "check 把你的 records 換成 []（一筆都沒有），再跑一次。",
+      "missing": "找不到 records = [...] 這一行。records 那一行要留著、寫在同一行（check 會把它換成別的帳再跑）。"
+     },
+     "hint": "一筆都沒有的時候，什麼都不用印（for 一圈都不跑，dict 是空的）；不要先拿第 0 筆，空的 list 沒有第 0 筆。"
+    }
+   ]
+  }
+ ]
+}
