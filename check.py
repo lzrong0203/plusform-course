@@ -771,7 +771,7 @@ def write_remedial(lesson: grader.Lesson, ledger: Path, outcome: grader.Outcome,
           "這份是照你錯的題目挑的。全程一樣關掉 AI，照順序做：", "",
           "1. 先看「錯在哪裡」，知道自己哪裡想錯。",
           "2. 回原課的影片，從寫的時間開始，看那一章。",
-          "3. 做練習：先在紙上寫下答案，再用 uv run 跑一次對答案（指令寫在每個練習檔的最上面）。"]
+          "3. 做練習：照每個練習檔最上面的說明做。猜輸出的，先在紙上寫下答案再用 uv run 跑；修錯和手寫的，改好、寫好程式再跑。"]
     if paper_of(lesson) == "A":
         md.append(f"4. 明天以後（{nxt.month}/{nxt.day} 起），在課程資料夾打 `uv run check.py start {base}B` 考卷 B。"
                   "題目不一樣，考的東西一樣。")
