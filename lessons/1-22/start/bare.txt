@@ -1,0 +1,40 @@
+# 1-22 第②圈：光禿禿的 except 為什麼危險。先不要跑，用眼睛追。
+# 在「答：」後面寫 A、B 或 C，存檔。
+# 提示：except 後面什麼都不寫（光禿禿的 except:），什麼錯都接住：打錯字的 NameError、按 Control C 的 KeyboardInterrupt 都算。
+
+第 1 題：
+#   def to_yuan(text):
+#       return int(txet)
+#
+#   try:
+#       amount = to_yuan("120")
+#       print("記下", amount)
+#   except:
+#       print("請再輸入一次")
+# 第 2 行把 text 打錯成 txet。印出什麼？
+#   A. 記下 120
+#   B. 請再輸入一次
+#   C. NameError 的錯誤訊息
+答：
+
+第 2 題：
+#   def to_yuan(text):
+#       return int(txet)
+#
+#   try:
+#       amount = to_yuan("120")
+#       print("記下", amount)
+#   except ValueError:
+#       print("請再輸入一次")
+# 跟第 1 題一樣打錯字，只是 except 後面寫了 ValueError。會怎樣？
+#   A. 記下 120
+#   B. 請再輸入一次
+#   C. NameError 的錯誤訊息，看得到第 2 行打錯字
+答：
+
+第 3 題：
+# 要接住「int 把文字變不成整數」這種錯，又不要把別的錯藏起來，except 後面寫哪一個？
+#   A. ValueError
+#   B. 什麼都不寫
+#   C. Exception
+答：

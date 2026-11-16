@@ -1,0 +1,144 @@
+{
+ "note": "1-22 的檢查：第①圈 predict.txt（隨片測驗 3 題：try 裡出錯後面跳過、else 與 finally、except 只接寫明的那一種）、money.py（call：to_yuan(\"1,200元\") 還是 1200；to_yuan(\"-35\") 要丟 ValueError、訊息裡有 -35；to_yuan(\"一百\") 要丟 ValueError，不能吞掉）、add.py（run 兩次：一百、-35、120 不再當掉、最後記下 120 元；85元 直接記下；ast_require named_except：要有 except ValueError、不能有光禿禿的 except:）；第②圈 bare.txt（3 題選擇題）、tutor.md（filled：四個標籤，自評）；第③圈 checks_money.py（chaff 的 assert 模式＋try_checks：學員用 try 寫的檢查跑課程的正確版和 3 個 AI 寫錯的版本：吞掉錯誤、丟錯類型、訊息沒有那個值）、green。grader 加的東西（只對寫了它的題目生效）：call 的 raises／msg_has、chaff assert 的 try_checks、ast_require 的 named_except。",
+ "checks": [
+  {
+   "type": "answers",
+   "id": "predict",
+   "file": "lessons/1-22/predict.txt",
+   "key": "answers/predict.json",
+   "group": "第一圈"
+  },
+  {
+   "type": "call",
+   "id": "yuan-1",
+   "file": "lessons/1-22/money.py",
+   "module": "money",
+   "func": "to_yuan",
+   "group": "第一圈",
+   "args": [
+    "1,200元"
+   ],
+   "expect": 1200,
+   "desc": "to_yuan(\"1,200元\") 還是交回 1200（加了 raise，原本的功能不能壞）",
+   "hint": "拿掉逗號和「元」、變成整數那幾行照留著；amount = int(text) 以後，不是負數就 return amount。",
+   "missing_hint": "money.py 應該在帳本的 lessons/1-22/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-22。"
+  },
+  {
+   "type": "call",
+   "id": "raise-neg",
+   "file": "lessons/1-22/money.py",
+   "module": "money",
+   "func": "to_yuan",
+   "group": "第一圈",
+   "args": [
+    "-35"
+   ],
+   "raises": "ValueError",
+   "msg_has": "-35",
+   "desc": "to_yuan(\"-35\") 丟出 ValueError，訊息裡有 -35",
+   "hint": "在 amount = int(text) 下面加：if amount < 0: 再空四格寫 raise ValueError(f\"金額不能是負數：{text}\")。訊息用 f-string 放進那個值。"
+  },
+  {
+   "type": "call",
+   "id": "raise-word",
+   "file": "lessons/1-22/money.py",
+   "module": "money",
+   "func": "to_yuan",
+   "group": "第一圈",
+   "args": [
+    "一百"
+   ],
+   "raises": "ValueError",
+   "desc": "to_yuan(\"一百\") 照樣丟出 ValueError（看不懂就說出來，不要吞掉）",
+   "hint": "to_yuan 裡不要用 try 把 int 的錯接住、交回 0：看不懂就讓 ValueError 丟出去，接不接住交給呼叫它的 add.py。"
+  },
+  {
+   "type": "run",
+   "id": "add-1",
+   "file": "lessons/1-22/add.py",
+   "group": "第一圈",
+   "desc": "add.py：打一百、-35 都不會當掉，會請你再輸入一次；打 120 才記下來",
+   "stdin": "一百\n-35\n120\n",
+   "timeout": 5,
+   "expect_contains": [
+    "請再輸入一次",
+    "金額不能是負數：-35",
+    "記下 120 元"
+   ],
+   "ast_require": [
+    {
+     "name": "ValueError",
+     "kind": "named_except"
+    }
+   ],
+   "eof_hint": "打對了（沒出錯）要在 else 裡 break 停下來；打錯了才再問一次。",
+   "hint": "try 包住 amount = to_yuan(text)；except ValueError as e: 印出「請再輸入一次。」和 e；else: 印出「記下」、金額、「元」，再 break。money.py 要先加好負數的 raise，-35 才會丟出 ValueError。",
+   "missing_hint": "add.py 應該在帳本的 lessons/1-22/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-22。"
+  },
+  {
+   "type": "run",
+   "id": "add-2",
+   "file": "lessons/1-22/add.py",
+   "group": "第一圈",
+   "desc": "add.py：第一次就打對（85元），直接記下 85 元",
+   "stdin": "85元\n",
+   "timeout": 5,
+   "expect_contains": [
+    "記下 85 元"
+   ],
+   "expect_not_contains": [
+    "請再輸入一次"
+   ],
+   "eof_hint": "打對了（沒出錯）要在 else 裡 break 停下來。",
+   "hint": "沒出錯就走 else：印出記下 85 元，再 break。"
+  },
+  {
+   "type": "answers",
+   "id": "bare",
+   "file": "lessons/1-22/bare.txt",
+   "key": "answers/bare.json",
+   "group": "第二圈"
+  },
+  {
+   "type": "filled",
+   "id": "tutor",
+   "file": "lessons/1-22/tutor.md",
+   "group": "第二圈",
+   "labels": [
+    "AI 的建議：",
+    "家教問我的：",
+    "我的回答：",
+    "我決定："
+   ],
+   "count": 1,
+   "item": "",
+   "desc": "tutor.md：拿 AI「一個 except: 全部接住」的建議問家教，四個標籤都寫了（自評，內容不改對錯）",
+   "hint": "照 tutor.md 上面的步驟問家教；「我決定」寫你收不收這個建議、為什麼。",
+   "missing_hint": "tutor.md 應該在帳本的 lessons/1-22/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-22。"
+  },
+  {
+   "type": "chaff",
+   "id": "r3",
+   "mode": "assert",
+   "try_checks": true,
+   "student_file": "lessons/1-22/checks_money.py",
+   "module": "money",
+   "reference": "reference/money.py",
+   "mutants": "mutants/mutants.json",
+   "teacher_file": "answers/checks_money.py",
+   "min_checks": 3,
+   "group": "第三圈"
+  },
+  {
+   "type": "run",
+   "id": "green",
+   "file": "lessons/1-22/checks_money.py",
+   "group": "第三圈",
+   "desc": "跑 checks_money.py：你的檢查在你的 money.py 上全部成立（什麼都沒印）",
+   "timeout": 5,
+   "expect_exact": [],
+   "hint": "跳出 AssertionError，代表 money.py 的 to_yuan 還沒照要求丟出錯誤，或檢查裡寫的值不在錯誤訊息裡。先自己跑 uv run lessons/1-22/checks_money.py 看是哪一條。",
+   "missing_hint": "checks_money.py 應該在帳本的 lessons/1-22/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-22。"
+  }
+ ]
+}

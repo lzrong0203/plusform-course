@@ -1,0 +1,7 @@
+{
+  "id": "1-22",
+  "title": "錯誤處理：try／except／else／finally 與 raise",
+  "minutes": 45,
+  "fast_minutes": 8,
+  "after_start": "接下來，用 VS Code 打開帳本，找到 lessons/1-22：\n  1. 第一圈：predict.txt 先別跑、預測 3 題；先跑一次 money.py 讀 Traceback，再在 to_yuan 加上負數就 raise ValueError；add.py 用 try、except ValueError、else 改寫，亂輸入不再當掉\n  2. 第二圈：拿 AI「一個 except: 全部接住」的建議問家教，記在 tutor.md；bare.txt 3 題\n  3. 第三圈：在 checks_money.py 用 try 寫檢查：負數要丟 ValueError、訊息裡要有那個值，抓到 3 個 AI 寫錯的版本\n做完回到課程資料夾打：uv run check.py 1-22"
+}

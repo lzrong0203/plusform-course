@@ -1,0 +1,26 @@
+{
+  "note": "回顧題：學員通過這課以後，往後第 2 課和第 5 課的 check 會各帶一題。",
+  "questions": [
+    {
+      "id": "r1",
+      "q": "try:\n    print(\"甲\")\n    n = int(\"5元\")\n    print(\"乙\")\nexcept ValueError:\n    print(\"丙\")\n印出哪幾行？\nA. 甲 乙\nB. 甲 丙\nC. 丙\n（寫 A、B 或 C）",
+      "accept": ["B"],
+      "explain": "先印甲；int(\"5元\") 丟出 ValueError，try 裡剩下的 print(\"乙\") 跳過，跳到 except 印丙。",
+      "choices": {"A": "甲 乙", "B": "甲 丙", "C": "丙"}
+    },
+    {
+      "id": "r2",
+      "q": "try:\n    n = int(\"30\")\nexcept ValueError:\n    print(\"看不懂\")\nelse:\n    print(\"記下\", n)\nfinally:\n    print(\"完成\")\n印出哪幾行？\nA. 記下 30、完成\nB. 看不懂、完成\nC. 記下 30\n（寫 A、B 或 C）",
+      "accept": ["A"],
+      "explain": "int(\"30\") 沒出錯，except 跳過、走 else 印「記下 30」；finally 不管有沒有出錯都會走，再印「完成」。",
+      "choices": {"A": "記下 30、完成", "B": "看不懂、完成", "C": "記下 30"}
+    },
+    {
+      "id": "r3",
+      "q": "while True:\n    try:\n        n = int(input(\"金額：\"))\n        break\n    except:\n        print(\"再一次\")\n程式在等你輸入時，按 Control C，會怎樣？\nA. 程式停下來\nB. 印出「再一次」，又問一次\nC. 出現 KeyboardInterrupt 的錯誤訊息\n（寫 A、B 或 C）",
+      "accept": ["B"],
+      "explain": "按 Control C 會丟出 KeyboardInterrupt；光禿禿的 except 什麼錯都接，連它也接住，所以只印「再一次」、又問一次，程式停不下來。",
+      "choices": {"A": "程式停下來", "B": "印出「再一次」，又問一次", "C": "出現 KeyboardInterrupt 的錯誤訊息"}
+    }
+  ]
+}

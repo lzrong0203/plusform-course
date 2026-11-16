@@ -1,0 +1,9 @@
+{
+  "target": "money.py",
+  "note": "hint 是學員的檢查沒抓到這個壞版本時，畫面上顯示的提示（每行壓在 68 欄內；中文字一個佔兩欄）。三個都是 AI 照 docstring 寫 to_yuan 時可能出的錯（範例示意）：m1 看不懂的金額用光禿禿的 except 吞掉、交回 0（第②圈講的那種）；m2 負數丟的是 TypeError；m3 負數有丟 ValueError、訊息裡卻沒有那個值。起點檔的範例 2（負數要丟 ValueError、訊息裡有 -35）抓到 m2、m3；m1 要一條「看不懂的金額也要丟 ValueError」的檢查才抓得到（學員自己寫）。影片第③圈熊寫三條：一般的金額、看不懂的要丟 ValueError、負數要丟 ValueError 而且訊息裡有那個值；思考站「丟錯類型的版本，哪一條抓得到」答案是第三條。",
+  "mutants": [
+    {"id": "m1", "file": "money_m1.py", "hint": "看不懂的金額（像 一百），有丟出 ValueError 嗎？", "what": "看不懂的金額用光禿禿的 except 吞掉，交回 0"},
+    {"id": "m2", "file": "money_m2.py", "hint": "負數（像 -35）丟出來的，是 ValueError 嗎？", "what": "負數丟的是 TypeError，不是 ValueError"},
+    {"id": "m3", "file": "money_m3.py", "hint": "負數的錯誤訊息裡，有那個值（像 -35）嗎？", "what": "負數有丟 ValueError，訊息裡卻沒有那個值"}
+  ]
+}

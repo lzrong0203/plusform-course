@@ -1,0 +1,20 @@
+{
+ "note": "1-22 第①圈：先猜（對答 3 題，都是選擇題；隨片測驗）。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {"id": "p1", "title": "try 裡出錯，後面跳過", "accept": ["B"],
+   "choices": {"A": "A B D", "B": "A C D", "C": "C D"},
+   "hint": "int(\"一百\") 那一行出錯以前，A 印出來了嗎？出錯以後，print(\"B\") 還會跑嗎？接住以後，程式繼續往下嗎？",
+   "explain": "先印 A；int(\"一百\") 丟出 ValueError，try 裡剩下的 print(\"B\") 跳過，跳到 except ValueError 印 C；接住以後繼續往下，印 D。"},
+  {"id": "p2", "title": "else 與 finally", "accept": ["A"],
+   "choices": {"A": "記下 85、下一筆、看不懂、下一筆", "B": "記下 85、看不懂、下一筆", "C": "記下 85、下一筆、看不懂、記下 八十五"},
+   "hint": "第一次 85 沒出錯：走 else，再走 finally。第二次 八十五 出錯：走 except，else 還會走嗎？finally 呢？",
+   "explain": "85 沒出錯，走 else 印「記下 85」，再走 finally 印「下一筆」；八十五 出錯，走 except 印「看不懂」，else 只在沒出錯時走所以跳過，finally 不管怎樣都走，再印「下一筆」。"},
+  {"id": "p3", "title": "except 只接寫明的那一種", "accept": ["C"],
+   "choices": {"A": "印出 看不懂、繼續", "B": "只印出 繼續", "C": "跳出 TypeError 的錯誤訊息，什麼都沒印"},
+   "hint": "\"100\" + 20 丟出來的是哪一種錯？except 後面寫的是哪一種？",
+   "explain": "文字加整數丟出的是 TypeError，不是 ValueError；except ValueError 接不到它，程式就停在那裡、印出 TypeError 的錯誤訊息，print(\"繼續\") 也不會跑。"}
+ ]
+}

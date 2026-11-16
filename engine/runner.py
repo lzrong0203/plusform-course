@@ -6,8 +6,10 @@ check.py 把要做的事用 JSON 從 stdin 傳進來（裡面有一個每次都�
 
 做這幾件事：
 - call：載入一個 .py 檔，呼叫裡面的函式，比對回傳值（strict_type：連型別一起比，1-3 的案例表用；seq_as_list：tuple 當 list 比、每個值的型別也比，1-4 用）
+  1-22 的 raises／msg_has（只對寫了它的題目）：這一次呼叫應該丟出 raises 那一種錯（名字比對，子類別也算），msg_has＝錯誤訊息裡要有這段字
 - load：只載入一個 .py 檔，看會不會一載入就出錯（老師端驗證壞版本用）
 - asserts：把學員寫的 assert 一條一條拿去跑「一個」版本（正確版或某一個壞版本）。
+  1-22 的 try_checks（只對寫了它的題目）：最外層的 try（裡面有 assert）也算一條檢查，整個 try 跑一次：沒出錯＝成立、AssertionError＝不成立、其他錯＝當掉。
   每個版本各開一個程序跑，版本之間不會互相影響；一個版本卡住，也不會拖累別的版本。
 - probe：回報現在用的是哪一個 Python
 
@@ -155,6 +157,9 @@ def op_call(req: dict) -> dict:
         return out
     for i, case in enumerate(req["cases"]):
         emit("progress", f"case {i}")
+        if case.get("raises"):   # 1-22：這一次呼叫應該丟出錯誤（只對寫了 raises 的題目）
+            out["cases"].append(_call_raises(func, case, path))
+            continue
         try:
             with quiet():
                 got = func(*case.get("args", []), **case.get("kwargs", {}))   # 1-19：kwargs＝用關鍵字交的參數（沒寫＝跟以前一樣只交 args）
@@ -168,6 +173,21 @@ def op_call(req: dict) -> dict:
         except BaseException as exc:  # noqa: BLE001
             out["cases"].append({"ok": False, "error": short_error(exc), "line": error_line(exc, path)})
     return out
+
+
+def _call_raises(func, case: dict, path: str) -> dict:
+    """1-22 raises／msg_has：呼叫一次，應該丟出 case["raises"] 那一種錯（照名字比，子類別也算），msg_has＝錯誤訊息裡要有的字。"""
+    want = case["raises"]
+    try:
+        with quiet():
+            got = func(*case.get("args", []), **case.get("kwargs", {}))
+    except BaseException as exc:  # noqa: BLE001 - 就是要接住學員的程式丟出來的任何錯
+        kind = type(exc).__name__
+        names = [k.__name__ for k in type(exc).__mro__]
+        msg = str(exc)
+        ok = want in names and (not case.get("msg_has") or case["msg_has"] in msg)
+        return {"ok": ok, "raised": kind, "type_ok": want in names, "msg": msg, "line": error_line(exc, path)}
+    return {"ok": False, "no_raise": True, "got": copy.deepcopy(got) if _jsonable(got) else repr(got), "type": type(got).__name__}
 
 
 def op_load(req: dict) -> dict:
@@ -196,6 +216,11 @@ def _value_text(node, ns, filename):
         return None
 
 
+def _try_check(stmt) -> bool:
+    """1-22 try_checks：這一行是最外層的 try，而且裡面（try、except、else、finally 任一段）有 assert。"""
+    return isinstance(stmt, ast.Try) and any(isinstance(n, ast.Assert) for n in ast.walk(stmt))
+
+
 def op_asserts(req: dict) -> dict:
     filename = req["checks_file"]
     _add_path(filename)
@@ -218,7 +243,23 @@ def op_asserts(req: dict) -> dict:
     for stmt in tree.body:
         code = compile(ast.Module(body=[stmt], type_ignores=[]), filename, "exec")
         broken = entry["load_error"] or entry["setup_error"]
-        if isinstance(stmt, ast.Assert):
+        if req.get("try_checks") and _try_check(stmt):   # 1-22：最外層的 try（裡面有 assert）整個算一條（只對寫了 try_checks 的題目）
+            rec = {"line": stmt.lineno, "try": True}
+            if broken:
+                rec.update(status="error", error=broken, skipped=True)
+            else:
+                emit("start", f"assert {stmt.lineno}")
+                try:
+                    with quiet():
+                        exec(code, ns)  # noqa: S102
+                    rec["status"] = "pass"
+                except AssertionError:
+                    rec["status"] = "fail"
+                except BaseException as exc:  # noqa: BLE001
+                    rec.update(status="error", error=short_error(exc))
+            entry["asserts"].append(rec)
+            emit("done", rec)
+        elif isinstance(stmt, ast.Assert):
             rec = {"line": stmt.lineno}
             if broken:
                 rec.update(status="error", error=broken, skipped=True)

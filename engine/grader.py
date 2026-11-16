@@ -13,8 +13,10 @@ check.py（學員端）和 tools/validate_lesson.py（老師端）共用這一�
                 金額換了也要算得對）；當掉時 Result.data["error"] 記錯誤種類（1-C1 矯正包用）；runs＝同一題換幾組輸入各跑一次，
                 全部對才算對（1-C2 第三部分：邊界和區間中間的金額放同一題）
   call          呼叫學員寫的函式，比對回傳值（同一個檔案、同一個函式的題目在同一個程序裡照順序呼叫，所以「第一次對、第二次就錯」抓得到；
-                1-19 加兩個只對寫了它的題目生效的欄位：kwargs＝用關鍵字交的參數 {"limit": 100}；seq_as_list＝交回的 tuple 跟 JSON 的 list 比）
+                1-19 加兩個只對寫了它的題目生效的欄位：kwargs＝用關鍵字交的參數 {"limit": 100}；seq_as_list＝交回的 tuple 跟 JSON 的 list 比；
+                1-22 加 raises＝這一次呼叫應該丟出這一種錯（例如 "ValueError"，不寫 expect）、msg_has＝錯誤訊息裡要有這段字）
   chaff         wheat/chaff：學員寫的檢查要在正確版全過、在每個壞版本至少錯一條
+                （1-22 在 assert 模式加 try_checks：最外層的 try（裡面有 assert）整個算一條檢查，學員用 try／except／else 寫「應該丟出 ValueError」）
   script_match  學員改過的腳本，在假的資料夾裡跑起來要跟安全版一樣
   git_commits   帳本是 git 存放庫，而且至少有幾個存檔點（commit）
   parsons       拼圖（Parsons，1-11 起）：把打亂的程式行排回去、自己縮排；行都要是題目給的（不能改字、多寫、少寫），排好跑出來要跟範例一樣
@@ -22,6 +24,7 @@ check.py（學員端）和 tools/validate_lesson.py（老師端）共用這一�
   either        兩條路選一條（1-17 起）：每條路是一串上面這些檢查、題數一樣；照學員做的那一條判（answer.py 的測試，或選擇題版）
                 （run 在 1-17 另加兩個只對寫了它的題目生效的欄位：loose＝比的時候空格不算；ast_require＝規定用推導式／迴圈＋append 寫）
                 （1-20 在 ast_require 加兩種：keyfunc＝sorted 的 key 要交一個用 def 寫的函式、不能用 lambda；flagloop＝要先給 True／False，再在 for 迴圈裡改，不能用 any／all）
+                （1-22 在 ast_require 加 named_except：要有 try 加上 except <name>（例如 except ValueError），而且不能有光禿禿的 except:）
   func_shape    學員寫的函式長得對不對（1-18 起；只看程式的樣子、不跑）：有沒有 def 那個名字、docstring 有沒有寫輸入／輸出／例子、
                 有沒有用 return 交回一個值（只 print 不 return，外面拿到的是 None）
                 （1-20 加 annotated＝每個參數和交回的值都寫了型別提示，只對寫了它的題目生效）
@@ -1001,6 +1004,13 @@ def ast_problems(source: str, rules: list[dict]) -> list[str]:
         elif kind == "calls":   # 1-21：要呼叫 name（例如 strptime、today）
             ok = _calls_ok(tree, name)
             default = f"要用到 {name}(…)，不要把答案直接寫死。"
+        elif kind == "named_except":   # 1-22：要有 try＋except <name>（例如 except ValueError），而且不能有光禿禿的 except:
+            hs = [h for n in ast.walk(tree) if isinstance(n, ast.Try) for h in n.handlers]
+            named = any(isinstance(h.type, ast.Name) and h.type.id == name or isinstance(h.type, ast.Tuple) and any(isinstance(e, ast.Name) and e.id == name for e in h.type.elts) for h in hs)
+            bare = any(h.type is None for h in hs)
+            ok = named and not bare
+            default = (f"不要用光禿禿的 except:，它連 Control C 和打錯字都接住；寫明 except {name}。" if bare
+                       else f"要用 try 包住會出錯的那一行，再寫 except {name}：接住它。")
         elif kind == "flagloop":
             ok = _flagloop_ok(tree, name)
             default = f"{name} 要改回迴圈：先寫 {name} = False（或 True），再在 for 迴圈裡遇到符合的就改它，不能用 any／all。"
@@ -1300,7 +1310,10 @@ class FuncShapeCheck(Check):
 class CallCheck(Check):
     def plan(self):
         s = self.spec
-        desc = s.get("desc") or f"{s['func']}({call_args_text(s)}) 應該是{show(s['expect'])}"
+        if s.get("raises"):   # 1-22：應該丟出錯誤的題目沒有 expect
+            desc = s.get("desc") or f"{s['func']}({call_args_text(s)}) 應該丟出 {s['raises']}"
+        else:
+            desc = s.get("desc") or f"{s['func']}({call_args_text(s)}) 應該是{show(s['expect'])}"
         return [self.stub(None, desc)]
 
     def _batch(self) -> dict:
@@ -1318,7 +1331,8 @@ class CallCheck(Check):
                 "file": str(path),
                 "module": s["module"],
                 "func": s["func"],
-                "cases": [{"args": c.get("args", []), "expect": c["expect"], **({"kwargs": c["kwargs"]} if c.get("kwargs") else {})} for c in specs],
+                "cases": [{"args": c.get("args", []), "expect": c.get("expect"), **({"kwargs": c["kwargs"]} if c.get("kwargs") else {}),
+                           **({k: c[k] for k in ("raises", "msg_has") if c.get(k)})} for c in specs],   # 1-22：raises／msg_has 只對寫了它的題目
                 # 1-19：kwargs＝用關鍵字交的參數（只對寫了它的題目生效）；seq_as_list＝交回 tuple 時跟 JSON 的 list 比（同一個函式只要有一題寫了就一起用）
                 **({"seq_as_list": True} if any(c.get("seq_as_list") for c in specs) else {}),
             })
@@ -1355,6 +1369,17 @@ class CallCheck(Check):
         if r.ok:
             return
         call = f"{s['func']}({call_args_text(s)})"
+        if s.get("raises"):   # 1-22：應該丟出錯誤
+            want = s["raises"]
+            if case.get("no_raise"):
+                r.detail = f"{call} 應該丟出 {want}，可是你的程式沒有丟出錯誤，交回了 {show(case.get('got'))}。"
+            elif not case.get("type_ok"):
+                r.detail = f"{call} 應該丟出 {want}，你的程式丟出的是 {case.get('raised')}（{case.get('msg', '')}）。"
+            else:
+                r.detail = f"{call} 有丟出 {want}，可是錯誤訊息「{case.get('msg', '')}」裡沒有 {s['msg_has']}。"
+            if s.get("hint"):
+                r.detail += f"\n  提示：{s['hint']}"
+            return
         if "error" in case:
             r.detail = f"{call} 應該回傳{show(s['expect'])}，可是你的程式當掉了：{case['error']}"
         else:
@@ -1539,6 +1564,16 @@ class ChaffCheck(Check):
                 if tree is not None:
                     comments = _comments(source)
                     for stmt in tree.body:
+                        if self.spec.get("try_checks") and isinstance(stmt, ast.Try):   # 1-22（只對寫了 try_checks 的題目）：最外層的 try 整個算一條檢查
+                            if any(isinstance(n, ast.Assert) for n in ast.walk(stmt)):
+                                first = lines[stmt.body[0].lineno - 1].strip() if stmt.body else ""
+                                checks.append(StudentCheck(stmt.lineno, f"try: {first} …", stmt=stmt))
+                                if any(h.type is None for h in stmt.handlers):
+                                    notes.append(f"第 {stmt.lineno} 行的 try 用了光禿禿的 except:，什麼錯都接住（連丟錯類型的版本也接住）；"
+                                                 "寫明 except ValueError 才抓得到丟錯類型的。")
+                            else:
+                                notes.append(f"第 {stmt.lineno} 行的 try 裡面沒有 assert，不算在檢查裡。")
+                            continue
                         if not isinstance(stmt, ast.Assert):
                             inner = [n for n in ast.walk(stmt) if isinstance(n, ast.Assert)]
                             if inner:
@@ -1969,6 +2004,8 @@ class ChaffCheck(Check):
             req["got_bare"] = True
         if self.spec.get("eval_once"):   # 1-13：assert 左右各算一次（remove_last(a) 會改 list，不能為了報「交回什麼」再呼叫一次）
             req["eval_once"] = True
+        if self.spec.get("try_checks"):   # 1-22：最外層的 try（裡面有 assert）整個算一條
+            req["try_checks"] = True
         reply = self.ctx.env.runner_raw(req, timeout=timeout)
         data = reply.result
         if data is not None:
@@ -2118,6 +2155,17 @@ class ChaffCheck(Check):
         return {"status": "pass" if table[mine[0]] == mine[1] else "fail", "why": "value"}
 
     def describe_ref_failure(self, c: StudentCheck, st: dict) -> str:
+        if self.mode == "assert" and isinstance(c.stmt, ast.Try):   # 1-22 try_checks：用 try 寫的「應該丟出錯誤」
+            msg = f"第 {c.line} 行開始的 try（{c.text}）\n  "
+            if st.get("not_run"):
+                return msg + "前面卡住了，這一段沒有跑到。"
+            if st.get("status") == "error":
+                if "NameError" in (st.get("error") or "") and not self.has_import:
+                    return msg + f"程式不認得這個名字（{st.get('error')}）。最上面那行 from {self.spec.get('module')} import … 要留著，不要刪掉。"
+                return msg + (f"在正確版上就當掉了（{st.get('error')}）。正確版丟出的是 ValueError：except 後面寫 ValueError；"
+                              "也看看 try 裡那一行是不是打錯字。")
+            return msg + ("在正確版上就不成立。走到 else 的 assert False，代表你交進去的值，正確版沒有丟出錯誤（它是合法的金額嗎？）；"
+                          "\n  不然就是 except 裡那條 assert 不成立：錯誤訊息裡有沒有你寫的那段字？")
         if self.mode == "assert":
             msg = f"第 {c.line} 行：{c.text}\n  "
             err = st.get("error") or ""

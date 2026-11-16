@@ -1,0 +1,20 @@
+{
+ "note": "1-22 第②圈：光禿禿的 except 為什麼危險（對答 3 題，選擇題）。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {"id": "b1", "title": "打錯字被吞掉", "accept": ["B"],
+   "choices": {"A": "記下 120", "B": "請再輸入一次", "C": "NameError 的錯誤訊息"},
+   "hint": "txet 這個名字不存在，跑到第 2 行會丟出 NameError。光禿禿的 except 接不接它？",
+   "explain": "打錯字丟出 NameError，光禿禿的 except 什麼錯都接，所以只印出「請再輸入一次」——明明 120 是對的金額，bug 卻被藏起來了。"},
+  {"id": "b2", "title": "寫明 ValueError，bug 看得到", "accept": ["C"],
+   "choices": {"A": "記下 120", "B": "請再輸入一次", "C": "NameError 的錯誤訊息，看得到第 2 行打錯字"},
+   "hint": "NameError 是 ValueError 嗎？except ValueError 接不到的錯，會怎樣？",
+   "explain": "except ValueError 只接 ValueError；NameError 接不到，程式停下來、印出錯誤訊息，最後一行寫著 name 'txet' is not defined——bug 一下就看得到。"},
+  {"id": "b3", "title": "只接知道怎麼辦的那一種", "accept": ["A"],
+   "choices": {"A": "ValueError", "B": "什麼都不寫", "C": "Exception"},
+   "hint": "int 變不成整數丟的是哪一種？什麼都不寫、寫 Exception，會不會連打錯字也接住？",
+   "explain": "int(\"一百\") 丟的是 ValueError，寫明它就好；什麼都不寫會連 Control C 都接住，Exception 也會接住打錯字的 NameError，bug 就看不到了。"}
+ ]
+}
