@@ -845,6 +845,10 @@ class RunCheck(Check):
                 return
             tmpdir = Path(tempfile.mkdtemp(prefix="plusform-swap-"))
             try:
+                if swap.get("siblings"):   # 1-21（只對寫了它的題目）：同一個資料夾的其他 .py 一起複製過去（main.py 要 import 旁邊的 money.py）
+                    for sib in path.parent.glob("*.py"):
+                        if sib.name != path.name and sib.is_file():
+                            shutil.copyfile(sib, tmpdir / sib.name)
                 moved = tmpdir / path.name
                 moved.write_text(pat.sub(swap["to"], src, count=1), encoding="utf-8")
                 p = self.ctx.env.run_file(moved, stdin=stdin)
@@ -889,6 +893,12 @@ class RunCheck(Check):
         for word in self.spec.get("expect_contains", []):
             if norm_line(word) not in joined:
                 problems.append(f"應該要看到{show(word)}，可是沒有。\n  你的印出：\n" + shown)
+        if self.spec.get("expect_today"):   # 1-21（只對寫了它的題目）：照今天的日期算出來的那一行要印出來（例如 "本月 %Y-%m" → 本月 2026-11），不能寫死
+            from datetime import date as _date
+            for pat in self.spec["expect_today"]:
+                want_line = norm_line(_date.today().strftime(pat))
+                if want_line not in [norm_line(x) for x in got]:
+                    problems.append(f"應該要有一行印出{show(_date.today().strftime(pat))}（照今天的日期算出來的），可是沒有。\n  你的印出：\n" + shown)
         for word in self.spec.get("expect_not_contains", []):
             if norm_line(word) in joined:
                 problems.append(f"不應該出現{show(word)}，可是出現了。\n  你的印出：\n" + shown)
@@ -942,10 +952,34 @@ def _flagloop_ok(tree: ast.AST, name: str) -> bool:
     return False
 
 
+def _imports_ok(tree: ast.AST, module: str, names: list[str]) -> bool:
+    """1-21 imports：有 from <module> import 這幾個名字（或 import <module>），而且這幾個名字不是在這個檔自己 def 的（不能把函式抄過來）。"""
+    got: set[str] = set()
+    whole = False
+    for n in ast.walk(tree):
+        if isinstance(n, ast.ImportFrom) and n.module == module and n.level == 0:
+            got |= {a.asname or a.name for a in n.names}
+        elif isinstance(n, ast.Import) and any(a.name == module for a in n.names):
+            whole = True
+    defs = {n.name for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
+    return (whole or set(names) <= got) and not (set(names) & defs)
+
+
+def _calls_ok(tree: ast.AST, name: str) -> bool:
+    """1-21 calls：程式裡有呼叫 name（func(…) 或 x.func(…) 都算）。"""
+    for n in ast.walk(tree):
+        if isinstance(n, ast.Call):
+            f = n.func
+            if (isinstance(f, ast.Name) and f.id == name) or (isinstance(f, ast.Attribute) and f.attr == name):
+                return True
+    return False
+
+
 def ast_problems(source: str, rules: list[dict]) -> list[str]:
     """1-17：run 題的 ast_require＝[{name, kind: listcomp|loop, msg}]。
     listcomp：name 這個名字要等於一個推導式（name = [… for … in …]）；loop：要先 name = []，再在 for 迴圈裡 name.append(…)。
     1-20 加：keyfunc＝name = sorted(…, key=某個用 def 寫的函式)，不能用 lambda；flagloop＝先 name = True／False，再在 for 迴圈裡改（不能用 any／all）。
+    1-21 加：imports＝from name import names（或 import name），而且那幾個名字不能在這個檔自己 def；calls＝程式裡要呼叫 name（func(…) 或 x.func(…)）。
     語法錯誤交給跑的時候報（這裡不重複）。"""
     try:
         tree = ast.parse(source)
@@ -961,6 +995,12 @@ def ast_problems(source: str, rules: list[dict]) -> list[str]:
         elif kind == "keyfunc":
             ok = _keyfunc_ok(tree, values)
             default = f"{name} 要用 sorted 排，key 交一個用 def 寫好的函式（例如 key=amount_of），不能用 lambda，也不能直接抄另一個名字。"
+        elif kind == "imports":   # 1-21：name 是模組名，names 是要拿的名字
+            ok = _imports_ok(tree, name, list(rule.get("names", [])))
+            default = f"要用 from {name} import {', '.join(rule.get('names', []))} 從 {name}.py 拿，不要把函式抄進這個檔。"
+        elif kind == "calls":   # 1-21：要呼叫 name（例如 strptime、today）
+            ok = _calls_ok(tree, name)
+            default = f"要用到 {name}(…)，不要把答案直接寫死。"
         elif kind == "flagloop":
             ok = _flagloop_ok(tree, name)
             default = f"{name} 要改回迴圈：先寫 {name} = False（或 True），再在 for 迴圈裡遇到符合的就改它，不能用 any／all。"

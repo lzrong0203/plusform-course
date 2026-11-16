@@ -1,0 +1,33 @@
+# 1-21 第②圈：查官方文件（3 題）。每題附了官方文件的網址，打開那一段讀，再回答。
+# 在「答：」後面寫 A、B 或 C，存檔。
+# 提示：官方文件是英文；只要找到那一個名字的那一段，看它寫的範圍或例子就好。
+
+第 1 題：
+#   from datetime import date
+#   print(date(2026, 11, 3).strftime("%b"))
+# 印出什麼？（查格式碼表裡的 %b）
+#   https://docs.python.org/3.13/library/datetime.html#format-codes
+#   A. 11
+#   B. Nov
+#   C. 11月
+答：
+
+第 2 題：
+#   import random
+#   print(random.randint(1, 6))
+# 每次跑都不一樣。可能印出哪些數？（查 random.randint）
+#   https://docs.python.org/3.13/library/random.html#random.randint
+#   A. 1 到 5
+#   B. 0 到 6
+#   C. 1 到 6
+答：
+
+第 3 題：
+#   import math
+#   print(math.ceil(1250 / 3))
+# 1250 元三個人分，每人至少付多少？印出什麼？（查 math.ceil）
+#   https://docs.python.org/3.13/library/math.html#math.ceil
+#   A. 417
+#   B. 416
+#   C. 416.67
+答：

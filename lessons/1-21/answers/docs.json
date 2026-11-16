@@ -1,0 +1,20 @@
+{
+ "note": "1-21 第②圈：查官方文件（對答 3 題，都是選擇題；每題附官方文件網址）。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {"id": "d1", "title": "格式碼 %b", "accept": ["B"],
+   "choices": {"A": "11", "B": "Nov", "C": "11月"},
+   "hint": "打開 https://docs.python.org/3.13/library/datetime.html#format-codes ，找 %b 那一列，看 Meaning 和 Example。",
+   "explain": "%b 是 Month as locale's abbreviated name（月份的英文縮寫），例子是 Jan, Feb, …, Dec，所以 11 月印出 Nov。兩位數的月份是小寫 %m。"},
+  {"id": "d2", "title": "random.randint 的範圍", "accept": ["C"],
+   "choices": {"A": "1 到 5", "B": "0 到 6", "C": "1 到 6"},
+   "hint": "打開 https://docs.python.org/3.13/library/random.html#random.randint ，看它說交回的整數 N 在什麼範圍。跟 range(1, 6) 一樣嗎？",
+   "explain": "官方文件：Return a random integer N such that a <= N <= b。randint(1, 6) 的 1 和 6 都包含在內，跟 range(1, 6) 停在 5 不一樣。"},
+  {"id": "d3", "title": "math.ceil", "accept": ["A"],
+   "choices": {"A": "417", "B": "416", "C": "416.67"},
+   "hint": "1250 / 3 是 416.666…。打開 https://docs.python.org/3.13/library/math.html#math.ceil ，看 ceil 交回的是哪一個整數。",
+   "explain": "官方文件：math.ceil(x) 交回大於或等於 x 的最小整數（無條件進位）。416.666… 進位是 417，三個人各付 417 元才夠 1250。"}
+ ]
+}

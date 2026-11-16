@@ -1,0 +1,26 @@
+{
+  "note": "回顧題：學員通過這課以後，往後第 2 課和第 5 課的 check 會各帶一題。",
+  "questions": [
+    {
+      "id": "r1",
+      "q": "# tools.py\nprint(\"載入 tools\")\n\nif __name__ == \"__main__\":\n    print(\"自己跑\")\n\n# app.py（跟 tools.py 同一個資料夾）\nimport tools\n\n跑 app.py，印出什麼？\nA. 什麼都不印\nB. 只印「載入 tools」\nC. 「載入 tools」和「自己跑」都印\n（寫 A、B 或 C）",
+      "accept": ["B"],
+      "explain": "import 會把 tools.py 從頭跑一遍，所以最上面的 print 會跑；被 import 的時候 __name__ 是 \"tools\"，不是 \"__main__\"，if 下面那行不跑。",
+      "choices": {"A": "什麼都不印", "B": "只印「載入 tools」", "C": "兩行都印"}
+    },
+    {
+      "id": "r2",
+      "q": "from datetime import datetime\nd = datetime.strptime(\"2026-11-03\", \"%Y-%M-%d\")\nprint(d.month)\n印出什麼？\nA. 11\nB. 1\nC. 出現錯誤訊息\n（寫 A、B 或 C）",
+      "accept": ["B"],
+      "explain": "大寫 %M 是分鐘（官方文件的格式碼表：Minute），所以 11 被當成 11 分；格式裡沒有月份，月份就是預設的 1。不會出現錯誤訊息，結果卻錯了，所以格式碼要查表、跑完要看結果。",
+      "choices": {"A": "11", "B": "1", "C": "出現錯誤訊息"}
+    },
+    {
+      "id": "r3",
+      "q": "AI 寫的程式第一行是 import twmoney。你試了 uv run python -c \"import twmoney\"，出現 ModuleNotFoundError；PyPI 搜尋 twmoney 也是沒有結果。怎麼辦？\nA. 不裝，退回去請 AI 改用標準函式庫或自己的檔\nB. 裝一個名字很像的\nC. 自己建一個 twmoney.py 讓它 import 得到\n（寫 A、B 或 C）",
+      "accept": ["A"],
+      "explain": "查不到就不要裝、也不要找名字很像的：有人會搶先用 AI 常編的名字放上壞程式。自己建一個同名的檔只是讓錯誤訊息消失，AI 以為那個套件會做的事還是沒人做。退回去請 AI 改寫。",
+      "choices": {"A": "不裝，退回去請 AI 改寫", "B": "裝一個名字很像的", "C": "自己建一個 twmoney.py"}
+    }
+  ]
+}

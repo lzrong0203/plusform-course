@@ -1,0 +1,28 @@
+# 1-21 第③圈：AI 叫你 import 的，先查它存不存在（3 題）。
+# 在「答：」後面寫 A、B 或 C，存檔。
+# 怎麼查：標準函式庫的全部模組列在 https://docs.python.org/3.13/py-modindex.html ；
+#         要另外裝的套件，到 https://pypi.org 搜尋名字（查不到，就不要自己去裝）。
+
+第 1 題：
+# AI 寫的程式最上面有這三行：
+#   A. import statistics
+#   B. import budgetkit
+#   C. import requests
+# 哪一行的名字是編出來的（標準函式庫沒有，PyPI 也查不到）？
+答：
+
+第 2 題：
+# 在帳本資料夾打 uv run python -c "import requests"，出現
+#   ModuleNotFoundError: No module named 'requests'
+# 這代表什麼？
+#   A. requests 是 AI 編出來的
+#   B. Python 壞掉了
+#   C. 你的帳本裡沒有裝；requests 是 PyPI 上查得到的套件（要不要裝，以後的課再說）
+答：
+
+第 3 題：
+# AI 叫你 import budgetkit。你用 uv run python -c 試，出現 ModuleNotFoundError；PyPI 也查不到這個名字。怎麼辦？
+#   A. 不裝。退回去，請 AI 只用標準函式庫，或你自己寫的檔
+#   B. 照 AI 說的，想辦法把它裝起來
+#   C. 裝一個 PyPI 上名字很像的
+答：

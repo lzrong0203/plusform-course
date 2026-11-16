@@ -1,0 +1,7 @@
+{
+  "id": "1-21",
+  "title": "模組與 import",
+  "minutes": 50,
+  "fast_minutes": 10,
+  "after_start": "接下來，用 VS Code 打開帳本，找到 lessons/1-21：\n  1. 第一圈：把 main.py 裡的 total、fmt 搬到 money.py，main.py 改成 from money import fmt, total；money.py 最下面的三行放進 if __name__ == \"__main__\":；main.py 用 datetime 印出本月、把 2026-11-03 解析成日期\n  2. 第二圈：問家教 %Y-%m-%d 的意思，再對照官方文件，記在 tutor.md；docs.txt 查官方文件 3 題\n  3. 第三圈：imports.txt 3 題：AI 叫你 import 的，先查它存不存在\n做完回到課程資料夾打：uv run check.py 1-21"
+}

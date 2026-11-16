@@ -1,0 +1,168 @@
+{
+ "note": "1-21 的檢查：第①圈 money.py（call 直接測 total、fmt 各兩次；run 直接跑 money.py，if __name__ == \"__main__\": 裡自己的檢查會印出來）、main.py（run：從 money import fmt、total（ast_require 的 imports：main.py 裡不能再留 def）、用 date.today() 算本月（expect_today：照跑的那一天算）、strptime 解析 2026-11-03；money.py 自己的檢查不能印出來；再把 amounts 換掉跑一次（swap 的 siblings：money.py 一起複製過去））；第②圈 docs.txt（查官方文件 3 題，選擇題，附網址）、tutor.md（filled：三個標籤都寫了，自評）；第③圈 imports.txt（3 題：三個 import 哪一個是編的、ModuleNotFoundError 代表什麼、查不到怎麼辦＝不裝、退回）。grader 在 run 加 expect_today、swap 的 siblings，ast_require 加 imports、calls（只對寫了它的題目生效）。",
+ "checks": [
+  {
+   "type": "call",
+   "id": "total-1",
+   "file": "lessons/1-21/money.py",
+   "module": "money",
+   "func": "total",
+   "group": "第一圈",
+   "args": [
+    [
+     120,
+     85
+    ]
+   ],
+   "expect": 205,
+   "desc": "money.py：total([120, 85]) 交回 205",
+   "hint": "把 main.py 裡的 total 整個搬過來（def 那一行和 return 那一行）。",
+   "missing_hint": "money.py 應該在帳本的 lessons/1-21/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-21。"
+  },
+  {
+   "type": "call",
+   "id": "total-2",
+   "file": "lessons/1-21/money.py",
+   "module": "money",
+   "func": "total",
+   "group": "第一圈",
+   "args": [
+    []
+   ],
+   "expect": 0,
+   "desc": "money.py：total([]) 交回 0",
+   "hint": "sum([]) 是 0。"
+  },
+  {
+   "type": "call",
+   "id": "fmt-1",
+   "file": "lessons/1-21/money.py",
+   "module": "money",
+   "func": "fmt",
+   "group": "第一圈",
+   "args": [
+    1250
+   ],
+   "expect": "1,250 元",
+   "desc": "money.py：fmt(1250) 交回 \"1,250 元\"",
+   "hint": "f\"{amount:,} 元\"：冒號後面的逗號是千分位（1-5 教過）。"
+  },
+  {
+   "type": "call",
+   "id": "fmt-2",
+   "file": "lessons/1-21/money.py",
+   "module": "money",
+   "func": "fmt",
+   "group": "第一圈",
+   "args": [
+    12000
+   ],
+   "expect": "12,000 元",
+   "desc": "money.py：fmt(12000) 交回 \"12,000 元\"",
+   "hint": "f\"{amount:,} 元\""
+  },
+  {
+   "type": "run",
+   "id": "money-self",
+   "file": "lessons/1-21/money.py",
+   "group": "第一圈",
+   "timeout": 5,
+   "desc": "直接跑 money.py：最下面自己的檢查會跑，印出「money.py 自己的檢查都過了」",
+   "expect_exact": [
+    "money.py 自己的檢查都過了"
+   ],
+   "hint": "三行檢查放在 if __name__ == \"__main__\": 下面（前面各空四格）。直接跑 money.py 時 __name__ 是 \"__main__\"，這三行才會跑。",
+   "missing_hint": "money.py 應該在帳本的 lessons/1-21/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-21。"
+  },
+  {
+   "type": "run",
+   "id": "main-1",
+   "file": "lessons/1-21/main.py",
+   "group": "第一圈",
+   "timeout": 5,
+   "desc": "跑 main.py：從 money import fmt、total，印出合計、本月（今天的年和月）、11 3；money.py 自己的檢查不會印出來",
+   "ast_require": [
+    {
+     "name": "money",
+     "kind": "imports",
+     "names": [
+      "fmt",
+      "total"
+     ],
+     "msg": "main.py 要用 from money import fmt, total 拿 money.py 的函式；total、fmt 搬到 money.py 以後，main.py 裡就不要再留一份 def。"
+    },
+    {
+     "name": "today",
+     "kind": "calls",
+     "msg": "本月要用 date.today() 算出來（今天是哪一天），不要把年月直接寫死。"
+    },
+    {
+     "name": "strptime",
+     "kind": "calls",
+     "msg": "要用 datetime.strptime(\"2026-11-03\", 格式碼) 把字串解析成日期，不要直接 print(11, 3)。"
+    }
+   ],
+   "expect_contains": [
+    "合計 1,820 元",
+    "11 3"
+   ],
+   "expect_today": [
+    "本月 %Y-%m"
+   ],
+   "expect_not_contains": [
+    "自己的檢查都過了"
+   ],
+   "hint": "格式碼查 https://docs.python.org/3.13/library/datetime.html#format-codes ：年是 %Y、月是小寫 %m、日是 %d（大寫 %M 是分鐘）。印出「money.py 自己的檢查都過了」，代表 money.py 最下面的三行還沒放進 if __name__ == \"__main__\": 裡。",
+   "missing_hint": "main.py 應該在帳本的 lessons/1-21/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-21。"
+  },
+  {
+   "type": "run",
+   "id": "main-2",
+   "file": "lessons/1-21/main.py",
+   "group": "第一圈",
+   "timeout": 5,
+   "desc": "main.py：amounts 換成別的金額，合計照 money.py 的 total、fmt 算",
+   "swap": {
+    "find": "^[ \\t]*amounts[ \\t]*=[ \\t]*\\[.*\\][ \\t]*(#.*)?$",
+    "to": "amounts = [300, 2000]",
+    "siblings": true,
+    "feed": "check 把你的 amounts 換成 [300, 2000]（money.py 一起放在旁邊），再跑一次。",
+    "missing": "找不到 amounts = [...] 這一行。這一行要留著（check 會換成別的金額再跑一次）。"
+   },
+   "expect_contains": [
+    "合計 2,300 元"
+   ],
+   "hint": "合計要用 fmt(total(amounts)) 算，不要把 1,820 元直接寫死。"
+  },
+  {
+   "type": "answers",
+   "id": "docs",
+   "file": "lessons/1-21/docs.txt",
+   "key": "answers/docs.json",
+   "group": "第二圈"
+  },
+  {
+   "type": "filled",
+   "id": "tutor",
+   "file": "lessons/1-21/tutor.md",
+   "group": "第二圈",
+   "labels": [
+    "我問家教的：",
+    "家教怎麼說：",
+    "我在官方文件查到的："
+   ],
+   "count": 1,
+   "item": "",
+   "desc": "tutor.md：問家教格式碼、再對照官方文件，三個標籤都寫了（自評，內容不改對錯）",
+   "hint": "照 tutor.md 上面的步驟問家教；「我在官方文件查到的」寫你在格式碼表上看到的那幾列（%Y、%m、%d、%M）。",
+   "missing_hint": "tutor.md 應該在帳本的 lessons/1-21/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-21。"
+  },
+  {
+   "type": "answers",
+   "id": "imports",
+   "file": "lessons/1-21/imports.txt",
+   "key": "answers/imports.json",
+   "group": "第三圈"
+  }
+ ]
+}
