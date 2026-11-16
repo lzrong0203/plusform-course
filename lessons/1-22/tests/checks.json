@@ -57,12 +57,11 @@
    "id": "add-1",
    "file": "lessons/1-22/add.py",
    "group": "第一圈",
-   "desc": "add.py：打一百、-35 都不會當掉，會請你再輸入一次；打 120 才記下來",
+   "desc": "add.py：打一百、-35 都不會當掉，會請你再輸入一次（印出錯誤訊息）；打 120 才記下來",
    "stdin": "一百\n-35\n120\n",
    "timeout": 5,
    "expect_contains": [
     "請再輸入一次",
-    "金額不能是負數：-35",
     "記下 120 元"
    ],
    "ast_require": [
@@ -73,7 +72,10 @@
    ],
    "eof_hint": "打對了（沒出錯）要在 else 裡 break 停下來；打錯了才再問一次。",
    "hint": "try 包住 amount = to_yuan(text)；except ValueError as e: 印出「請再輸入一次。」和 e；else: 印出「記下」、金額、「元」，再 break。money.py 要先加好負數的 raise，-35 才會丟出 ValueError。",
-   "missing_hint": "add.py 應該在帳本的 lessons/1-22/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-22。"
+   "missing_hint": "add.py 應該在帳本的 lessons/1-22/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-22。",
+   "expect_regex": [
+    "請再輸入一次。.*-35"
+   ]
   },
   {
    "type": "run",

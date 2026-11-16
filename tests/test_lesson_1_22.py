@@ -255,7 +255,14 @@ class Add(unittest.TestCase):
         write(mine("add.py"), ref("add.py"))
         out = ev(["add-1"])
         self.assertFalse(out.results[0].ok)
-        self.assertIn("金額不能是負數：-35", out.results[0].detail)
+        self.assertIn("沒有看到應該要印的字", out.results[0].detail)
+
+    def test_other_message_wording_ok(self):
+        """錯誤訊息的寫法不限（AI 交回的版本寫「金額不可為負數」）：請再輸入一次的那一行有 -35 就算。"""
+        write(mine("money.py"), ref("money.py").replace("金額不能是負數", "金額不可為負數"))
+        write(mine("add.py"), ref("add.py"))
+        out = ev(["add-1"])
+        self.assertTrue(out.results[0].ok, out.results[0].detail)
 
     def test_try_without_except_message(self):
         """README 常見錯誤那一列的原文：try 後面沒有 except。"""
