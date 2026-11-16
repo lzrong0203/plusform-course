@@ -1,5 +1,5 @@
 {
- "note": "1-20 的檢查：第①圈 predict.txt（型別提示不檢查、穩定排序（reverse 也一樣）、*args 包成 tuple，選擇題 3 題）、plain.py（run：AI 的 5 行改寫成普通寫法，最後一行印出五個 True；ast_require 的 keyfunc（sorted 的 key 交 def 寫的函式、不能用 lambda）、flagloop（any／all 改回迴圈）；再把 entries 換掉跑一次）、sort2.py（依金額、再依日期；run 兩次，第二次換資料）；第②圈 translate.txt（白話翻譯 4 題，選擇題）、tutor.md（filled：四個標籤都寫了，自評）；第③圈 top3.py（func_shape：型別提示留著（annotated）、docstring 要有輸入／輸出／例子、要 return；call 直接測函式三次（四類同一類好幾筆、不到三類、空的 list））、checks_top3.py（chaff 的 assert 模式：學員的 assert 跑課程的正確版和 3 個 AI 寫錯的版本：key 方向寫反、沒有先加總、沒有只留前三類）、green。grader 在 ast_require 加 keyfunc、flagloop，func_shape 加 annotated（只對寫了它的題目生效）。",
+ "note": "1-20 的檢查：第①圈 predict.txt（型別提示不檢查、穩定排序（reverse 也一樣）、*args 包成 tuple，選擇題 3 題）、plain.py（run：AI 的 5 行改寫成普通寫法，最後一行印出五個 True；ast_require 的 keyfunc（sorted 的 key 交 def 寫的函式、不能用 lambda）、flagloop（any／all 改回迴圈）；再把 entries 換掉跑一次）、sort2.py（依金額、再依日期；run 兩次，第二次換資料）；第②圈 translate.txt（白話翻譯 4 題，選擇題）、tutor.md（filled：四個標籤都寫了，自評）；第③圈 top3.py（func_shape：型別提示留著（annotated）、docstring 要有輸入／輸出／例子、要 return；call 直接測函式三次（四類同一類好幾筆、不到三類、空的 list））、checks_top3.py（chaff 的 assert 模式：學員的 assert 跑課程的正確版和 3 個 AI 寫錯的版本：排序方向寫反、沒有先加總、沒有只留前三類）、green。grader 在 ast_require 加 keyfunc、flagloop，func_shape 加 annotated（只對寫了它的題目生效）。",
  "checks": [
   {
    "type": "answers",

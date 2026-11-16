@@ -9,7 +9,7 @@
 
 A. 先猜（`predict.txt`）：3 題，先不要跑，用眼睛追。
 
-B. 把 AI 的一行改回普通寫法（`plain.py`）。上面是 AI 常寫的 5 行（有 `lambda`、`any`、`all`），下面改寫成不用 lambda、不用 any／all 的版本：有 lambda 的，先用 `def` 寫一個函式（例如 `amount_of`），key 交那個函式的名字；`any`／`all` 改回 for 迴圈。第一行已經改好當範例。每改好一個，下面寫一條 `assert` 確認跟 AI 寫的一樣。最後一行 print 不要改，五個都一樣就印出 `True True True True True`。
+B. 把 AI 的一行改回普通寫法（`plain.py`）。上面是 AI 寫的 5 行（有 `lambda`、`any`、`all`），下面改寫成不用 lambda、不用 any／all 的版本：有 lambda 的，先用 `def` 寫一個函式（例如 `amount_of`），key 交那個函式的名字；`any`／`all` 改回 for 迴圈。第一行已經改好當範例。每改好一個，下面寫一條 `assert` 確認跟 AI 寫的一樣。最後一行 print 不要改，五個都一樣就印出 `True True True True True`。
 
 C. 依金額、再依日期排序（`sort2.py`）。金額由小到大；金額一樣的，再依日期由早到晚。
 
@@ -21,7 +21,7 @@ C. 依金額、再依日期排序（`sort2.py`）。金額由小到大；金額�
 2. docstring：寫清楚**輸入**、**輸出**（合計大的在前、最多三類、空的交回 `[]`）、**例子**（例子寫一次真的呼叫和它交回的值）
 3. assert：在 `checks_top3.py` 至少寫 3 條
 
-把 def 那一行、docstring 和 assert 一起貼給 AI（免費的聊天版就可以），請它照 docstring 寫函式內容、assert 不要改，再把它寫的函式內容貼進 `top3.py`。**沒有 AI 帳號的**，打開課程資料夾的 `lessons/1-20/frozen/top3.py`（課程的凍結版，影片裡 AI 寫的那一份），把 docstring 下面的函式內容抄過來。課程另外藏了 3 個 AI 寫錯的版本（範例示意），你的 assert 要每一個都抓到；其中一個是 **key 方向寫反**（合計從小排到大）。
+把 def 那一行、docstring 和 assert 一起貼給 AI（免費的聊天版就可以），請它照 docstring 寫函式內容、assert 不要改，再把它寫的函式內容貼進 `top3.py`。**沒有 AI 帳號的**，打開課程資料夾的 `lessons/1-20/frozen/top3.py`（課程的凍結版，影片裡 AI 寫的那一份），把 docstring 下面的函式內容抄過來。課程另外藏了 3 個 AI 寫錯的版本（範例示意），你的 assert 要每一個都抓到；其中一個是 **排序方向寫反**（合計從小排到大）。
 
 **選做加深（check 不檢查）：遞迴（`deep.py`）。** 函式裡呼叫自己。只要追得出巢狀清單的加總就好：先用眼睛追最下面那一行會印出什麼，再跑一次對答案。一步一步的追法在 `補充.md`。
 
@@ -92,7 +92,7 @@ $
 | 「newest2 要用 sorted 排，key 交一個用 def 寫的函式」 | 你還是用了 lambda，或直接寫 `newest2 = newest` | 先 `def` 一個函式，key 交它的名字 |
 | plain.py 印出 `True False True True True` | 第二個跟 AI 寫的不一樣 | 看 `reverse=True` 有沒有一起寫 |
 | sort2.py 只照日期排好 | 兩次的順序反了（先金額、再日期） | 先照日期排，再照金額排 |
-| 「top3(…) 應該回傳 [('書', 450), ('餐', 420), ('衣', 60)]」，交回的是從小排到大 | key 方向寫反 | `reverse=True` |
+| 「top3(…) 應該回傳 [('書', 450), ('餐', 420), ('衣', 60)]」，交回的是從小排到大 | 排序方向寫反 | `reverse=True` |
 | 第三圈「壞版本 1 沒抓到」 | 你的 assert 都只有一類 | 再寫一條兩類以上、合計不一樣的 |
 | 「top3 的型別提示還沒寫完」 | def 那一行的 `: …`、`-> …` 被刪掉了 | 照起點檔留著 |
 | `error: Failed to spawn: check.py` | 你不在課程資料夾裡 | 先打 `cd ~/code/plusform-course` |

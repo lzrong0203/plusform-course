@@ -3,9 +3,9 @@
 grader 加的東西（只對寫了它的題目生效）：run 的 ast_require 多兩種——keyfunc（name = sorted(…, key=某個用 def 寫的函式)，不能用 lambda、不能直接抄 AI 的結果）、
 flagloop（先給 True／False，再在 for 迴圈裡改，不能用 any／all）；func_shape 加 annotated（每個參數和交回的值都寫了型別提示）。
 其他用到的是前幾課已有的：answers（strict_choice）、run（swap、loose）、filled、func_shape、call（seq_as_list：交回 list 裡的 tuple 跟 JSON 的 list 比）、chaff 的 assert 模式。
-第③圈：學員的 assert 拿去跑課程的正確版和 3 個 AI 寫錯的版本（m1 key 方向寫反、m2 沒有先依分類加總、m3 沒有只留前三類）；
+第③圈：學員的 assert 拿去跑課程的正確版和 3 個 AI 寫錯的版本（m1 排序方向寫反、m2 沒有先依分類加總、m3 沒有只留前三類）；
 影片裡熊的三條：第一條（只有一類）只抓到 m2，第二條（四類、同一類好幾筆、金額有大有小）三個都抓到，第三條（空的 list）一個都抓不到
-（思考站「哪一條抓得到 key 方向寫反的版本？」答案是第二條）。
+（思考站「哪一條抓得到 排序方向寫反的版本？」答案是第二條）。
 全部寫在 PLUSFORM_TEST_WS 底下，不寫課程資料夾、不寫真的家目錄。需要 uv（帳本是真的 uv 專案）。
 """
 
@@ -320,7 +320,7 @@ class Asserts(unittest.TestCase):
         self.assertEqual([part(out, m).ok for m in ("m1", "m2", "m3")], [False, True, False])
 
     def test_station_which_catches_reversed_key(self):
-        """思考站「熊的三條，哪一條抓得到 key 方向寫反的版本？」：在 m1 上第一、三條成立，只有第二條不成立（答案 B）。"""
+        """思考站「熊的三條，哪一條抓得到 排序方向寫反的版本？」：在 m1 上第一、三條成立，只有第二條不成立（答案 B）。"""
         les = grader.load_lesson(LID, COURSE)
         spec = next(c for c in les.checks if c["id"] == "r3")
         write(mine("checks_top3.py"), BEAR)

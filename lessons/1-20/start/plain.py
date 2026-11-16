@@ -1,4 +1,4 @@
-# 1-20 第①圈：把 AI 常寫的 5 行，改寫成不用 lambda、不用 any／all 的普通寫法，再用 assert 確認結果一樣。
+# 1-20 第①圈：把 AI 寫的 5 行，改寫成不用 lambda、不用 any／all 的普通寫法，再用 assert 確認結果一樣。
 # entries 那一行和 AI 寫的 5 行不要改（check 會把 entries 換成別的資料，再跑一次）。最後一行 print 也不要改。
 # 寫法：
 #   - 有 lambda 的：先用 def 寫一個函式（例如 amount_of），key 交那個函式的名字
