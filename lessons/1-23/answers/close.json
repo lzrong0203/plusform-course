@@ -1,0 +1,20 @@
+{
+ "note": "1-23 第②圈：with 和關檔（對答 3 題，選擇題）。第 1、2 題用 Python 3.13 實跑過（tests/test_lesson_1_23.py 也跑），第 3 題照官方教學 7.2 的 Warning。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {"id": "c1", "title": "write 以後、關檔以前", "accept": ["B"],
+   "choices": {"A": "'11/03,午餐,120\\n'", "B": "''（空的）", "C": "錯誤訊息"},
+   "hint": "f.write 寫的字，是馬上進到檔案裡，還是先放在 Python 手上？自己跑一次看看。",
+   "explain": "f.write 寫的字先放在 Python 手上的暫存區（緩衝區），還沒進到檔案；with 結束、關檔的時候才一起寫進去。所以 with 還沒結束時讀檔案，讀到的是空的。"},
+  {"id": "c2", "title": "with 結束就關檔", "accept": ["C"],
+   "choices": {"A": "False", "B": "錯誤訊息", "C": "True"},
+   "hint": "with 那一段跑完，檔案關了沒？f.closed 是在問「關了嗎」。",
+   "explain": "with 那一段跑完，Python 會自動關檔（就算中間出錯也會關）；f.closed 是 True。"},
+  {"id": "c3", "title": "不關檔的風險", "accept": ["A"],
+   "choices": {"A": "可能沒有完整寫進檔案，就算程式正常結束也一樣", "B": "一定會寫進檔案，只是比較慢", "C": "Python 會跳出錯誤訊息"},
+   "hint": "官方教學 7.2 有一段 Warning（警告）。",
+   "explain": "官方教學 7.2：沒有用 with、也沒有呼叫 f.close()，f.write() 寫的字可能沒有完整寫進磁碟，就算程式正常結束也一樣。所以檔案一律用 with 開。"}
+ ]
+}

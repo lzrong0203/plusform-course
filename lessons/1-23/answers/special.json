@@ -1,0 +1,5 @@
+{
+ "note": "1-23 第③圈的特殊作答：備註裡有逗號，課程版本讀回來時用逗號切成五段，裝不進四個名字，當掉（ValueError: too many values to unpack）。這課先記下來、不修，2-4 用 csv 模組解決。",
+ "func": "roundtrip",
+ "rules": []
+}

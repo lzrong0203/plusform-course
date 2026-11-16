@@ -1,0 +1,183 @@
+{
+ "note": "1-23 的檢查：第①圈 predict.txt（隨片測驗 3 題：w 會先清空、a 接在後面、相對路徑跟著在哪裡跑）；save.py（sandbox：在暫存資料夾擺假帳本，從帳本最上層跑 uv run lessons/1-23/save.py，lessons/1-23/ledger.txt 要一模一樣三行、帳本最上層不能多出 ledger.txt；with_open、open_utf8）；read.py（先跑 save.py，再進 lessons/1-23 跑 read.py，印出三行和合計）；來回測試 roundtrip（save.py 跑一次、換成一筆 12/01 書 450 再跑一次、從帳本最上層跑 read.py：只印新的那一筆，w 沒寫成 a、read.py 沒寫死）。第②圈 close.txt（3 題）、tutor.md（filled 四個標籤，自評）；第③圈 checks_store.py（chaff 的 assert 模式＋tmp_cwd：學員的來回測試在暫存資料夾跑課程版本 store.py 和 3 個 AI 寫錯的版本；備註有逗號那一條要標「# 已知會當掉」記下來，不用修，2-4 用 CSV 解決）。學員帳本裡真的 ledger.txt 一個都不動。grader 加的東西（只對寫了它的題目生效）：run 的 sandbox、ast_require 的 with_open／open_utf8、chaff assert 的 tmp_cwd／min_crash_marks／mark_note。",
+ "checks": [
+  {
+   "type": "answers",
+   "id": "predict",
+   "file": "lessons/1-23/predict.txt",
+   "key": "answers/predict.json",
+   "group": "第一圈"
+  },
+  {
+   "type": "run",
+   "id": "save-1",
+   "file": "lessons/1-23/save.py",
+   "group": "第一圈",
+   "desc": "save.py：從帳本資料夾跑，ledger.txt 寫在 save.py 旁邊，三行一模一樣",
+   "timeout": 5,
+   "sandbox": {
+    "copy": [
+     "save.py"
+    ],
+    "steps": [
+     {
+      "run": "save.py",
+      "cwd": "."
+     }
+    ],
+    "files": {
+     "ledger.txt": [
+      "11/03,午餐,120",
+      "11/04,公車,15",
+      "11/05,晚餐,180"
+     ]
+    },
+    "files_hint": "用 with open(p, \"w\", encoding=\"utf-8\") as f: 打開，for 每一筆 f.write(f\"{d},{item},{amount}\\n\")。",
+    "absent_top": [
+     "ledger.txt"
+    ],
+    "absent_hint": "p 要跟著這個檔走：p = Path(__file__).parent / \"ledger.txt\"。只寫 \"ledger.txt\" 是相對路徑，會跟著你在哪個資料夾打指令跑。"
+   },
+   "expect_contains": [
+    "存好了"
+   ],
+   "ast_require": [
+    {
+     "name": "open",
+     "kind": "with_open"
+    },
+    {
+     "name": "open",
+     "kind": "open_utf8"
+    }
+   ],
+   "hint": "日期、項目、金額中間用逗號接起來，最後加 \\n 換行；p 改成 Path(__file__).parent / \"ledger.txt\"。",
+   "missing_hint": "save.py 應該在帳本的 lessons/1-23/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-23。"
+  },
+  {
+   "type": "run",
+   "id": "read-1",
+   "file": "lessons/1-23/read.py",
+   "group": "第一圈",
+   "desc": "read.py：先跑 save.py，再進 lessons/1-23 跑 read.py，印出三筆和合計 315 元",
+   "timeout": 5,
+   "sandbox": {
+    "copy": [
+     "save.py",
+     "read.py"
+    ],
+    "steps": [
+     {
+      "run": "save.py",
+      "cwd": "."
+     },
+     {
+      "run": "read.py",
+      "cwd": "lesson"
+     }
+    ]
+   },
+   "expect_exact": [
+    "11/03 午餐 120 元",
+    "11/04 公車 15 元",
+    "11/05 晚餐 180 元",
+    "合計 315 元"
+   ],
+   "ast_require": [
+    {
+     "name": "open",
+     "kind": "with_open"
+    },
+    {
+     "name": "open",
+     "kind": "open_utf8"
+    }
+   ],
+   "hint": "for line in f: 一次拿一行；row = line.rstrip(\"\\n\") 拿掉換行；d, item, amount = row.split(\",\")；print(d, item, amount, \"元\")；total += int(amount)。",
+   "missing_hint": "read.py 應該在帳本的 lessons/1-23/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-23。"
+  },
+  {
+   "type": "run",
+   "id": "roundtrip",
+   "file": "lessons/1-23/read.py",
+   "group": "第一圈",
+   "desc": "來回測試：save.py 換成別的帳再存一次（w 整個重寫），read.py 從帳本資料夾跑，讀回來的就是新的那一筆",
+   "timeout": 5,
+   "sandbox": {
+    "copy": [
+     "save.py",
+     "read.py"
+    ],
+    "swap_file": "save.py",
+    "steps": [
+     {
+      "run": "save.py",
+      "cwd": "."
+     },
+     {
+      "run": "save.py",
+      "cwd": ".",
+      "swap": true
+     },
+     {
+      "run": "read.py",
+      "cwd": "."
+     }
+    ]
+   },
+   "swap": {
+    "find": "entries\\s*=\\s*\\[[^\\]]*\\]",
+    "to": "entries = [(\"12/01\", \"書\", 450)]",
+    "missing": "save.py 裡找不到 entries = [ … ] 那幾行：起點檔給的三筆帳不要刪掉。",
+    "feed": "save.py 的 entries 換成一筆 (\"12/01\", \"書\", 450)，再存一次："
+   },
+   "expect_exact": [
+    "12/01 書 450 元",
+    "合計 450 元"
+   ],
+   "hint": "存檔要用 \"w\"（整個重寫），不是 \"a\"（接在後面）；read.py 要真的一行一行讀檔案，不要把帳寫死在 print 裡。",
+   "missing_hint": "read.py 應該在帳本的 lessons/1-23/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-23。"
+  },
+  {
+   "type": "answers",
+   "id": "close",
+   "file": "lessons/1-23/close.txt",
+   "key": "answers/close.json",
+   "group": "第二圈"
+  },
+  {
+   "type": "filled",
+   "id": "tutor",
+   "file": "lessons/1-23/tutor.md",
+   "group": "第二圈",
+   "labels": [
+    "家教問我的：",
+    "我一開始的回答：",
+    "我跑出來的：",
+    "家教怎麼說："
+   ],
+   "count": 1,
+   "item": "",
+   "desc": "tutor.md：請家教問你 with 的問題，四個標籤都寫了（自評，內容不改對錯）",
+   "hint": "照 tutor.md 上面的步驟問家教；它要你試的，自己跑跑看，把結果寫在「我跑出來的」。",
+   "missing_hint": "tutor.md 應該在帳本的 lessons/1-23/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-23。"
+  },
+  {
+   "type": "chaff",
+   "id": "r3",
+   "mode": "assert",
+   "tmp_cwd": true,
+   "student_file": "lessons/1-23/checks_store.py",
+   "module": "store",
+   "reference": "reference/store.py",
+   "mutants": "mutants/mutants.json",
+   "teacher_file": "answers/checks_store.py",
+   "special": "answers/special.json",
+   "min_checks": 3,
+   "min_crash_marks": 1,
+   "crash_mark_hint": "還沒有一行標「已知會當掉」：寫一筆備註裡有逗號的帳（例如 \"跟小明, 小華\"），\n  assert roundtrip(那一串) == 那一串，跑跑看；當掉了，就在那一行最後加上「# 已知會當掉」。",
+   "mark_note": "這課先記下來、不修：2-4 會用 csv 模組，備註裡有逗號也存得回來。",
+   "group": "第三圈"
+  }
+ ]
+}

@@ -17,6 +17,8 @@ check.py（學員端）和 tools/validate_lesson.py（老師端）共用這一�
                 1-22 加 raises＝這一次呼叫應該丟出這一種錯（例如 "ValueError"，不寫 expect）、msg_has＝錯誤訊息裡要有這段字）
   chaff         wheat/chaff：學員寫的檢查要在正確版全過、在每個壞版本至少錯一條
                 （1-22 在 assert 模式加 try_checks：最外層的 try（裡面有 assert）整個算一條檢查，學員用 try／except／else 寫「應該丟出 ValueError」）
+                （1-23 在 assert 模式加 tmp_cwd：學員的檢查檔複製到暫存資料夾、在那裡跑（檢查會寫檔案，不寫帳本）；min_crash_marks：
+                  至少幾行標「已知會當掉」；mark_note：標對了以後多印的一句）
   script_match  學員改過的腳本，在假的資料夾裡跑起來要跟安全版一樣
   git_commits   帳本是 git 存放庫，而且至少有幾個存檔點（commit）
   parsons       拼圖（Parsons，1-11 起）：把打亂的程式行排回去、自己縮排；行都要是題目給的（不能改字、多寫、少寫），排好跑出來要跟範例一樣
@@ -25,6 +27,9 @@ check.py（學員端）和 tools/validate_lesson.py（老師端）共用這一�
                 （run 在 1-17 另加兩個只對寫了它的題目生效的欄位：loose＝比的時候空格不算；ast_require＝規定用推導式／迴圈＋append 寫）
                 （1-20 在 ast_require 加兩種：keyfunc＝sorted 的 key 要交一個用 def 寫的函式、不能用 lambda；flagloop＝要先給 True／False，再在 for 迴圈裡改，不能用 any／all）
                 （1-22 在 ast_require 加 named_except：要有 try 加上 except <name>（例如 except ValueError），而且不能有光禿禿的 except:）
+                （1-23 在 run 加 sandbox：把學員的檔複製到系統的暫存資料夾（帳本最上層／lessons/<課號> 的樣子）照步驟跑，可以從不同資料夾跑、
+                  檢查寫出來的檔案內容、不該出現的檔案；不碰學員帳本裡真的 ledger.txt。ast_require 加 with_open（open 要寫在 with 後面）、
+                  open_utf8（每個 open 都要寫 encoding="utf-8"））
   func_shape    學員寫的函式長得對不對（1-18 起；只看程式的樣子、不跑）：有沒有 def 那個名字、docstring 有沒有寫輸入／輸出／例子、
                 有沒有用 return 交回一個值（只 print 不 return，外面拿到的是 None）
                 （1-20 加 annotated＝每個參數和交回的值都寫了型別提示，只對寫了它的題目生效）
@@ -332,10 +337,10 @@ class Env:
         return procs.run(cmd, stdin=stdin, cwd=cwd or self.cwd(), env=child_env(),
                          timeout=timeout or self.timeout, cap=self.cap)
 
-    def _run_runner(self, cmd: list[str], request: dict, timeout: float) -> Reply:
+    def _run_runner(self, cmd: list[str], request: dict, timeout: float, cwd: Path | None = None) -> Reply:
         token = secrets.token_hex(8)
         payload = dict(request, token=token)
-        p = procs.run(cmd + [str(RUNNER)], stdin=json.dumps(payload, ensure_ascii=False), cwd=self.cwd(),
+        p = procs.run(cmd + [str(RUNNER)], stdin=json.dumps(payload, ensure_ascii=False), cwd=cwd or self.cwd(),
                       env=child_env(), timeout=timeout, cap=self.cap)
         prefix = f"{MARK}{token}@@"
         events: list[tuple[str, str]] = []
@@ -353,8 +358,9 @@ class Env:
                 events.append((kind, rest))
         return Reply(result=result, events=events, proc=p)
 
-    def runner_raw(self, request: dict, timeout: float | None = None) -> Reply:
-        return self._run_runner(self.python_cmd() + ["-B"], request, timeout or self.timeout)
+    def runner_raw(self, request: dict, timeout: float | None = None, cwd: Path | None = None) -> Reply:
+        # 1-23：cwd＝在哪個資料夾跑（chaff 的 tmp_cwd 用暫存資料夾）；沒寫照舊是帳本
+        return self._run_runner(self.python_cmd() + ["-B"], request, timeout or self.timeout, cwd=cwd)
 
     def runner(self, request: dict, timeout: float | None = None) -> dict:
         reply = self.runner_raw(request, timeout)
@@ -838,7 +844,13 @@ class RunCheck(Check):
             r.detail = f"同一支程式剛剛就{self.ctx.stuck[str(path)]}，這題先不再等一次。先修好那個問題。"
             return
         swap = self.spec.get("swap")
-        if swap:
+        if self.spec.get("sandbox"):   # 1-23（只對寫了它的題目）：在暫存資料夾照步驟跑，不碰帳本裡真的檔案
+            p, problems0, feed0 = self.run_sandbox(path, stdin)
+            if p is None:
+                r.detail = problems0[0] if problems0 else "沒有跑起來。"
+                return
+            feed = feed0 + feed
+        elif swap:
             # 1-C1 第三部分：把學員程式裡的一行（例如 total = 1730）換成別的金額，再跑一次，看是不是用算的、不是把答案寫死。
             # 換過的程式寫在系統的暫存資料夾（同一個檔名），不寫帳本、也不寫課程資料夾；只對寫了 swap 的 checks.json 生效
             src = read_student_text(path)
@@ -884,6 +896,8 @@ class RunCheck(Check):
         problems = []
         if self.spec.get("ast_require"):   # 1-17 起（只對寫了它的題目）：照規定的寫法寫（推導式、迴圈＋append），不能 cut2 = cut 直接抄答案
             problems.extend(ast_problems(read_student_text(path), self.spec["ast_require"]))
+        if self.spec.get("sandbox"):   # 1-23：寫出來的檔案（內容、位置）先報，再報印出來的字
+            problems.extend(self._sb_problems)
         if "expect_exact" in self.spec:
             want = output_lines("\n".join(self.spec["expect_exact"]) if isinstance(self.spec["expect_exact"], list) else self.spec["expect_exact"])
             # 1-17 起（只對寫了 loose 的題目）：空格不算（AI 照描述寫的程式，「2 筆」跟「2筆」都對）；全形半形照舊用 NFKC 當成一樣
@@ -910,6 +924,82 @@ class RunCheck(Check):
             r.detail = feed + problems[0] + hint_text
         elif self.spec.get("time_it") == "timer":   # 1-7 的計時題：記下作答檔最後一次存檔的時間（check.py 照 timer 開始的時間算分鐘）
             r.data["mtime"] = path.stat().st_mtime
+
+
+    def run_sandbox(self, path: Path, stdin: str):
+        """1-23 sandbox（只對寫了它的題目）：在系統的暫存資料夾擺一個假帳本（最上層＋lessons/<課號>），把學員資料夾裡 copy 列的檔複製進去，
+        照 steps 一步一步跑（run＝跑哪一個檔、cwd＝"." 帳本最上層或 "lesson" 那一課的資料夾、swap＝這一步先套用 swap 再跑），
+        最後一步印出來的交給一般的 expect_* 比；files＝{這一課資料夾裡的檔名: 每一行}（跑完要一模一樣）、absent_top＝帳本最上層不該出現的檔。
+        學員帳本裡的檔一個都不動（swap 也只改暫存資料夾裡的那一份）。回傳（最後一步的 Proc 或 None, 問題, 給學員看的說明）。"""
+        sb = self.spec["sandbox"]
+        self._sb_problems: list[str] = []
+        rel_dir = Path(self.spec["file"]).parent          # 例如 lessons/1-23
+        src_dir = path.parent                              # 學員帳本裡（或老師端的 reference/）那個資料夾
+        tmp = Path(tempfile.mkdtemp(prefix="plusform-sandbox-"))
+        les = tmp / rel_dir
+        les.mkdir(parents=True, exist_ok=True)
+        swap = self.spec.get("swap")
+        cmd_dir = {".": "帳本資料夾", "lesson": rel_dir.as_posix()}
+        how = []
+        try:
+            originals: dict[str, str] = {}
+            for name in sb.get("copy", [path.name]):
+                f = src_dir / name
+                if not f.is_file():
+                    return None, [self.ctx.missing((rel_dir / name).as_posix(), self.spec.get("missing_hint"))], ""
+                originals[name] = read_student_text(f)
+                (les / name).write_text(originals[name], encoding="utf-8")
+            swapped: dict[str, str] = {}
+            if swap:
+                target = sb.get("swap_file", path.name)
+                pat = re.compile(swap["find"], re.MULTILINE)
+                if not pat.search(originals.get(target, "")):
+                    return None, [swap.get("missing", "找不到題目規定要有的那一行。")], ""
+                swapped[target] = pat.sub(swap["to"], originals[target], count=1)
+            last = None
+            steps = sb.get("steps", [{"run": path.name, "cwd": "."}])
+            for k, st in enumerate(steps, start=1):
+                name = st["run"]
+                for nm, txt in originals.items():   # 這一步要不要用換過的那一份
+                    want = swapped.get(nm, txt) if st.get("swap") else txt
+                    (les / nm).write_text(want, encoding="utf-8")
+                cwd = tmp if st.get("cwd", ".") == "." else les
+                where = cmd_dir.get(st.get("cwd", "."), "帳本資料夾")
+                cmd = f"uv run {(rel_dir / name).as_posix()}" if cwd == tmp else f"uv run {name}"
+                how.append(f"{k}. 在{where}打 {cmd}" + ("（換過資料的那一份）" if st.get("swap") else ""))
+                p = self.ctx.env.run_file(les / name, stdin=stdin if k == len(steps) else st.get("stdin", ""), cwd=cwd, timeout=self.own_timeout())
+                if p.timed_out or p.overflow or p.returncode != 0:
+                    if k < len(steps):
+                        story = (f"跑了很久還沒結束，被停下來了。" if p.timed_out else "印了太多東西被停下來了。" if p.overflow
+                                 else crash_story(p, st.get("stdin", "")))
+                        note = "check 在暫存資料夾裡照這樣跑（不動你帳本裡的檔案）：\n  " + "\n  ".join(how)
+                        return None, [note + f"\n  第 {k} 步就沒過：{story}" + (f"\n  提示：{self.spec['hint']}" if self.spec.get("hint") else "")], ""
+                last = p
+            for name, want in (sb.get("files") or {}).items():
+                f = les / name
+                if not f.is_file():
+                    self._sb_problems.append(f"跑完以後，{(rel_dir / name).as_posix()}（{path.name} 旁邊）沒有出現。" + (f"\n  提示：{sb['files_hint']}" if sb.get("files_hint") else ""))
+                    continue
+                try:
+                    got = f.read_bytes().decode("utf-8").replace("\r\n", "\n").split("\n")
+                except UnicodeDecodeError:
+                    self._sb_problems.append(f"{name} 不是用 UTF-8 存的：open 要寫 encoding=\"utf-8\"。")
+                    continue
+                if got and got[-1] == "":
+                    got.pop()
+                if [x.rstrip() for x in got] != list(want):
+                    shown = "\n".join("    " + x for x in got) or "    （空的）"
+                    self._sb_problems.append(f"{name} 的內容跟應該的不一樣。\n  應該是：\n" + "\n".join("    " + w for w in want) + f"\n  你的 {name}：\n" + shown)
+            for name in sb.get("absent_top", []):
+                if (tmp / name).exists():
+                    self._sb_problems.append(f"從帳本資料夾跑，{name} 跑到帳本最上層去了（不在 {path.name} 旁邊）。"
+                                             + (f"\n  提示：{sb['absent_hint']}" if sb.get("absent_hint") else ""))
+            feed = "check 在暫存資料夾裡照這樣跑（不動你帳本裡的檔案）：\n  " + "\n  ".join(how) + "\n  "
+            if swap and swap.get("feed"):
+                feed = swap["feed"] + "\n  " + feed
+            return last, [], feed
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
 
 
 def _assigned(tree: ast.AST, name: str) -> list[ast.AST]:
@@ -1011,6 +1101,20 @@ def ast_problems(source: str, rules: list[dict]) -> list[str]:
             ok = named and not bare
             default = (f"不要用光禿禿的 except:，它連 Control C 和打錯字都接住；寫明 except {name}。" if bare
                        else f"要用 try 包住會出錯的那一行，再寫 except {name}：接住它。")
+        elif kind in ("with_open", "open_utf8"):   # 1-23：open( 要寫在 with 後面／每個 open 都寫 encoding="utf-8"
+            opens = [n for n in ast.walk(tree) if isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id == "open"]
+            if kind == "with_open":
+                in_with = {id(it.context_expr) for n in ast.walk(tree) if isinstance(n, ast.With) for it in n.items}
+                ok = bool(opens) and all(id(c) in in_with for c in opens)
+                default = ("還沒有用 open 打開檔案。" if not opens else
+                           "open(…) 要寫在 with 後面：with open(…) as f:，下面空四格寫要做的事，做完 Python 會自動幫你關檔。")
+            else:
+                def utf8(c: ast.Call) -> bool:
+                    return any(k.arg == "encoding" and isinstance(k.value, ast.Constant) and isinstance(k.value.value, str)
+                               and k.value.value.lower().replace("_", "-") in ("utf-8", "utf8") for k in c.keywords)
+                ok = bool(opens) and all(utf8(c) for c in opens)
+                default = ("還沒有用 open 打開檔案。" if not opens else
+                           'open(…) 裡要寫 encoding="utf-8"：沒寫的話，Windows 上會用系統預設的編碼，中文可能讀成亂碼或跳出 UnicodeDecodeError。')
         elif kind == "flagloop":
             ok = _flagloop_ok(tree, name)
             default = f"{name} 要改回迴圈：先寫 {name} = False（或 True），再在 for 迴圈裡遇到符合的就改它，不能用 any／all。"
@@ -1979,6 +2083,10 @@ class ChaffCheck(Check):
         need_req = int(self.spec.get("min_req_marks", 0))
         if need_req and len([m for m in parsed.marks if m.kind == "需求有問題"]) < need_req:
             out.append(self.stub("sreq", f"至少 {need_req} 行標「需求有問題」"))
+        # 1-23（只對寫了 min_crash_marks 的 checks.json 生效）：至少要有幾行標「已知會當掉」；還沒有就多一題沒過的（題數跟標了以後一樣）
+        need_crash = int(self.spec.get("min_crash_marks", 0))
+        if need_crash and len([m for m in parsed.marks if m.kind == "已知會當掉"]) < need_crash:
+            out.append(self.stub("scrash", f"至少 {need_crash} 行標「已知會當掉」"))
         return out
 
     # ----- 每個版本各跑一次（各自一個程序） -----
@@ -2006,7 +2114,18 @@ class ChaffCheck(Check):
             req["eval_once"] = True
         if self.spec.get("try_checks"):   # 1-22：最外層的 try（裡面有 assert）整個算一條
             req["try_checks"] = True
-        reply = self.ctx.env.runner_raw(req, timeout=timeout)
+        tmp = None
+        if self.spec.get("tmp_cwd"):   # 1-23（只對寫了它的題目）：檢查檔複製到暫存資料夾、在那裡跑（每個版本各一個，檢查寫的測試檔不會互相留下來）
+            tmp = Path(tempfile.mkdtemp(prefix="plusform-chaff-"))
+            src = Path(req["checks_file"])
+            copy = tmp / src.name
+            copy.write_bytes(src.read_bytes())
+            req["checks_file"] = str(copy)
+        try:
+            reply = self.ctx.env.runner_raw(req, timeout=timeout, cwd=tmp)
+        finally:
+            if tmp is not None:
+                shutil.rmtree(tmp, ignore_errors=True)
         data = reply.result
         if data is not None:
             if "runner_error" in data:
@@ -2362,6 +2481,13 @@ class ChaffCheck(Check):
                     r.ok, r.detail, r.note = judge_case_mark(mk, self._cases[mk.line][0], self.spec["func"], key, mark_status.get(mk.line, {}))
                 else:
                     r.ok, r.detail, r.note = judge_mark(mk, key, mark_status.get(mk.line, {}))
+        if self.spec.get("mark_note"):   # 1-23：標對了的「已知會當掉」，多印一句（例如 2-4 怎麼解決）
+            for mk in marks:
+                r = by_id[f"s{mk.line}"]
+                if r.ok and mk.kind == "已知會當掉":
+                    r.note = (r.note + "\n  " if r.note else "") + self.spec["mark_note"]
+        if "scrash" in by_id:   # 1-23（min_crash_marks）：提示寫在 checks.json 的 crash_mark_hint
+            by_id["scrash"].detail = self.spec.get("crash_mark_hint", "還沒有一行標「已知會當掉」：找一個連正確版都會當掉的情況，在那一行最後加上「# 已知會當掉」。")
         if "sreq" in by_id:   # 1-15 起（min_req_marks）：提示寫在 checks.json 的 req_mark_hint（每行 ≤68 欄）
             by_id["sreq"].detail = self.spec.get("req_mark_hint", "還沒有一行標「需求有問題」：把需求卡每一條都寫成 assert 跑跑看。")
         if "smin" in by_id:

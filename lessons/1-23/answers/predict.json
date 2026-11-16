@@ -1,0 +1,20 @@
+{
+ "note": "1-23 第①圈：先猜（對答 3 題，都是選擇題；隨片測驗「w 和 a 差在哪」＋相對路徑）。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {"id": "p1", "title": "w 會先清空", "accept": ["B"],
+   "choices": {"A": "3 行（新的接在後面）", "B": "1 行（只剩 11/05 晚餐）", "C": "2 行（沒有變）"},
+   "hint": "w 一打開檔案，原本的兩行還在嗎？",
+   "explain": "w 一打開就先把檔案清空（官方文件：truncating the file first），再寫進新的一行，所以只剩 11/05 晚餐。"},
+  {"id": "p2", "title": "a 接在後面", "accept": ["C"],
+   "choices": {"A": "1 行", "B": "0 行", "C": "2 行（11/05 晚餐 兩次）"},
+   "hint": "a 打開時會不會清空？第二次跑，第一次寫的那一行還在嗎？",
+   "explain": "a 打開時不清空，寫的字接在最後面（appending to the end of file）；跑兩次就接了兩次，一共兩行。"},
+  {"id": "p3", "title": "相對路徑跟著在哪裡跑", "accept": ["A"],
+   "choices": {"A": "帳本資料夾最上層（你打指令的地方）", "B": "lessons/1-23 裡，save.py 旁邊", "C": "課程資料夾裡"},
+   "hint": "只寫 \"ledger.txt\" 時，Python 從哪個資料夾找起？是 save.py 在的地方，還是你打指令的地方？",
+   "explain": "只寫檔名是相對路徑，從「現在在哪個資料夾執行」算起（官方文件：relative to the current working directory）；你在帳本資料夾打指令，檔案就寫在帳本最上層。要跟著 save.py 走，用 Path(__file__).parent / \"ledger.txt\"。"}
+ ]
+}

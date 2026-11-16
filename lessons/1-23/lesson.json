@@ -1,0 +1,7 @@
+{
+ "id": "1-23",
+ "title": "檔案讀寫：關掉程式，帳還在",
+ "minutes": 45,
+ "fast_minutes": 8,
+ "after_start": "接下來，用 VS Code 打開帳本，找到 lessons/1-23：\n  1. 第一圈：predict.txt 先別跑、先猜 3 題；save.py 用 with open 把三筆帳寫進 ledger.txt，read.py 讀回來印出合計；p 都改成 Path(__file__).parent / \"ledger.txt\"\n  2. 第二圈：請家教問你 with 的問題，記在 tutor.md；close.txt 3 題\n  3. 第三圈：在 checks_store.py 寫來回測試（存了再讀回來要一模一樣），抓到 3 個 AI 寫錯的版本；備註有逗號那一條標「# 已知會當掉」記下來\n做完回到課程資料夾打：uv run check.py 1-23"
+}

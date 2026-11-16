@@ -1,0 +1,28 @@
+# 1-23 第②圈：with 和關檔。先想，再自己跑跑看（可以貼給家教一起討論）。
+# 在「答：」後面寫 A、B 或 C，存檔。
+
+第 1 題：
+#   from pathlib import Path
+#   p = Path("note.txt")
+#   with open(p, "w", encoding="utf-8") as f:
+#       f.write("11/03,午餐,120\n")
+#       print(repr(p.read_text(encoding="utf-8")))
+# 第 5 行（with 還沒結束）印出什麼？
+#   A. '11/03,午餐,120\n'
+#   B. ''（空的）
+#   C. 錯誤訊息
+答：
+
+第 2 題：
+# 同一段程式，with 那一段跑完以後，再寫一行 print(f.closed)，會印出什麼？
+#   A. False
+#   B. 錯誤訊息
+#   C. True
+答：
+
+第 3 題：
+# 官方教學說：沒有用 with、也沒有呼叫 f.close()，f.write() 寫的字會怎樣？
+#   A. 可能沒有完整寫進檔案，就算程式正常結束也一樣
+#   B. 一定會寫進檔案，只是比較慢
+#   C. Python 會跳出錯誤訊息
+答：

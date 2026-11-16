@@ -1,0 +1,44 @@
+{
+ "note": "回顧題：學員通過這課以後，往後第 2 課和第 5 課的 check 會各帶一題。",
+ "questions": [
+  {
+   "id": "r1",
+   "q": "ledger.txt 原本有 3 行。跑一次：\nwith open(\"ledger.txt\", \"w\", encoding=\"utf-8\") as f:\n    f.write(\"12/01,書,450\\n\")\nledger.txt 變成幾行？\nA. 4 行\nB. 3 行\nC. 1 行\n（寫 A、B 或 C）",
+   "accept": [
+    "C"
+   ],
+   "explain": "w 一打開就先把檔案清空，再寫進新的一行，所以只剩 1 行；要接在後面用 a。",
+   "choices": {
+    "A": "4 行",
+    "B": "3 行",
+    "C": "1 行"
+   }
+  },
+  {
+   "id": "r2",
+   "q": "read.py 在 lessons/1-23 裡，寫 open(\"ledger.txt\", encoding=\"utf-8\")；ledger.txt 也在 lessons/1-23 裡。\n在帳本資料夾（最上層）打 uv run lessons/1-23/read.py，會怎樣？\nA. 印出 ledger.txt 的內容\nB. FileNotFoundError，找不到 ledger.txt\nC. 印出空的\n（寫 A、B 或 C）",
+   "accept": [
+    "B"
+   ],
+   "explain": "只寫檔名是相對路徑，從你打指令的資料夾（帳本最上層）找，那裡沒有 ledger.txt，所以 FileNotFoundError。用 Path(__file__).parent / \"ledger.txt\" 就會跟著 read.py 走。",
+   "choices": {
+    "A": "印出 ledger.txt 的內容",
+    "B": "FileNotFoundError，找不到 ledger.txt",
+    "C": "印出空的"
+   }
+  },
+  {
+   "id": "r3",
+   "q": "為什麼 open 一律寫 encoding=\"utf-8\"？\nA. 不寫的話，Windows 上會用系統預設的編碼，中文可能變亂碼或讀不出來\nB. 不寫的話，檔案會比較大\nC. 不寫的話，Mac 上一定會出錯\n（寫 A、B 或 C）",
+   "accept": [
+    "A"
+   ],
+   "explain": "沒寫 encoding 時，Python 3.13 用系統的地區設定編碼：Mac 通常是 UTF-8，繁體中文的 Windows 常見是 cp950，讀 UTF-8 存的中文會出錯或變亂碼。一律寫上，兩邊都一樣。",
+   "choices": {
+    "A": "不寫的話，Windows 上會用系統預設的編碼，中文可能變亂碼或讀不出來",
+    "B": "不寫的話，檔案會比較大",
+    "C": "不寫的話，Mac 上一定會出錯"
+   }
+  }
+ ]
+}

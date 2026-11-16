@@ -1,0 +1,35 @@
+# 1-23 第①圈：先猜。先不要跑，用眼睛想（隨片測驗：w 和 a 差在哪）。
+# 在「答：」後面寫 A、B 或 C，存檔。
+# 提示：w 一打開就先把檔案清空，再寫；a 打開時不清空，寫的字接在最後面。
+#       檔名只寫 "ledger.txt"（相對路徑）時，是從「你在哪個資料夾打指令」去找。
+
+第 1 題：
+# ledger.txt 原本有兩行：
+#     11/03,午餐,120
+#     11/04,公車,15
+# 跑下面這段一次：
+#   with open("ledger.txt", "w", encoding="utf-8") as f:
+#       f.write("11/05,晚餐,180\n")
+# ledger.txt 變成幾行？
+#   A. 3 行（新的接在後面）
+#   B. 1 行（只剩 11/05 晚餐）
+#   C. 2 行（沒有變）
+答：
+
+第 2 題：
+# ledger.txt 原本是空的。下面這段跑兩次：
+#   with open("ledger.txt", "a", encoding="utf-8") as f:
+#       f.write("11/05,晚餐,180\n")
+# ledger.txt 變成幾行？
+#   A. 1 行
+#   B. 0 行
+#   C. 2 行（11/05 晚餐 兩次）
+答：
+
+第 3 題：
+# save.py 放在帳本的 lessons/1-23 裡，裡面寫 open("ledger.txt", "w", encoding="utf-8")。
+# 你在帳本資料夾（最上層）打 uv run lessons/1-23/save.py。ledger.txt 會出現在哪裡？
+#   A. 帳本資料夾最上層（你打指令的地方）
+#   B. lessons/1-23 裡，save.py 旁邊
+#   C. 課程資料夾裡
+答：
