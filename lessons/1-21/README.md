@@ -24,7 +24,7 @@ C. `main.py` 用標準函式庫的 `datetime`：把兩個 `"…"` 換成格式�
 - **找得到 money.py 的條件：** 官方教學 6.1.2：import 先找「你跑的那個檔所在的資料夾」。這一課把兩個檔放在同一個資料夾；`money.py` 不在 `main.py` 旁邊（帳本裡別的地方也沒有它），就會出現 `ModuleNotFoundError: No module named 'money'`。
 - **標準函式庫：** Python 自己帶的模組，裝好 Python 就有、不用另外裝。`datetime`（日期）、`random`（亂數）、`math`（數學）、`pathlib`（路徑）都是。
 - **datetime 的格式碼：** `date.today()` 是今天；`.strftime("%Y-%m")` 照格式把日期變成字串；`datetime.strptime("2026-11-03", "%Y-%m-%d")` 反過來，把字串照格式解析成日期。`%Y` 四位數的年、小寫 `%m` 兩位數的月、`%d` 兩位數的日；**大寫 `%M` 是分鐘**，寫錯了不一定會出現錯誤訊息（`strptime("2026-11-03", "%Y-%M-%d")` 照樣跑，月份卻變成 1）。完整的表：https://docs.python.org/3.13/library/datetime.html#format-codes
-- **random、math：** `random.randint(1, 6)` 每次跑都不一樣，可能是 1 到 6（官方文件：a <= N <= b，兩頭都包含）。`math.ceil(1250 / 3)` 是無條件進位，417。
+- **random、math：** `random.randint(1, 6)` 每次跑挑到的可能不一樣、也可能重複，但一定在 1 到 6 之間（官方文件：a <= N <= b，兩頭都包含）。`math.ceil(1250 / 3)` 是無條件進位，417。
 - **pathlib（Mac／Windows 路徑不同）：** Mac 的路徑用斜線 `/`，Windows 用反斜線 `\`。`Path("lessons") / "1-21" / "money.py"` 在 Mac 印出 `lessons/1-21/money.py`，在 Windows 印出 `lessons\1-21\money.py`：用 `Path` 接，兩邊都對。
 - **ModuleNotFoundError：** import 找不到那個模組。原因有兩種：這台電腦沒裝，或根本不存在。`uv run python -c "import 名字"` 只是試 import，不會替你安裝那個套件；再到 PyPI 搜尋看看（PyPI 上的名字不一定跟 import 的名字一樣，查不到可靠的出處就先不要裝）。
 

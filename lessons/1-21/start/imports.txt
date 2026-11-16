@@ -1,14 +1,15 @@
 # 1-21 第③圈：AI 叫你 import 的，先查它存不存在（3 題）。
 # 在「答：」後面寫 A、B 或 C，存檔。
 # 怎麼查：標準函式庫的全部模組列在 https://docs.python.org/3.13/py-modindex.html ；
-#         要另外裝的套件，到 https://pypi.org 搜尋名字（查不到，就不要自己去裝）。
+#         要另外裝的套件，到 https://pypi.org 搜尋名字。
+# 查不到可靠的出處，就先不要自己去裝（查不到不代表一定不存在，PyPI 上的名字也不一定跟 import 的一樣）。
 
 第 1 題：
 # AI 寫的程式最上面有這三行：
 #   A. import statistics
 #   B. import budgetkit
 #   C. import requests
-# 哪一行的名字是編出來的（標準函式庫沒有，PyPI 也查不到）？
+# 其中一個是課程準備的假名字，就是 AI 會編出來的那種（標準函式庫的清單裡沒有，PyPI 也搜尋不到）。是哪一行？
 答：
 
 第 2 題：

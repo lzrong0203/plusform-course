@@ -19,7 +19,7 @@
       "id": "r3",
       "q": "AI 寫的程式第一行是 import twmoney。你試了 uv run python -c \"import twmoney\"，出現 ModuleNotFoundError；PyPI 搜尋 twmoney 也是沒有結果。怎麼辦？\nA. 不裝，退回去請 AI 改用標準函式庫或自己的檔\nB. 裝一個名字很像的\nC. 自己建一個 twmoney.py 讓它 import 得到\n（寫 A、B 或 C）",
       "accept": ["A"],
-      "explain": "查不到就不要裝、也不要找名字很像的：有人會搶先用 AI 常編的名字放上壞程式。自己建一個同名的檔只是讓錯誤訊息消失，AI 以為那個套件會做的事還是沒人做。退回去請 AI 改寫。",
+      "explain": "查不到可靠的出處就先不要裝、也不要找名字很像的：有人可能會搶先用 AI 常編的名字放上壞程式。自己建一個同名的檔只是讓錯誤訊息消失，AI 以為那個套件會做的事還是沒人做。退回去請 AI 改寫。",
       "choices": {"A": "不裝，退回去請 AI 改寫", "B": "裝一個名字很像的", "C": "自己建一個 twmoney.py"}
     }
   ]

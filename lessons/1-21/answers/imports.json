@@ -6,15 +6,15 @@
  "questions": [
   {"id": "i1", "title": "哪一個是編的", "accept": ["B"],
    "choices": {"A": "import statistics", "B": "import budgetkit", "C": "import requests"},
-   "hint": "先到 https://docs.python.org/3.13/py-modindex.html 找標準函式庫有沒有這個名字；沒有的，再到 https://pypi.org 搜尋。兩邊都查不到的那一個就是編的。",
-   "explain": "statistics 在標準函式庫的模組清單裡（裝好 Python 就有）；requests 是 PyPI 上查得到的套件（要另外裝）；budgetkit 兩邊都查不到，是編出來的名字。"},
+   "hint": "先到 https://docs.python.org/3.13/py-modindex.html 找標準函式庫有沒有這個名字；沒有的，再到 https://pypi.org 搜尋。這一題的假名字是課程準備的，兩邊都找不到。平常遇到兩邊都找不到的，只能說還沒找到可靠的出處，不能證明它不存在，先不要裝。",
+   "explain": "statistics 在標準函式庫的模組清單裡（裝好 Python 就有）；requests 是 PyPI 上查得到的套件（要另外裝）；budgetkit 是課程準備的假名字，標準函式庫和 PyPI 都找不到。平常查不到，就當作還沒找到可靠的出處，先不要裝。"},
   {"id": "i2", "title": "ModuleNotFoundError 代表什麼", "accept": ["C"],
    "choices": {"A": "requests 是 AI 編出來的", "B": "Python 壞掉了", "C": "帳本裡沒有裝；requests 是 PyPI 上查得到的套件"},
    "hint": "ModuleNotFoundError 只說「這台電腦找不到這個模組」。找不到的原因有兩種：沒裝，或根本不存在。requests 在 PyPI 上查不查得到？",
-   "explain": "ModuleNotFoundError 是 import 找不到那個模組。requests 在 PyPI 上查得到，所以是帳本裡沒裝，不是編的。要分清楚「沒裝」和「不存在」，就要去 PyPI 查。"},
+   "explain": "ModuleNotFoundError 是 import 找不到那個模組。requests 在 PyPI 上查得到，所以是帳本裡沒裝，不是編的。要分清楚是「沒裝」還是「可能根本不存在」，就要去 PyPI 搜尋看看。"},
   {"id": "i3", "title": "查不到怎麼辦", "accept": ["A"],
    "choices": {"A": "不裝，退回去請 AI 只用標準函式庫或你自己的檔", "B": "照 AI 說的，想辦法把它裝起來", "C": "裝一個 PyPI 上名字很像的"},
-   "hint": "PyPI 查不到，代表這個名字現在沒有人放上去。有人會搶先用這種名字放壞程式，名字很像的也不一定是你要的。",
-   "explain": "查不到就不要裝，也不要找名字很像的來裝：有人會用 AI 常編的名字放上壞程式。退回去，請 AI 改用標準函式庫或你自己寫的 money.py。"}
+   "hint": "PyPI 搜尋不到，代表你還沒找到可靠的出處（PyPI 上的名字也不一定跟 import 的一樣）。有人可能會搶先用這種名字放壞程式，名字很像的也不一定是你要的。",
+   "explain": "查不到可靠的出處就先不要裝，也不要找名字很像的來裝：有人可能會用 AI 常編的名字放上壞程式。退回去，請 AI 改用標準函式庫或你自己寫的 money.py，或請它給官方來源。"}
  ]
 }

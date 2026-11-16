@@ -15,7 +15,7 @@
 第 2 題：
 #   import random
 #   print(random.randint(1, 6))
-# 每次跑都不一樣。可能印出哪些數？（查 random.randint）
+# 每次跑挑到的可能不一樣，也可能重複。可能印出哪些數？（查 random.randint）
 #   https://docs.python.org/3.13/library/random.html#random.randint
 #   A. 1 到 5
 #   B. 0 到 6
