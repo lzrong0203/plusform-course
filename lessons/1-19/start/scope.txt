@@ -1,0 +1,70 @@
+# 1-19 第①圈：範圍題 5 題。先不要跑，用眼睛追。
+# 在「答：」後面寫 A、B 或 C，存檔。
+# 提示：呼叫的時候開一個小框。函式裡給了值的名字（名字 = …），是小框自己的，外面那個不會變；
+#       函式裡只讀、沒給值的名字，框裡找不到，就到外面找。
+
+第 1 題：
+#   rate = 30
+#   def to_twd(usd):
+#       return usd * rate
+#
+#   print(to_twd(2))
+# 印出什麼？
+#   A. 60
+#   B. 出現錯誤訊息
+#   C. 2
+答：
+
+第 2 題：
+#   s = 0
+#   def add(a):
+#       s = a + 1
+#       return s
+#
+#   add(5)
+#   print(s)
+# 印出什麼？
+#   A. 6
+#   B. 0
+#   C. 出現錯誤訊息
+答：
+
+第 3 題：
+#   count = 0
+#   def add_one():
+#       count = count + 1
+#
+#   add_one()
+#   print(count)
+# 印出什麼？
+#   A. 1
+#   B. 0
+#   C. 出現錯誤訊息
+答：
+
+第 4 題：
+#   def make():
+#       t = 50
+#       return t
+#
+#   make()
+#   print(t)
+# 印出什麼？
+#   A. 50
+#   B. 出現錯誤訊息
+#   C. None
+答：
+
+第 5 題：
+#   total = 100
+#   def add(total, amount):
+#       total = total + amount
+#       return total
+#
+#   print(add(1, 2))
+#   print(total)
+# 印出哪兩行？
+#   A. 3 和 100
+#   B. 103 和 103
+#   C. 3 和 3
+答：

@@ -1,0 +1,406 @@
+{
+ "note": "1-19 的檢查：第①圈 scope.txt（範圍題 5 題，選擇題）、add_entry.py（func_shape 要 return；call 照順序呼叫三次：沒給帳本兩次（第二次要是新的一本，預設值 [] 的陷阱抓得到）、給了帳本一次；run 印 [120] [65]）、split.py（call 直接呼叫 total、by_category、biggest、light 兩次（第二次用關鍵字 budget=1200）；run 跑出來要跟 report_long.py 一模一樣）；第②圈 tutor.md（filled：六個標籤都寫了，自評）；第③圈 over_limit.py（func_shape：docstring 要有輸入／輸出／例子、要 return；call 照順序呼叫四次：同一個程序裡第二次呼叫抓得到「結果存在函式外面」、用關鍵字 limit=100、照原本的順序、都沒超過交回 []）、checks_over_limit.py（chaff 的 assert 模式、eval_once：學員的 assert 跑課程的正確版和 3 個 AI 寫錯的版本：結果存在函式外面（第一次對、第二次就錯）、門檻寫死 300、都沒超過交回 None）、green。grader 的 call 加 kwargs、seq_as_list（只對寫了它的題目生效）。",
+ "checks": [
+  {
+   "type": "answers",
+   "id": "scope",
+   "file": "lessons/1-19/scope.txt",
+   "key": "answers/scope.json",
+   "group": "第一圈"
+  },
+  {
+   "type": "func_shape",
+   "id": "add-def",
+   "file": "lessons/1-19/add_entry.py",
+   "func": "add_entry",
+   "must_return": true,
+   "group": "第一圈",
+   "desc": "add_entry.py：寫了 def add_entry，用 return 交回帳本",
+   "missing_hint": "add_entry.py 應該在帳本的 lessons/1-19/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-19。"
+  },
+  {
+   "type": "call",
+   "id": "add-1",
+   "file": "lessons/1-19/add_entry.py",
+   "module": "add_entry",
+   "func": "add_entry",
+   "args": [
+    120
+   ],
+   "expect": [
+    120
+   ],
+   "group": "第一圈",
+   "desc": "沒給帳本：add_entry(120) 交回 [120]（check 載入你的檔案時，最下面那兩行已經先呼叫過兩次）",
+   "hint": "預設值只在 Python 讀到 def 那一行時做一次：預設值寫 []，每次呼叫都共用同一個 list（最下面那兩次呼叫加進去的還在）。改成 book=None，函式裡 if book is None: book = []。"
+  },
+  {
+   "type": "call",
+   "id": "add-2",
+   "file": "lessons/1-19/add_entry.py",
+   "module": "add_entry",
+   "func": "add_entry",
+   "args": [
+    65
+   ],
+   "expect": [
+    65
+   ],
+   "group": "第一圈",
+   "desc": "再呼叫一次、又沒給帳本：add_entry(65) 交回 [65]（新的一本，不是接在上一次後面）",
+   "hint": "預設值只在 Python 讀到 def 那一行時做一次：預設值寫 []，每次呼叫都共用同一個 list。改成 book=None，函式裡 if book is None: book = []。"
+  },
+  {
+   "type": "call",
+   "id": "add-3",
+   "file": "lessons/1-19/add_entry.py",
+   "module": "add_entry",
+   "func": "add_entry",
+   "args": [
+    85,
+    [
+     120
+    ]
+   ],
+   "expect": [
+    120,
+    85
+   ],
+   "group": "第一圈",
+   "desc": "有給帳本：add_entry(85, [120]) 交回 [120, 85]（記進交進來的那一本）",
+   "hint": "有交帳本進來時（book 不是 None），要加進那一本，不要每次都做新的。"
+  },
+  {
+   "type": "run",
+   "id": "add-run",
+   "file": "lessons/1-19/add_entry.py",
+   "group": "第一圈",
+   "desc": "add_entry.py：印出 [120] [65]",
+   "timeout": 5,
+   "expect_exact": [
+    "[120] [65]"
+   ],
+   "hint": "印出 [120, 65] [120, 65]，代表兩次呼叫還在共用同一個 list（預設值是 []）。",
+   "missing_hint": "add_entry.py 應該在帳本的 lessons/1-19/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-19。"
+  },
+  {
+   "type": "call",
+   "id": "split-total",
+   "file": "lessons/1-19/split.py",
+   "module": "split",
+   "func": "total",
+   "args": [
+    [
+     [
+      "餐",
+      120
+     ],
+     [
+      "車",
+      30
+     ],
+     [
+      "餐",
+      85
+     ],
+     [
+      "書",
+      450
+     ],
+     [
+      "車",
+      60
+     ],
+     [
+      "餐",
+      300
+     ]
+    ]
+   ],
+   "expect": 1045,
+   "group": "第一圈",
+   "desc": "split.py：total(11 月的六筆) 交回 1045",
+   "missing_hint": "split.py 應該在帳本的 lessons/1-19/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-19。"
+  },
+  {
+   "type": "call",
+   "id": "split-cat",
+   "file": "lessons/1-19/split.py",
+   "module": "split",
+   "func": "by_category",
+   "args": [
+    [
+     [
+      "餐",
+      120
+     ],
+     [
+      "車",
+      30
+     ],
+     [
+      "餐",
+      85
+     ],
+     [
+      "書",
+      450
+     ],
+     [
+      "車",
+      60
+     ],
+     [
+      "餐",
+      300
+     ]
+    ]
+   ],
+   "expect": {
+    "餐": 505,
+    "車": 90,
+    "書": 450
+   },
+   "group": "第一圈",
+   "desc": "split.py：by_category(11 月的六筆) 交回 {\"餐\": 505, \"車\": 90, \"書\": 450}"
+  },
+  {
+   "type": "call",
+   "id": "split-big",
+   "file": "lessons/1-19/split.py",
+   "module": "split",
+   "func": "biggest",
+   "args": [
+    [
+     [
+      "餐",
+      120
+     ],
+     [
+      "車",
+      30
+     ],
+     [
+      "餐",
+      85
+     ],
+     [
+      "書",
+      450
+     ],
+     [
+      "車",
+      60
+     ],
+     [
+      "餐",
+      300
+     ]
+    ]
+   ],
+   "expect": [
+    "書",
+    450
+   ],
+   "seq_as_list": true,
+   "group": "第一圈",
+   "desc": "split.py：biggest(11 月的六筆) 交回 (\"書\", 450)"
+  },
+  {
+   "type": "call",
+   "id": "split-light1",
+   "file": "lessons/1-19/split.py",
+   "module": "split",
+   "func": "light",
+   "args": [
+    1045
+   ],
+   "expect": "紅燈",
+   "group": "第一圈",
+   "desc": "split.py：light(1045) 交回 \"紅燈\"（沒給 budget，用預設值 1000）"
+  },
+  {
+   "type": "call",
+   "id": "split-light2",
+   "file": "lessons/1-19/split.py",
+   "module": "split",
+   "func": "light",
+   "args": [
+    1045
+   ],
+   "kwargs": {
+    "budget": 1200
+   },
+   "expect": "黃燈",
+   "group": "第一圈",
+   "desc": "split.py：light(1045, budget=1200) 交回 \"黃燈\"（用關鍵字給預算）",
+   "hint": "函式裡要用參數 budget 算，不要寫死 1000：ratio = s / budget。"
+  },
+  {
+   "type": "run",
+   "id": "split-run",
+   "file": "lessons/1-19/split.py",
+   "group": "第一圈",
+   "desc": "split.py：跑出來跟 report_long.py 一模一樣（兩份報表）",
+   "timeout": 5,
+   "expect_exact": [
+    "== 11 月報表（預算 1000 元）==",
+    "合計 1045 元",
+    "餐 505 元",
+    "車 90 元",
+    "書 450 元",
+    "最大的一筆 書 450 元",
+    "紅燈",
+    "== 11 月報表（預算 1200 元）==",
+    "合計 1045 元",
+    "餐 505 元",
+    "車 90 元",
+    "書 450 元",
+    "最大的一筆 書 450 元",
+    "黃燈"
+   ],
+   "hint": "report 裡要印的照 report_long.py 抄；合計、小計、最大的一筆、燈號改成呼叫上面四個函式。最下面三行不要改。",
+   "missing_hint": "split.py 應該在帳本的 lessons/1-19/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-19。"
+  },
+  {
+   "type": "filled",
+   "id": "tutor",
+   "file": "lessons/1-19/tutor.md",
+   "group": "第二圈",
+   "labels": [
+    "我踩到的錯：",
+    "家教問我的：",
+    "我的回答：",
+    "我出的題目：",
+    "家教的回答：",
+    "跑出來對不對："
+   ],
+   "count": 1,
+   "item": "",
+   "desc": "tutor.md：請家教解釋範圍錯誤、你出一題考它，六個標籤都寫了（自評，內容不改對錯）",
+   "hint": "照 tutor.md 上面的步驟問家教；「我出的題目」寫你自己出的那一段程式和問題，「跑出來對不對」寫你自己跑的結果。",
+   "missing_hint": "tutor.md 應該在帳本的 lessons/1-19/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-19。"
+  },
+  {
+   "type": "func_shape",
+   "id": "doc",
+   "file": "lessons/1-19/over_limit.py",
+   "func": "over_limit",
+   "group": "第三圈",
+   "docstring": [
+    "輸入：",
+    "輸出：",
+    "例子："
+   ],
+   "example": true,
+   "must_return": true,
+   "desc": "over_limit.py：docstring 寫了輸入、輸出、例子，函式用 return 交回結果",
+   "hint": "照第③圈的寫法：輸入是一串金額和門檻 limit（沒給就是 300）；輸出是新的 list；例子寫一次呼叫和它交回的值。",
+   "missing_hint": "over_limit.py 應該在帳本的 lessons/1-19/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-19。"
+  },
+  {
+   "type": "call",
+   "id": "lim-1",
+   "file": "lessons/1-19/over_limit.py",
+   "module": "over_limit",
+   "func": "over_limit",
+   "args": [
+    [
+     120,
+     450,
+     85
+    ]
+   ],
+   "expect": [
+    450
+   ],
+   "group": "第三圈",
+   "desc": "over_limit([120, 450, 85]) 交回 [450]（沒給 limit，用 300）"
+  },
+  {
+   "type": "call",
+   "id": "lim-2",
+   "file": "lessons/1-19/over_limit.py",
+   "module": "over_limit",
+   "func": "over_limit",
+   "args": [
+    [
+     120,
+     450,
+     85
+    ]
+   ],
+   "kwargs": {
+    "limit": 100
+   },
+   "expect": [
+    120,
+    450
+   ],
+   "group": "第三圈",
+   "desc": "接着再呼叫：over_limit([120, 450, 85], limit=100) 交回 [120, 450]",
+   "hint": "第一次對、第二次就錯：是不是把結果存在函式外面的 list（或預設值寫成 []）？result = [] 要寫在函式裡面。也看一下有沒有用 limit 比，不是寫死 300。"
+  },
+  {
+   "type": "call",
+   "id": "lim-3",
+   "file": "lessons/1-19/over_limit.py",
+   "module": "over_limit",
+   "func": "over_limit",
+   "args": [
+    [
+     500,
+     320,
+     80
+    ]
+   ],
+   "expect": [
+    500,
+    320
+   ],
+   "group": "第三圈",
+   "desc": "第三次呼叫：over_limit([500, 320, 80]) 交回 [500, 320]（照原本的順序）"
+  },
+  {
+   "type": "call",
+   "id": "lim-4",
+   "file": "lessons/1-19/over_limit.py",
+   "module": "over_limit",
+   "func": "over_limit",
+   "args": [
+    [
+     50,
+     80
+    ]
+   ],
+   "expect": [],
+   "group": "第三圈",
+   "desc": "over_limit([50, 80]) 交回 []（都沒超過）",
+   "hint": "都沒超過的時候，交回空的 list []，不是 None。"
+  },
+  {
+   "type": "chaff",
+   "id": "r3",
+   "mode": "assert",
+   "student_file": "lessons/1-19/checks_over_limit.py",
+   "module": "over_limit",
+   "reference": "reference/over_limit.py",
+   "mutants": "mutants/mutants.json",
+   "teacher_file": "answers/checks_over_limit.py",
+   "min_checks": 3,
+   "eval_once": true,
+   "group": "第三圈"
+  },
+  {
+   "type": "run",
+   "id": "green",
+   "file": "lessons/1-19/checks_over_limit.py",
+   "group": "第三圈",
+   "desc": "跑 checks_over_limit.py：你的 assert 在你的 over_limit.py 上全部成立（什麼都沒印）",
+   "timeout": 5,
+   "expect_exact": [],
+   "hint": "跳出 AssertionError，代表 over_limit.py 還沒寫好，或 assert 右邊寫的答案算錯了。先自己跑 uv run lessons/1-19/checks_over_limit.py 看是哪一條。",
+   "missing_hint": "checks_over_limit.py 應該在帳本的 lessons/1-19/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-19。"
+  }
+ ]
+}

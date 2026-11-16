@@ -18,6 +18,7 @@ check.py 把要做的事用 JSON 從 stdin 傳進來（裡面有一個每次都�
 
 import ast
 import contextlib
+import copy
 import importlib.util
 import io
 import json
@@ -156,13 +157,14 @@ def op_call(req: dict) -> dict:
         emit("progress", f"case {i}")
         try:
             with quiet():
-                got = func(*case.get("args", []))
+                got = func(*case.get("args", []), **case.get("kwargs", {}))   # 1-19：kwargs＝用關鍵字交的參數（沒寫＝跟以前一樣只交 args）
             if req.get("seq_as_list"):   # 1-4 的 cases：交回 (334, 333, 333)；JSON 傳來的預期值是 list，兩邊都換成 list 比
                 got = _as_list(got)
             ok = got == case["expect"]
             if req.get("strict_type"):   # 1-3 的 cases：型別也要一樣（120、120.0、"120" 都不同；True 也不算 1）
                 ok = ok and (_same_types(got, case["expect"]) if req.get("seq_as_list") else type(got) is type(case["expect"]))
-            out["cases"].append({"ok": ok, "got": got if _jsonable(got) else repr(got), "type": type(got).__name__})
+            # 1-19：交回的值當下先存一份（下一題再呼叫時，函式可能改到同一個 list，報出來的要是這一題交回的那一刻）
+            out["cases"].append({"ok": ok, "got": copy.deepcopy(got) if _jsonable(got) else repr(got), "type": type(got).__name__})
         except BaseException as exc:  # noqa: BLE001
             out["cases"].append({"ok": False, "error": short_error(exc), "line": error_line(exc, path)})
     return out

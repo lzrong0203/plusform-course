@@ -1,0 +1,7 @@
+{
+  "id": "1-19",
+  "title": "函式（下）：預設值、關鍵字參數、範圍",
+  "minutes": 60,
+  "fast_minutes": 10,
+  "after_start": "接下來，用 VS Code 打開帳本的 lessons/1-19：\n  1. 第一圈：scope.txt 先別跑、預測 5 題範圍題；add_entry.py 把預設值 [] 改成 None，修好共用同一個 list 的陷阱；split.py 照寫好的五個函式名字和說明，把 report_long.py 的 60 行搬進去\n  2. 第二圈：請家教解釋你踩到的範圍錯誤，再出一題同類型的考它，記在 tutor.md\n  3. 第三圈：在 over_limit.py 的 docstring 寫輸入、輸出、例子，在 checks_over_limit.py 寫 assert；函式內容交給 AI（或抄課程的凍結版），用 assert 驗收\n做完回到課程資料夾打：uv run check.py 1-19"
+}

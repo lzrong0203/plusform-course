@@ -12,7 +12,8 @@ check.py（學員端）和 tools/validate_lesson.py（老師端）共用這一�
   run           在帳本的環境裡跑學員的程式（stdin 由這裡餵），比對印出來的字；swap＝先把一行換掉再跑（1-C1 第三部分：
                 金額換了也要算得對）；當掉時 Result.data["error"] 記錯誤種類（1-C1 矯正包用）；runs＝同一題換幾組輸入各跑一次，
                 全部對才算對（1-C2 第三部分：邊界和區間中間的金額放同一題）
-  call          呼叫學員寫的函式，比對回傳值
+  call          呼叫學員寫的函式，比對回傳值（同一個檔案、同一個函式的題目在同一個程序裡照順序呼叫，所以「第一次對、第二次就錯」抓得到；
+                1-19 加兩個只對寫了它的題目生效的欄位：kwargs＝用關鍵字交的參數 {"limit": 100}；seq_as_list＝交回的 tuple 跟 JSON 的 list 比）
   chaff         wheat/chaff：學員寫的檢查要在正確版全過、在每個壞版本至少錯一條
   script_match  學員改過的腳本，在假的資料夾裡跑起來要跟安全版一樣
   git_commits   帳本是 git 存放庫，而且至少有幾個存檔點（commit）
@@ -436,6 +437,12 @@ def or_list(items: list[str]) -> str:
 
 def args_text(args: list) -> str:
     return ", ".join(repr(a) for a in args)
+
+
+def call_args_text(spec: dict) -> str:
+    """call 題的括號裡（1-19：kwargs 寫成 limit=100 接在後面；沒寫 kwargs 的題目跟 args_text 一樣）。"""
+    parts = [repr(a) for a in spec.get("args", [])] + [f"{k}={v!r}" for k, v in (spec.get("kwargs") or {}).items()]
+    return ", ".join(parts)
 
 
 def output_lines(text: str) -> list[str]:
@@ -1209,7 +1216,7 @@ class FuncShapeCheck(Check):
 class CallCheck(Check):
     def plan(self):
         s = self.spec
-        desc = s.get("desc") or f"{s['func']}({args_text(s.get('args', []))}) 應該是{show(s['expect'])}"
+        desc = s.get("desc") or f"{s['func']}({call_args_text(s)}) 應該是{show(s['expect'])}"
         return [self.stub(None, desc)]
 
     def _batch(self) -> dict:
@@ -1227,7 +1234,9 @@ class CallCheck(Check):
                 "file": str(path),
                 "module": s["module"],
                 "func": s["func"],
-                "cases": [{"args": c.get("args", []), "expect": c["expect"]} for c in specs],
+                "cases": [{"args": c.get("args", []), "expect": c["expect"], **({"kwargs": c["kwargs"]} if c.get("kwargs") else {})} for c in specs],
+                # 1-19：kwargs＝用關鍵字交的參數（只對寫了它的題目生效）；seq_as_list＝交回 tuple 時跟 JSON 的 list 比（同一個函式只要有一題寫了就一起用）
+                **({"seq_as_list": True} if any(c.get("seq_as_list") for c in specs) else {}),
             })
             data = {"reply": reply, "ids": [c["id"] for c in specs]}
         self.ctx._call_cache[key] = data
@@ -1261,7 +1270,7 @@ class CallCheck(Check):
         r.ok = bool(case.get("ok"))
         if r.ok:
             return
-        call = f"{s['func']}({args_text(s.get('args', []))})"
+        call = f"{s['func']}({call_args_text(s)})"
         if "error" in case:
             r.detail = f"{call} 應該回傳{show(s['expect'])}，可是你的程式當掉了：{case['error']}"
         else:

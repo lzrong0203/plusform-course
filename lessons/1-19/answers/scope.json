@@ -1,0 +1,28 @@
+{
+ "note": "1-19 第①圈：範圍題（對答 5 題，都是選擇題）。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {"id": "q1", "title": "函式裡只讀外面的名字", "accept": ["A"],
+   "choices": {"A": "60", "B": "出現錯誤訊息", "C": "2"},
+   "hint": "函式裡有沒有給 rate 值？框裡找不到 rate，會到哪裡找？",
+   "explain": "函式裡只讀 rate、沒有給它值；框裡找不到，就到外面找，找到 30，所以是 2 × 30 = 60。"},
+  {"id": "q2", "title": "函式裡給值，是框裡自己的", "accept": ["B"],
+   "choices": {"A": "6", "B": "0", "C": "出現錯誤訊息"},
+   "hint": "函式裡寫了 s = …，這個 s 是小框自己的，還是外面那個？呼叫完，外面的 s 有沒有被改？",
+   "explain": "函式裡給了 s 值，這個 s 是小框自己的（區域變數），框裡的 s 是 6；外面的 s 一直是 0。add(5) 交回的 6 沒有拿去用。"},
+  {"id": "q3", "title": "先讀再給值（UnboundLocalError）", "accept": ["C"],
+   "choices": {"A": "1", "B": "0", "C": "出現錯誤訊息"},
+   "hint": "函式裡有 count = 這一行，整個函式裡的 count 都是框裡的；右邊的 count + 1 要先讀框裡的 count，它有值了嗎？",
+   "explain": "函式裡有給 count 值，Python 就把整個函式裡的 count 當成框裡自己的；右邊的 count + 1 要讀框裡的 count，可是它還沒有值，所以出錯：UnboundLocalError: cannot access local variable 'count' where it is not associated with a value。"},
+  {"id": "q4", "title": "函式裡的名字，外面找不到", "accept": ["B"],
+   "choices": {"A": "50", "B": "出現錯誤訊息", "C": "None"},
+   "hint": "t 是在哪裡給值的？函式跑完，小框和裡面的名字還在嗎？",
+   "explain": "t 是函式小框裡的名字，函式跑完小框就收起來，外面沒有 t：NameError: name 't' is not defined。要用它，拿函式交回來的值（x = make()）。"},
+  {"id": "q5", "title": "參數和外面的名字一樣", "accept": ["A"],
+   "choices": {"A": "3 和 100", "B": "103 和 103", "C": "3 和 3"},
+   "hint": "參數 total 是小框裡的名字，接住的是交進來的 1；函式裡改的是哪一個 total？",
+   "explain": "參數也是小框裡的名字：框裡的 total 接住 1，加上 2 變成 3，交回 3；外面的 total 一直是 100。"}
+ ]
+}
