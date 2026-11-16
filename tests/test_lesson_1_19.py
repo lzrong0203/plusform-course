@@ -308,6 +308,15 @@ class Asserts(unittest.TestCase):
         out = ev(["green"])
         self.assertTrue(out.results[0].ok, out.results[0].detail)
 
+    def test_frozen_version_passes_everything(self):
+        """沒有 AI 帳號的：凍結版的函式內容抄進自己的 over_limit.py（docstring 留自己寫的）。"""
+        frozen = (D / "frozen" / "over_limit.py").read_text(encoding="utf-8")
+        body = frozen.split('    """\n', 1)[1]   # docstring 結束的那一行以下＝函式內容
+        write(mine("over_limit.py"), HEAD + DOC + body)
+        write(mine("checks_over_limit.py"), BEAR)
+        out = ev(["doc", "lim-1", "lim-2", "lim-3", "lim-4", "green"])
+        self.assertTrue(all(r.ok for r in out.results), [(r.id, r.detail) for r in out.results])
+
 
 if __name__ == "__main__":
     unittest.main()
