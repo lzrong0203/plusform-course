@@ -30,7 +30,7 @@ C. 把長程式拆成小函式（`split.py`）。`report_long.py` 是熊的月�
 - **範圍：** 呼叫的時候開一個小框（1-18）。函式裡**給了值**的名字（`s = …`）是小框自己的，叫**區域變數**，函式跑完就不見；寫在函式外面的叫**全域變數**。函式裡只讀、沒給值的名字，框裡找不到就到外面找（官方教學：variable references first look in the local symbol table, … then in the global symbol table, and finally in the table of built-in names）。
 - **UnboundLocalError：** 函式裡只要有一行給 `count` 值，整個函式裡的 `count` 都是框裡的；在給值之前先讀它（`count = count + 1` 的右邊、或前面先 `print(count)`），就會出現 `UnboundLocalError: cannot access local variable 'count' where it is not associated with a value`。看到它，先找函式裡有沒有給同一個名字值。
 - **要改外面的數字：** 用參數交進去、用 `return` 交回來（`count = add_one(count)`），不要在函式裡偷改外面的。
-- **預設值只做一次：** 預設值是 Python 讀到 def 那一行時就做好的（官方教學：The default value is evaluated only once）。預設值寫 `[]` 或 `{}`，每次呼叫都共用同一個盒子；改成 `None`，函式裡 `if book is None: book = []`。
+- **預設值只做一次：** 預設值是 Python 讀到 def 那一行時就做好的（官方教學：The default value is evaluated only once）。預設值寫 `[]` 或 `{}`，沒給這個參數的每一次呼叫都共用同一個盒子（有交帳本進來就用交進來的那一本）；改成 `None`，函式裡 `if book is None: book = []`。
 - 第③圈的 assert：同一個檔案裡的 assert 照順序呼叫。只呼叫一次的檢查，抓不到「第一次對、第二次就錯」的版本。
 
 ## 3. 開始前要打的指令
