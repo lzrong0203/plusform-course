@@ -15,18 +15,18 @@ C. `main.py` 用標準函式庫的 `datetime`：把兩個 `"…"` 換成格式�
 
 **第②圈：問家教格式碼，再對照官方文件。** 照 `tutor.md` 的步驟，在家教專案裡問 `%Y-%m-%d` 是什麼意思、寫成大寫 `%M` 會怎樣、官方文件哪裡查得到；再打開官方文件的格式碼表自己對照，記在 `tutor.md`（三個標籤都寫了就算交了，內容不改對錯）。再做查官方文件 3 題（`docs.txt`，每題附網址）。
 
-**第③圈：AI 叫你 import 的，先查它存不存在（`imports.txt`，3 題）。** 標準函式庫的模組都列在 https://docs.python.org/3.13/py-modindex.html ；要另外裝的套件，到 https://pypi.org 搜尋名字。兩邊都查不到，就是編出來的名字：**不要裝**，也不要找名字很像的來裝，退回去請 AI 改用標準函式庫或你自己寫的檔。（怎麼判斷一個查得到的套件能不能裝，4-8 會再講。）
+**第③圈：AI 叫你 import 的，先查它存不存在（`imports.txt`，3 題）。** 標準函式庫的模組都列在 https://docs.python.org/3.13/py-modindex.html ；要另外裝的套件，到 https://pypi.org 搜尋名字。兩邊都查不到可靠的出處，就**先不要裝**，也不要找名字很像的來裝，退回去請 AI 改用標準函式庫或你自己寫的檔（PyPI 上的名字不一定跟 import 的名字一樣，看到 import foo 不能直接去裝叫 foo 的套件，見 `補充.md` 第 5 節）。（怎麼判斷一個查得到的套件能不能裝，4-8 會再講。）
 
 ## 2. 提示
 
 - **模組：** 一個 `.py` 檔就是一個模組，檔名去掉 `.py` 就是模組的名字（`money.py` → `money`）。`from money import fmt, total` 是「從 money 這個模組拿 fmt 和 total 來用」；`import math` 是整個模組拿進來，用的時候寫 `math.ceil(…)`。
 - **import 會先把那個檔從頭跑一遍。** 所以 `money.py` 最外層的 print、assert，在 `main.py` import 它的時候都會跑。官方教學（6.1.1）：直接跑一個檔時，它的 `__name__` 是 `"__main__"`；被 import 的時候，`__name__` 是模組的名字（`"money"`），`if __name__ == "__main__":` 下面那段就不跑。你帳本的 `main.py`（0-C）最下面就有這兩行。
-- **找得到 money.py 的條件：** 官方教學 6.1.2：import 先找「你跑的那個檔所在的資料夾」。`money.py` 不在 `main.py` 旁邊，就會出現 `ModuleNotFoundError: No module named 'money'`。
+- **找得到 money.py 的條件：** 官方教學 6.1.2：import 先找「你跑的那個檔所在的資料夾」。這一課把兩個檔放在同一個資料夾；`money.py` 不在 `main.py` 旁邊（帳本裡別的地方也沒有它），就會出現 `ModuleNotFoundError: No module named 'money'`。
 - **標準函式庫：** Python 自己帶的模組，裝好 Python 就有、不用另外裝。`datetime`（日期）、`random`（亂數）、`math`（數學）、`pathlib`（路徑）都是。
 - **datetime 的格式碼：** `date.today()` 是今天；`.strftime("%Y-%m")` 照格式把日期變成字串；`datetime.strptime("2026-11-03", "%Y-%m-%d")` 反過來，把字串照格式解析成日期。`%Y` 四位數的年、小寫 `%m` 兩位數的月、`%d` 兩位數的日；**大寫 `%M` 是分鐘**，寫錯了不一定會出現錯誤訊息（`strptime("2026-11-03", "%Y-%M-%d")` 照樣跑，月份卻變成 1）。完整的表：https://docs.python.org/3.13/library/datetime.html#format-codes
 - **random、math：** `random.randint(1, 6)` 每次跑都不一樣，可能是 1 到 6（官方文件：a <= N <= b，兩頭都包含）。`math.ceil(1250 / 3)` 是無條件進位，417。
 - **pathlib（Mac／Windows 路徑不同）：** Mac 的路徑用斜線 `/`，Windows 用反斜線 `\`。`Path("lessons") / "1-21" / "money.py"` 在 Mac 印出 `lessons/1-21/money.py`，在 Windows 印出 `lessons\1-21\money.py`：用 `Path` 接，兩邊都對。
-- **ModuleNotFoundError：** import 找不到那個模組。原因有兩種：這台電腦沒裝，或根本不存在。`uv run python -c "import 名字"` 可以只試 import、不裝任何東西；要分清楚是哪一種，到 PyPI 搜尋。
+- **ModuleNotFoundError：** import 找不到那個模組。原因有兩種：這台電腦沒裝，或根本不存在。`uv run python -c "import 名字"` 只是試 import，不會替你安裝那個套件；再到 PyPI 搜尋看看（PyPI 上的名字不一定跟 import 的名字一樣，查不到可靠的出處就先不要裝）。
 
 ## 3. 開始前要打的指令
 
@@ -46,7 +46,7 @@ uv run lessons/1-21/main.py
 uv run python -c "import twmoney"
 ```
 
-（最後一行只是試 import，不會裝任何東西；影片裡的 twmoney 是課程準備的、AI 編出來的那種名字，PyPI 查不到，不要去裝。）
+（最後一行只是試 import，不會替你安裝 twmoney；影片裡的 twmoney 是課程準備的、AI 編出來的那種名字，PyPI 查不到，不要去裝。）
 
 檢查的時候**回到課程資料夾**：
 
