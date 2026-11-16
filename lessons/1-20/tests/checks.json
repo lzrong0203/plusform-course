@@ -1,0 +1,281 @@
+{
+ "note": "1-20 的檢查：第①圈 predict.txt（型別提示不檢查、穩定排序（reverse 也一樣）、*args 包成 tuple，選擇題 3 題）、plain.py（run：AI 的 5 行改寫成普通寫法，最後一行印出五個 True；ast_require 的 keyfunc（sorted 的 key 交 def 寫的函式、不能用 lambda）、flagloop（any／all 改回迴圈）；再把 entries 換掉跑一次）、sort2.py（依金額、再依日期；run 兩次，第二次換資料）；第②圈 translate.txt（白話翻譯 4 題，選擇題）、tutor.md（filled：四個標籤都寫了，自評）；第③圈 top3.py（func_shape：型別提示留著（annotated）、docstring 要有輸入／輸出／例子、要 return；call 直接測函式三次（四類同一類好幾筆、不到三類、空的 list））、checks_top3.py（chaff 的 assert 模式：學員的 assert 跑課程的正確版和 3 個 AI 寫錯的版本：key 方向寫反、沒有先加總、沒有只留前三類）、green。grader 在 ast_require 加 keyfunc、flagloop，func_shape 加 annotated（只對寫了它的題目生效）。",
+ "checks": [
+  {
+   "type": "answers",
+   "id": "predict",
+   "file": "lessons/1-20/predict.txt",
+   "key": "answers/predict.json",
+   "group": "第一圈"
+  },
+  {
+   "type": "run",
+   "id": "plain-1",
+   "file": "lessons/1-20/plain.py",
+   "group": "第一圈",
+   "desc": "plain.py：AI 的 5 行改寫成不用 lambda、不用 any／all 的普通寫法，五個都跟 AI 寫的一樣",
+   "timeout": 5,
+   "ast_require": [
+    {
+     "name": "by_amount2",
+     "kind": "keyfunc",
+     "msg": "by_amount2 要用 sorted 排，key 交 def 寫好的函式（範例的 amount_of），不能用 lambda。"
+    },
+    {
+     "name": "newest2",
+     "kind": "keyfunc",
+     "msg": "newest2 要用 sorted 排，key 交一個用 def 寫的函式（例如 def date_of(e): return e[0]），不能用 lambda，也不能寫 newest2 = newest。"
+    },
+    {
+     "name": "top2b",
+     "kind": "keyfunc",
+     "msg": "top2b 要用 sorted 排（後面接 [:2]），key 交一個用 def 寫的函式，不能用 lambda，也不能寫 top2b = top2。"
+    },
+    {
+     "name": "has_big2",
+     "kind": "flagloop",
+     "msg": "has_big2 要改回迴圈：先寫 has_big2 = False，再用 for 一筆一筆看，有一筆 >= 300 就改成 True；不能用 any。"
+    },
+    {
+     "name": "all_small2",
+     "kind": "flagloop",
+     "msg": "all_small2 要改回迴圈：先寫 all_small2 = True，再用 for 一筆一筆看，有一筆不是 < 400 就改成 False；不能用 all。"
+    }
+   ],
+   "expect_exact": [
+    "True True True True True"
+   ],
+   "hint": "先把 lambda 翻成白話：lambda e: e[0] 是「收到一筆 e，交回 e[0]（日期）」，改成 def date_of(e): return e[0]，key 交 date_of；any 改成先給 False、遇到符合的改 True；all 改成先給 True、遇到不符合的改 False。印出 False 的那一個，就是跟 AI 寫的不一樣。",
+   "missing_hint": "plain.py 應該在帳本的 lessons/1-20/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-20。"
+  },
+  {
+   "type": "run",
+   "id": "plain-2",
+   "file": "lessons/1-20/plain.py",
+   "group": "第一圈",
+   "desc": "plain.py：entries 換成別的資料，五個還是跟 AI 寫的一樣（照 entries 算，不是寫死答案）",
+   "timeout": 5,
+   "swap": {
+    "find": "^[ \\t]*entries[ \\t]*=[ \\t]*\\[.*\\][ \\t]*(#.*)?$",
+    "to": "entries = [(\"12/02\", \"書\", 200), (\"12/01\", \"餐\", 120), (\"12/03\", \"車\", 200)]",
+    "feed": "check 把你的 entries 換成三筆（12/02 書 200、12/01 餐 120、12/03 車 200），再跑一次。",
+    "missing": "找不到 entries = [...] 這一行。最上面那一行要留著（check 會換成別的資料再跑一次）。"
+   },
+   "expect_exact": [
+    "True True True True True"
+   ],
+   "hint": "改寫的要照 entries 算，不要把答案寫死；這次沒有一筆 >= 300（has_big 是 False）、每一筆都 < 400（all_small 是 True），兩筆 200 一樣大，照原本的順序。"
+  },
+  {
+   "type": "run",
+   "id": "sort-1",
+   "file": "lessons/1-20/sort2.py",
+   "group": "第一圈",
+   "desc": "sort2.py：依金額由小到大，金額一樣的再依日期由早到晚",
+   "timeout": 5,
+   "loose": true,
+   "expect_exact": [
+    "11/01 車 85",
+    "11/04 餐 85",
+    "11/02 書 120",
+    "11/03 餐 120"
+   ],
+   "hint": "先照日期排一次（key 交日期），再把排好的照金額排一次（key 交金額）：sorted 是穩定排序，金額一樣的會留著照日期排好的順序。順序反過來（先金額、再日期）會變成只照日期排。",
+   "missing_hint": "sort2.py 應該在帳本的 lessons/1-20/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-20。"
+  },
+  {
+   "type": "run",
+   "id": "sort-2",
+   "file": "lessons/1-20/sort2.py",
+   "group": "第一圈",
+   "desc": "sort2.py：換一組五筆的資料也排得對",
+   "timeout": 5,
+   "loose": true,
+   "swap": {
+    "find": "^[ \\t]*entries[ \\t]*=[ \\t]*\\[.*\\][ \\t]*(#.*)?$",
+    "to": "entries = [(\"12/05\", \"書\", 45), (\"12/02\", \"餐\", 300), (\"12/04\", \"車\", 45), (\"12/01\", \"衣\", 300), (\"12/03\", \"餐\", 150)]",
+    "feed": "check 把你的 entries 換成五筆（12/05 書 45、12/02 餐 300、12/04 車 45、12/01 衣 300、12/03 餐 150），再跑一次。",
+    "missing": "找不到 entries = [...] 這一行。最上面那一行要留著（check 會換成別的資料再跑一次）。"
+   },
+   "expect_exact": [
+    "12/04 車 45",
+    "12/05 書 45",
+    "12/03 餐 150",
+    "12/01 衣 300",
+    "12/02 餐 300"
+   ],
+   "hint": "要照 entries 排，不要把答案寫死：先照日期、再照金額，排兩次。"
+  },
+  {
+   "type": "answers",
+   "id": "translate",
+   "file": "lessons/1-20/translate.txt",
+   "key": "answers/translate.json",
+   "group": "第二圈"
+  },
+  {
+   "type": "filled",
+   "id": "tutor",
+   "file": "lessons/1-20/tutor.md",
+   "group": "第二圈",
+   "labels": [
+    "家教問我的：",
+    "我一開始的回答：",
+    "家教怎麼說：",
+    "我加 print 跑出來的："
+   ],
+   "count": 1,
+   "item": "",
+   "desc": "tutor.md：請家教考你 key 每次收到的是什麼，四個標籤都寫了（自評，內容不改對錯）",
+   "hint": "照 tutor.md 上面的步驟問家教；「我加 print 跑出來的」寫你把 lambda 改回 def、加一行 print 以後，終端機印出來的東西。",
+   "missing_hint": "tutor.md 應該在帳本的 lessons/1-20/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-20。"
+  },
+  {
+   "type": "func_shape",
+   "id": "doc",
+   "file": "lessons/1-20/top3.py",
+   "func": "top3",
+   "group": "第三圈",
+   "docstring": [
+    "輸入：",
+    "輸出：",
+    "例子："
+   ],
+   "example": true,
+   "annotated": true,
+   "must_return": true,
+   "desc": "top3.py：型別提示留著，docstring 寫了輸入、輸出、例子，函式用 return 交回結果",
+   "hint": "照第③圈的寫法：輸入是一串 (分類, 金額)；輸出是 list，每一筆是 (分類, 合計)，合計大的在前、最多三類；例子寫一次呼叫和它交回的值。",
+   "hint_hints": "def top3(entries: list[tuple[str, int]]) -> list[tuple[str, int]]: 這一行照起點檔留著。",
+   "missing_hint": "top3.py 應該在帳本的 lessons/1-20/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-20。"
+  },
+  {
+   "type": "call",
+   "id": "top-1",
+   "file": "lessons/1-20/top3.py",
+   "module": "top3",
+   "func": "top3",
+   "group": "第三圈",
+   "args": [
+    [
+     [
+      "餐",
+      120
+     ],
+     [
+      "書",
+      450
+     ],
+     [
+      "餐",
+      300
+     ],
+     [
+      "車",
+      30
+     ],
+     [
+      "衣",
+      60
+     ]
+    ]
+   ],
+   "expect": [
+    [
+     "書",
+     450
+    ],
+    [
+     "餐",
+     420
+    ],
+    [
+     "衣",
+     60
+    ]
+   ],
+   "seq_as_list": true,
+   "desc": "top3(五筆，四類) 交回 [(\"書\", 450), (\"餐\", 420), (\"衣\", 60)]（先依分類加總、從大排到小、只留前三類）",
+   "hint": "同一類要先加起來（餐 120 + 300 = 420），再照合計從大排到小（reverse=True），最後只留前三類（[:3]）。"
+  },
+  {
+   "type": "call",
+   "id": "top-2",
+   "file": "lessons/1-20/top3.py",
+   "module": "top3",
+   "func": "top3",
+   "group": "第三圈",
+   "args": [
+    [
+     [
+      "車",
+      60
+     ],
+     [
+      "餐",
+      85
+     ],
+     [
+      "車",
+      90
+     ],
+     [
+      "餐",
+      40
+     ]
+    ]
+   ],
+   "expect": [
+    [
+     "車",
+     150
+    ],
+    [
+     "餐",
+     125
+    ]
+   ],
+   "seq_as_list": true,
+   "desc": "top3([(\"車\", 60), (\"餐\", 85), (\"車\", 90), (\"餐\", 40)]) 交回 [(\"車\", 150), (\"餐\", 125)]（不到三類就全部交回）",
+   "hint": "同一類好幾筆，先加起來再比：車 60 + 90 = 150、餐 85 + 40 = 125，合計大的在前。"
+  },
+  {
+   "type": "call",
+   "id": "top-3",
+   "file": "lessons/1-20/top3.py",
+   "module": "top3",
+   "func": "top3",
+   "group": "第三圈",
+   "args": [
+    []
+   ],
+   "expect": [],
+   "seq_as_list": true,
+   "desc": "top3([]) 交回 []（空的 list）",
+   "hint": "一筆都沒有時，交回空的 list []，不是 None。"
+  },
+  {
+   "type": "chaff",
+   "id": "r3",
+   "mode": "assert",
+   "student_file": "lessons/1-20/checks_top3.py",
+   "module": "top3",
+   "reference": "reference/top3.py",
+   "mutants": "mutants/mutants.json",
+   "teacher_file": "answers/checks_top3.py",
+   "min_checks": 3,
+   "group": "第三圈"
+  },
+  {
+   "type": "run",
+   "id": "green",
+   "file": "lessons/1-20/checks_top3.py",
+   "group": "第三圈",
+   "desc": "跑 checks_top3.py：你的 assert 在你的 top3.py 上全部成立（什麼都沒印）",
+   "timeout": 5,
+   "expect_exact": [],
+   "hint": "跳出 AssertionError，代表 top3.py 還沒寫好，或 assert 右邊寫的答案算錯了。先自己跑 uv run lessons/1-20/checks_top3.py 看是哪一條。",
+   "missing_hint": "checks_top3.py 應該在帳本的 lessons/1-20/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-20。"
+  }
+ ]
+}

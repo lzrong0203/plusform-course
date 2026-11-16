@@ -1,0 +1,26 @@
+{
+  "note": "回顧題：學員通過這課以後，往後第 2 課和第 5 課的 check 會各帶一題。",
+  "questions": [
+    {
+      "id": "r1",
+      "q": "def twice(x: int) -> int:\n    return x + x\n\nprint(twice(\"5\"))\n印出什麼？\nA. 10\nB. 55\nC. 出現錯誤訊息\n（寫 A、B 或 C）",
+      "accept": ["B"],
+      "explain": "型別提示只是說明，Python 跑的時候不檢查；交進去的是字串 \"5\"，字串加字串是接起來，印出 55。",
+      "choices": {"A": "10", "B": "55", "C": "出現錯誤訊息"}
+    },
+    {
+      "id": "r2",
+      "q": "data = [(\"餐\", 85), (\"車\", 30), (\"書\", 85)]\ntop = sorted(data, key=lambda e: e[1])\n排好以後，前兩筆的分類是？\nA. 車、餐\nB. 車、書\nC. 餐、書\n（寫 A、B 或 C）",
+      "accept": ["A"],
+      "explain": "照金額從小排到大，車 30 最前面；餐和書都是 85，key 一樣大的照原本的順序（穩定排序），餐本來在書前面，所以是車、餐。",
+      "choices": {"A": "車、餐", "B": "車、書", "C": "餐、書"}
+    },
+    {
+      "id": "r3",
+      "q": "amounts = [50, 80]\nprint(any(a > 100 for a in amounts))\n印出什麼？\nA. True\nB. False\nC. 出現錯誤訊息\n（寫 A、B 或 C）",
+      "accept": ["B"],
+      "explain": "any 問「有沒有任何一筆」成立；50 和 80 都沒有超過 100，所以是 False。",
+      "choices": {"A": "True", "B": "False", "C": "出現錯誤訊息"}
+    }
+  ]
+}

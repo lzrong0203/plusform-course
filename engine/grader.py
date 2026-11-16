@@ -21,8 +21,10 @@ check.py（學員端）和 tools/validate_lesson.py（老師端）共用這一�
   filled        自評的表單寫了沒（1-12 起）：每個標籤（例如「家教問：」「我的回答：」）後面都寫了字就算交了，內容不改對錯
   either        兩條路選一條（1-17 起）：每條路是一串上面這些檢查、題數一樣；照學員做的那一條判（answer.py 的測試，或選擇題版）
                 （run 在 1-17 另加兩個只對寫了它的題目生效的欄位：loose＝比的時候空格不算；ast_require＝規定用推導式／迴圈＋append 寫）
+                （1-20 在 ast_require 加兩種：keyfunc＝sorted 的 key 要交一個用 def 寫的函式、不能用 lambda；flagloop＝要先給 True／False，再在 for 迴圈裡改，不能用 any／all）
   func_shape    學員寫的函式長得對不對（1-18 起；只看程式的樣子、不跑）：有沒有 def 那個名字、docstring 有沒有寫輸入／輸出／例子、
                 有沒有用 return 交回一個值（只 print 不 return，外面拿到的是 None）
+                （1-20 加 annotated＝每個參數和交回的值都寫了型別提示，只對寫了它的題目生效）
 
 學員寫的檔案一律用 utf-8-sig 讀（Windows 記事本會在最前面加看不見的 BOM），
 讀不懂（例如存成 Big5）就給白話的說明，不噴 Traceback。
@@ -913,9 +915,37 @@ def _appends_in_for(tree: ast.AST, name: str) -> bool:
     return False
 
 
+def _keyfunc_ok(tree: ast.AST, values: list[ast.AST]) -> bool:
+    """1-20 keyfunc：右邊有 sorted(…, key=名字)，那個名字是用 def 寫在最外層的函式；右邊不能有 lambda。"""
+    defs = {n.name for n in getattr(tree, "body", []) if isinstance(n, ast.FunctionDef)}
+    for v in values:
+        if any(isinstance(n, ast.Lambda) for n in ast.walk(v)):
+            continue
+        for n in ast.walk(v):
+            if isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id == "sorted":
+                key = next((k.value for k in n.keywords if k.arg == "key"), None)
+                if isinstance(key, ast.Name) and key.id in defs:
+                    return True
+    return False
+
+
+def _flagloop_ok(tree: ast.AST, name: str) -> bool:
+    """1-20 flagloop：先 name = True 或 False，再在某個 for 迴圈裡給 name 值；每一次給值都不能用 any()／all()。"""
+    values = _assigned(tree, name)
+    if any(isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id in ("any", "all") for v in values for n in ast.walk(v)):
+        return False
+    if not any(isinstance(v, ast.Constant) and isinstance(v.value, bool) for v in values):
+        return False
+    for f in ast.walk(tree):
+        if isinstance(f, ast.For) and _assigned(f, name):
+            return True
+    return False
+
+
 def ast_problems(source: str, rules: list[dict]) -> list[str]:
     """1-17：run 題的 ast_require＝[{name, kind: listcomp|loop, msg}]。
     listcomp：name 這個名字要等於一個推導式（name = [… for … in …]）；loop：要先 name = []，再在 for 迴圈裡 name.append(…)。
+    1-20 加：keyfunc＝name = sorted(…, key=某個用 def 寫的函式)，不能用 lambda；flagloop＝先 name = True／False，再在 for 迴圈裡改（不能用 any／all）。
     語法錯誤交給跑的時候報（這裡不重複）。"""
     try:
         tree = ast.parse(source)
@@ -928,6 +958,12 @@ def ast_problems(source: str, rules: list[dict]) -> list[str]:
         if kind == "listcomp":
             ok = any(isinstance(v, ast.ListComp) for v in values)
             default = f"{name} 要用一行推導式寫（{name} = [… for … in …]），不能直接寫答案或抄另一個名字。"
+        elif kind == "keyfunc":
+            ok = _keyfunc_ok(tree, values)
+            default = f"{name} 要用 sorted 排，key 交一個用 def 寫好的函式（例如 key=amount_of），不能用 lambda，也不能直接抄另一個名字。"
+        elif kind == "flagloop":
+            ok = _flagloop_ok(tree, name)
+            default = f"{name} 要改回迴圈：先寫 {name} = False（或 True），再在 for 迴圈裡遇到符合的就改它，不能用 any／all。"
         else:
             ok = any(isinstance(v, ast.List) and not v.elts for v in values) and _appends_in_for(tree, name)
             default = f"{name} 要改回迴圈：先寫 {name} = []，再在 for 迴圈裡 {name}.append(…)。"
@@ -1197,6 +1233,14 @@ class FuncShapeCheck(Check):
             ex = next((lab for lab, shown in zip(labels, s["docstring"]) if "例子" in shown), None)
             if s.get("example") and ex is not None and f"{func}(" not in "".join(sec[ex].split()):
                 r.detail = f"{func} 的 docstring：「例子」要寫一次真的呼叫，例如 {func}(…) 是 …（輸入什麼、交回什麼）。"
+                return
+        if s.get("annotated"):   # 1-20 起（只對寫了它的題目）：每個參數都有「: 型別」、括號後面有「-> 型別」
+            params = fn.args.posonlyargs + fn.args.args + fn.args.kwonlyargs + [a for a in (fn.args.vararg, fn.args.kwarg) if a]
+            bare = [a.arg for a in params if a.annotation is None]
+            if bare or fn.returns is None:
+                what = (f"參數 {'、'.join(bare)} 後面還沒寫「: 型別」" if bare else "") + ("、" if bare and fn.returns is None else "") + \
+                       ("括號後面還沒寫「-> 型別」（交回什麼）" if fn.returns is None else "")
+                r.detail = f"{func} 的型別提示還沒寫完：{what}。" + (f"\n  提示：{s['hint_hints']}" if s.get("hint_hints") else "")
                 return
         if s.get("must_return"):
             def gives(n: ast.Return) -> bool:

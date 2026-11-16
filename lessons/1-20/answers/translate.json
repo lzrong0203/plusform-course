@@ -1,0 +1,24 @@
+{
+ "note": "1-20 第②圈：白話翻譯（對答 4 題，都是選擇題）。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {"id": "t1", "title": "型別提示", "accept": ["A"],
+   "choices": {"A": "收一串整數，交回一個小數；只是說明，不檢查", "B": "一定要收整數，交錯就出錯", "C": "收一個小數，交回一串整數"},
+   "hint": "冒號後面寫參數應該是什麼，箭頭後面寫交回什麼；Python 跑的時候會檢查嗎？",
+   "explain": "amounts: list[int] 是「amounts 應該是一串整數」，-> float 是「交回一個小數」。這是型別提示，寫給人和工具看的說明；Python 跑的時候不檢查，交錯型別也照樣跑。"},
+  {"id": "t2", "title": "sorted 的 key 和 lambda", "accept": ["B"],
+   "choices": {"A": "照第三筆帳排，從大排到小，改掉 entries", "B": "每一筆交給 lambda 拿出金額，照金額從大排到小，做新的 list", "C": "照日期從大排到小，做新的 list"},
+   "hint": "lambda e: e[2] 的 e 是什麼？是整個 entries，還是一筆帳？e[2] 是那一筆的第幾格？sorted 會改掉原本的 list 嗎？",
+   "explain": "sorted 會把每一筆各交給 key 一次，e 是一筆帳，e[2] 是那一筆的金額；照金額比，reverse=True 從大排到小。sorted 做出一個新的 list，entries 不變。"},
+  {"id": "t3", "title": "all", "accept": ["C"],
+   "choices": {"A": "有沒有任何一筆不超過 1000", "B": "把超過 1000 的拿掉", "C": "是不是每一筆都不超過 1000"},
+   "hint": "any 是「有沒有任何一筆」，all 是什麼？它交回的是一個 list，還是 True／False？",
+   "explain": "all 問的是「是不是每一筆都成立」：每一筆都 <= 1000 才是 True，只要有一筆超過就是 False。它交回 True 或 False，不會拿掉任何一筆（「有沒有任何一筆」是 any）。"},
+  {"id": "t4", "title": "*args", "accept": ["B"],
+   "choices": {"A": "一定要交一個 list", "B": "交幾個都可以，包成一個 tuple 叫 amounts", "C": "只能交一個，名字叫 *amounts"},
+   "hint": "參數前面的一個星號是什麼意思？add_all(120, 85, 300) 時，amounts 是什麼？",
+   "explain": "參數前面一個星號，呼叫時交幾個都可以（一個都不交也可以），全部包成一個 tuple：add_all(120, 85, 300) 的 amounts 是 (120, 85, 300)。名字是 amounts，星號只是寫在 def 那一行的記號。"}
+ ]
+}

@@ -1,0 +1,32 @@
+# 1-20 第②圈：白話翻譯。每一題是一行 AI 常寫的程式，選出翻得對的白話。
+# 在「答：」後面寫 A、B 或 C，存檔。
+# 提示：先找它在問什麼（型別提示、key、any／all、星號），再一段一段翻；拿不準就改回普通寫法跑跑看。
+# 這幾題的 entries，每一筆都是 (日期, 分類, 金額)，amounts 是一串金額。
+
+第 1 題：
+#   def average(amounts: list[int]) -> float:
+#   A. average 收一串整數，交回一個小數；這只是說明，Python 跑的時候不檢查
+#   B. average 一定要收整數，交錯型別就會出現錯誤訊息
+#   C. average 收一個小數，交回一串整數
+答：
+
+第 2 題：
+#   top = sorted(entries, key=lambda e: e[2], reverse=True)
+#   A. 照第三筆帳排，從大排到小，把 entries 改掉
+#   B. 每一筆交給 lambda、拿出金額，照金額從大排到小，做出一個新的 list
+#   C. 照日期從大排到小，做出一個新的 list
+答：
+
+第 3 題：
+#   ok = all(a <= 1000 for a in amounts)
+#   A. 有沒有任何一筆不超過 1000
+#   B. 把超過 1000 的都拿掉
+#   C. 是不是每一筆都不超過 1000（都沒超過才是 True）
+答：
+
+第 4 題：
+#   def add_all(*amounts):
+#   A. amounts 一定要交一個 list
+#   B. 呼叫時交幾個金額都可以，全部包成一個 tuple，叫 amounts
+#   C. 呼叫時只能交一個金額，名字叫 *amounts
+答：

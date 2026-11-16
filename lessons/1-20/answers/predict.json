@@ -1,0 +1,20 @@
+{
+ "note": "1-20 第①圈：先猜（對答 3 題，都是選擇題）。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {"id": "p1", "title": "型別提示不檢查", "accept": ["B"],
+   "choices": {"A": "42", "B": "42.0", "C": "出現錯誤訊息"},
+   "hint": "amount: int 和 -> int 是說明，Python 跑的時候會不會擋下 85.0？85.0 // 2 算出來是整數還是小數？",
+   "explain": "型別提示只是寫給人和工具看的說明，Python 跑的時候不檢查，85.0 照樣交進去；小數做 // 2，算出來是 42.0（還是小數）。寫了 -> int，交回的也不一定是整數。"},
+  {"id": "p2", "title": "穩定排序（reverse 也一樣）", "accept": ["A"],
+   "choices": {"A": "餐 120 和 書 120", "B": "書 120 和 餐 120", "C": "車 30 和 餐 120"},
+   "hint": "reverse=True 是從大排到小；兩筆都是 120，key 一樣大的，誰本來在前面？",
+   "explain": "key 是金額，reverse=True 從大排到小，車 30 在最後；餐和書都是 120，key 一樣大的照原本的順序（穩定排序），餐本來就在書前面，所以是餐 120、書 120。"},
+  {"id": "p3", "title": "*args 包成 tuple", "accept": ["C"],
+   "choices": {"A": "1 0", "B": "2 和錯誤訊息", "C": "2 0"},
+   "hint": "*items 會把交進來的全部包成一個 tuple；交兩個是幾格？一個都不交呢？",
+   "explain": "count(120, 85) 的 items 是 (120, 85)，len 是 2；count() 一個都沒交，items 是空的 tuple ()，len 是 0，不會出錯。"}
+ ]
+}
