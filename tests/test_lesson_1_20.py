@@ -28,14 +28,16 @@ LID = "1-20"
 D = COURSE / "lessons" / LID
 IMP = "from top3 import top3\n"
 A1 = 'assert top3([("餐", 120), ("餐", 85)]) == [("餐", 205)]\n'
-A2 = 'assert top3([("餐", 120), ("書", 450), ("餐", 300), ("車", 30), ("衣", 60)]) == [("書", 450), ("餐", 420), ("衣", 60)]\n'
+A2 = 'nov = [("餐", 120), ("書", 450), ("餐", 300), ("車", 30), ("衣", 60)]\nassert top3(nov) == [("書", 450), ("餐", 420), ("衣", 60)]\n'
 A3 = "assert top3([]) == []\n"
 BEAR = IMP + "# 同一類的兩筆要加起來\n" + A1 + "# 四類，同一類好幾筆、金額有大有小\n" + A2 + "# 空的 list：交回空的 list\n" + A3   # 影片裡熊寫的三條
 HEAD = "def top3(entries: list[tuple[str, int]]) -> list[tuple[str, int]]:\n"
 DOC = ('    """依分類加總，排出花費最大的前三類。\n\n'
-       '    輸入：entries，一串 (分類, 金額)，同一類可以有好幾筆，可以是空的\n'
-       '    輸出：list，每一筆是 (分類, 合計)，合計大的在前，最多三類；空的交回 []\n'
-       '    例子：top3([("餐", 120), ("餐", 85)]) 是 [("餐", 205)]\n    """\n')
+       '    輸入：entries，一串 (分類, 金額)，同一類可以有好幾筆\n'
+       '    輸出：list，每一筆是 (分類, 合計)，合計大的在前，最多三類\n'
+       '          entries 是空的，交回 []\n'
+       '    例子：top3([("餐", 120), ("書", 450), ("餐", 300)])\n'
+       '          是 [("書", 450), ("餐", 420)]\n    """\n')
 BODY = ("    totals = {}\n    for cat, amount in entries:\n        totals[cat] = totals.get(cat, 0) + amount\n"
         "    return sorted(totals.items(), key=lambda kv: kv[1], reverse=True)[:3]\n")
 
