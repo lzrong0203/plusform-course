@@ -44,7 +44,7 @@
     {"id": "1-C3", "title": "檢核站 3"},
     {"id": "1-18", "title": "函式（上）：def、參數、return"},
     {"id": "1-19", "title": "函式（下）：預設值、關鍵字參數、範圍"},
-    {"id": "1-20", "title": "看懂 AI 常用的寫法（下）：型別提示、lambda、sorted 的 key、any／all、*args"},
+    {"id": "1-20", "title": "看懂 AI 常用的寫法（下）：型別提示、lambda、sorted 的 key"},
     {"id": "1-21", "title": "模組與 import"},
     {"id": "1-22", "title": "錯誤處理：try／except／else／finally 與 raise"},
     {"id": "1-23", "title": "檔案讀寫：關掉程式，帳還在"},

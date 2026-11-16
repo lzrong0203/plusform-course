@@ -25,5 +25,5 @@
 - 模組與 import（例外：只有 checks_top3.py 的 from top3 import top3 這一行，照抄就好；1-21 才教）
 
 `predict.txt`、`translate.txt`、`tutor.md` 是文字檔，不是程式，不在檢查範圍。
-`deep.py` 是選做加深（遞迴，check 不檢查）。
+`deep.py` 是選做加深（遞迴，check 不檢查）；`sort.py` 是影片裡熊的示範檔（跟著打，check 不檢查）。
 `frozen/top3.py` 是課程的凍結版（第③圈 AI 照 docstring 寫的版本，給沒有 AI 帳號的學員抄函式內容），不是起點檔。

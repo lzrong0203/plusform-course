@@ -43,7 +43,7 @@ git pull
 uv run check.py start 1-20
 ```
 
-它會把起點檔複製到你的帳本 `lessons/1-20/`：`predict.txt`、`plain.py`、`sort2.py`、`translate.txt`、`tutor.md`、`top3.py`、`checks_top3.py`、`deep.py`（選做）。
+它會把起點檔複製到你的帳本 `lessons/1-20/`：`predict.txt`、`plain.py`、`sort2.py`、`translate.txt`、`tutor.md`、`top3.py`、`checks_top3.py`、`deep.py`（選做），還有影片裡熊的示範檔 `sort.py`（跟著打，不檢查）。
 
 用 VS Code 打開帳本，寫完存檔，在 VS Code 下面的終端機（帳本資料夾）自己跑跑看：
 

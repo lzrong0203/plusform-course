@@ -1,6 +1,6 @@
 {
   "id": "1-20",
-  "title": "看懂 AI 常用的寫法（下）：型別提示、lambda、sorted 的 key、any／all、*args",
+  "title": "看懂 AI 常用的寫法（下）：型別提示、lambda、sorted 的 key",
   "minutes": 55,
   "fast_minutes": 10,
   "after_start": "接下來，用 VS Code 打開帳本的 lessons/1-20：\n  1. 第一圈：predict.txt 先別跑、預測 3 題；plain.py 把 AI 常寫的 5 行改寫成不用 lambda、不用 any／all 的普通寫法，用 assert 確認一樣；sort2.py 依金額、再依日期排序\n  2. 第二圈：請家教考你 key 每次收到的是什麼，記在 tutor.md；translate.txt 白話翻譯 4 題\n  3. 第三圈：top3.py 的型別提示已經寫好，在 docstring 寫輸入、輸出、例子，在 checks_top3.py 寫 assert；函式內容交給 AI（或抄課程的凍結版），用 assert 驗收\n做完回到課程資料夾打：uv run check.py 1-20"
