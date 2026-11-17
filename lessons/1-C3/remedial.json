@@ -7,7 +7,7 @@
     {
      "lesson": "1-16",
      "title": "可變與參照：為什麼你的 list 自己變了",
-     "time": "1:36",
+     "time": "1:35",
      "chapter": "第①圈 b = a 不是複製：名牌、id 和 is"
     }
    ],
@@ -20,13 +20,13 @@
     {
      "lesson": "1-16",
      "title": "可變與參照：為什麼你的 list 自己變了",
-     "time": "3:34",
+     "time": "3:31",
      "chapter": "第①圈 複製一份：copy 和切片"
     },
     {
      "lesson": "1-13",
      "title": "list：一串帳目",
-     "time": "3:30",
+     "time": "3:28",
      "chapter": "第①圈 改內容：append、insert、remove、pop、in、sum"
     }
    ],
@@ -39,13 +39,13 @@
     {
      "lesson": "1-14",
      "title": "tuple、set 與拆包",
-     "time": "5:12",
+     "time": "5:11",
      "chapter": "第①圈 set：去掉重複、交集與差集"
     },
     {
      "lesson": "1-14",
      "title": "tuple、set 與拆包",
-     "time": "3:19",
+     "time": "3:18",
      "chapter": "第①圈 拆包與交換：a, b = b, a"
     }
    ],
@@ -58,7 +58,7 @@
     {
      "lesson": "1-13",
      "title": "list：一串帳目",
-     "time": "5:12",
+     "time": "5:08",
      "chapter": "第①圈 排序：sorted 和 sort，b = a.sort() 是什麼"
     }
    ],
@@ -71,7 +71,7 @@
     {
      "lesson": "1-15",
      "title": "dict：用名字找資料",
-     "time": "3:29",
+     "time": "3:26",
      "chapter": "第①圈 查不到的鍵：KeyError 和 get"
     },
     {
@@ -96,7 +96,7 @@
     {
      "lesson": "1-17",
      "title": "看懂 AI 最愛的寫法（上）：推導式、zip",
-     "time": "5:31",
+     "time": "5:29",
      "chapter": "第①圈 zip 配成一對對、長度不同、enumerate"
     }
    ],
@@ -109,7 +109,7 @@
     {
      "lesson": "1-11",
      "title": "for、range、enumerate 與兩層迴圈",
-     "time": "6:02",
+     "time": "6:01",
      "chapter": "第①圈 enumerate 編號、兩層迴圈"
     }
    ],
@@ -122,7 +122,7 @@
     {
      "lesson": "1-17",
      "title": "看懂 AI 最愛的寫法（上）：推導式、zip",
-     "time": "4:07",
+     "time": "4:06",
      "chapter": "第①圈 翻成白話、改回迴圈（同一條 assert）"
     }
    ],
@@ -148,7 +148,7 @@
     {
      "lesson": "1-15",
      "title": "dict：用名字找資料",
-     "time": "4:25",
+     "time": "4:22",
      "chapter": "第①圈 各分類的小計、1-9 的燈號改成對照表"
     }
    ],
