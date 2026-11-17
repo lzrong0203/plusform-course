@@ -1,0 +1,56 @@
+{
+ "note": "1-27 第一部分（卷 A）：追蹤，三段 6 題。第一段考 1-15、1-16（dec = nov 是同一個 dict 多一個名字，改 dec 等於改 nov；copy() 做出另一個 dict，改它不影響原本的；get 查不到交回預設值），第二段考 1-17、1-20、1-14（zip 配成一對對、推導式先看 for 再看 if、sorted 的 key 用 lambda 拿每一對的第二個、reverse=True 大的在前；top[0][0] 拿第一對的第一個），第三段考 1-24、1-22、1-18（@dataclass 的 Entry；to_int 遇到不是數字的就 raise ValueError，try 裡出錯、append 跳過、跳到 except；sum 加起來）。答案用 Python 3.13 實際跑過（course/production/1-27/rec/src/facts_out.txt）。一行印好幾個值的開 keep_spaces（「350 80」跟「35080」不一樣）。",
+ "normalize": "text",
+ "how": "答案（例如：1 2）",
+ "strict_choice": true,
+ "questions": [
+  {
+   "id": "t1",
+   "title": "第一段第 6 行印出什麼",
+   "accept": ["350 80"],
+   "keep_spaces": true,
+   "hint": "dec = nov 有沒有做出另一個 dict？第 3 行改的是哪一個盒子？第 5 行改的又是哪一個？",
+   "explain": "dec = nov 只是同一個 dict 多一張標籤，第 3 行改 dec 就是改 nov：餐飲 300 + 50 = 350；backup 是 copy() 做出的另一個 dict，第 5 行改它不影響 nov，交通還是 80：350 80。"
+  },
+  {
+   "id": "t2",
+   "title": "第一段第 7 行印出什麼",
+   "accept": ["2 0"],
+   "keep_spaces": true,
+   "hint": "len 數的是 dict 裡有幾個鍵；get 查不到的鍵，交回第二個參數。",
+   "explain": "dec 跟 nov 是同一個 dict，裡面有餐飲、交通兩個鍵：len 是 2；backup 裡沒有「娛樂」，get 交回預設值 0：2 0。"
+  },
+  {
+   "id": "t3",
+   "title": "第二段第 6 行印出什麼",
+   "accept": ["2 電影"],
+   "keep_spaces": true,
+   "hint": "zip 把兩串配成一對對；推導式先看 for、再看 if，最後看最前面放進去的是什麼。big[-1] 是最後一個。",
+   "explain": "pairs 是 (午餐, 120)、(公車, 15)、(電影, 280)；cost >= 100 的是午餐和電影，放進去的是 name：big 是 [午餐, 電影]，len 2、最後一個電影：2 電影。"
+  },
+  {
+   "id": "t4",
+   "title": "第二段第 7 行印出什麼",
+   "accept": ["電影 15"],
+   "keep_spaces": true,
+   "hint": "key=lambda p: p[1] 是照每一對的第二個（金額）排；reverse=True 大的排前面。top[0] 是哪一對？[0] 再拿它的第一個。",
+   "explain": "照金額由大到小：(電影, 280)、(午餐, 120)、(公車, 15)；top[0][0] 是電影，top[-1][1] 是最後一對的金額 15：電影 15。"
+  },
+  {
+   "id": "t5",
+   "title": "第三段第 18 行印出什麼",
+   "accept": ["跳過 八十"],
+   "keep_spaces": true,
+   "hint": "三個 text 哪一個讓 to_int 走到第 10 行？raise ValueError(text) 的訊息是什麼？e 印出來就是那個訊息。",
+   "explain": "120、35 都是數字；八十 不是 0 到 9 的數字，第 10 行 raise ValueError(\"八十\")，第 16 行的 append 跳過、跳到第 17 行的 except，e 的訊息就是八十：跳過 八十。"
+  },
+  {
+   "id": "t6",
+   "title": "第三段第 19 行印出什麼",
+   "accept": ["2 155"],
+   "keep_spaces": true,
+   "hint": "出錯的那一次，第 16 行的 append 有做到嗎？book 裡有幾筆、金額加起來多少？",
+   "explain": "八十那一次在 to_int 就出錯，append 沒做到；book 裡只有 120 和 35 兩筆：2 155。"
+  }
+ ]
+}

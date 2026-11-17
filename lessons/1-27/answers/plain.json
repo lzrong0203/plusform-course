@@ -1,0 +1,44 @@
+{
+ "note": "1-27 第一部分（卷 A）：白話 3 題（仿 UCSD CS1-LLM 期末考的「解釋」題，選出對得上的白話），考 1-17（推導式翻成白話）、1-20（any）、1-23＋1-17（with open 讀檔＋推導式）。三題的結果用 Python 3.13 實際跑過（facts_out.txt 的 A1～A3：餐飲那兩筆的項目 ['午餐', '晚餐']；any 有一筆超過就 True、空的 list 是 False；空白的行不要、頭尾空白拿掉）。選擇題開 strict_choice。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {
+   "id": "p1",
+   "title": "第 1 題：names 這一行",
+   "accept": ["C"],
+   "choices": {
+    "A": "把分類是餐飲的那幾筆，金額加起來",
+    "B": "把每一筆的分類都改成「餐飲」",
+    "C": "分類是餐飲的那幾筆，把項目名稱照原本的順序放進一個新的 list"
+   },
+   "hint": "推導式先看 for（一筆一筆拿出來）、再看 if（哪幾筆留下）、最後看最前面放進新 list 的是什麼（e.item 還是 e.amount？）。",
+   "explain": "for e in book 一筆一筆拿，if 只留分類是餐飲的，放進新 list 的是 e.item（項目名稱），順序照原本的：C。它沒有加總（A 要 sum(e.amount …)），也沒有改任何一筆（B）。"
+  },
+  {
+   "id": "p2",
+   "title": "第 2 題：over",
+   "accept": ["B"],
+   "choices": {
+    "A": "每一筆都超過 limit，才交回 True",
+    "B": "只要有一筆超過 limit，就交回 True；一筆都沒有，交回 False",
+    "C": "交回超過 limit 的那幾筆"
+   },
+   "hint": "any 和 all 差在哪？any 交回的是 True／False，還是一串東西？",
+   "explain": "any 只要有一個是 True 就交回 True，全部都不是（或 book 是空的）交回 False：B。「每一筆都」是 all（A）；any 交回的是 True／False，不是那幾筆（C）。"
+  },
+  {
+   "id": "p3",
+   "title": "第 3 題：read_notes",
+   "accept": ["A"],
+   "choices": {
+    "A": "一行一行讀出來，拿掉頭尾的空白和換行，空白的行不要，交回一個 list",
+    "B": "只讀出第一行，拿掉頭尾的空白",
+    "C": "把每一行寫回檔案，空白的行刪掉"
+   },
+   "hint": "open 沒寫 \"w\" 或 \"a\"，是讀還是寫？for line in f 會拿到幾行？if line.strip() 什麼時候不成立？",
+   "explain": "沒寫模式就是讀；for line in f 一行一行拿，if line.strip() 把空白的行擋掉（strip 以後是空字串就不成立），放進去的是 strip 過的那一行：A。"
+  }
+ ]
+}

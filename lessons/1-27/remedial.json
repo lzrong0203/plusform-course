@@ -1,0 +1,378 @@
+{
+ "note": "1-27 矯正包的對照表（course/production/1-27/tapes/tools/make_remedial.py 產生，不手改）：錯的題目（items）→ 主題（topics）→ 原課章節的時間碼與練習檔。時間碼用各課現在的時間軸照說明欄章節的算法重算（影片從那個時間開始看那一章）；練習檔在 practice/，交卷沒過時 check.py 把用得到的複製到帳本的 lessons/1-27/practice/。卷 A、卷 B 共用（每一題考的概念一樣，題目 id 也一樣）。",
+ "topics": {
+  "ref": {
+   "name": "b = a 不是複製：同一個 list 或 dict 多一個名字，改一個、兩個都變；要另一個用 copy()",
+   "where": [
+    {
+     "lesson": "1-16",
+     "title": "可變與參照：為什麼你的 list 自己變了",
+     "time": "1:35",
+     "chapter": "第①圈 b = a 不是複製：名牌、id 和 is"
+    },
+    {
+     "lesson": "1-16",
+     "title": "可變與參照：為什麼你的 list 自己變了",
+     "time": "3:31",
+     "chapter": "第①圈 複製一份：copy 和切片"
+    }
+   ],
+   "practice": "p_ref.py",
+   "how": "先在紙上寫下每一行 print 印出什麼，再跑"
+  },
+  "dict": {
+   "name": "dict：len 數鍵、get 查不到交回預設值",
+   "where": [
+    {
+     "lesson": "1-15",
+     "title": "dict：用名字找資料",
+     "time": "3:26",
+     "chapter": "第①圈 查不到的鍵：KeyError 和 get"
+    }
+   ],
+   "practice": "p_dict.py",
+   "how": "先在紙上寫下每一行 print 印出什麼，再跑"
+  },
+  "comp": {
+   "name": "推導式：先看 for、再看 if、最後看最前面放進去的；zip 配成一對對",
+   "where": [
+    {
+     "lesson": "1-17",
+     "title": "看懂 AI 最愛的寫法（上）：推導式、zip",
+     "time": "1:47",
+     "chapter": "第①圈 迴圈折成一行、只留想要的"
+    },
+    {
+     "lesson": "1-17",
+     "title": "看懂 AI 最愛的寫法（上）：推導式、zip",
+     "time": "5:29",
+     "chapter": "第①圈 zip 配成一對對、長度不同、enumerate"
+    }
+   ],
+   "practice": "p_comp.py",
+   "how": "先在紙上寫下每一行 print 印出什麼，再跑"
+  },
+  "sortkey": {
+   "name": "sorted 的 key 和 lambda：照每一個的哪一部分排；reverse=True 大的在前",
+   "where": [
+    {
+     "lesson": "1-20",
+     "title": "看懂 AI 常用的寫法（下）：型別提示、lambda、sorted 的 key",
+     "time": "1:47",
+     "chapter": "第①圈 型別提示、sorted 的 key、lambda"
+    }
+   ],
+   "practice": "p_key.py",
+   "how": "先在紙上寫下每一行 print 印出什麼，再跑"
+  },
+  "tryflow": {
+   "name": "try 裡出錯，後面的跳過、跳到 except；raise ValueError(訊息) 把錯丟出去",
+   "where": [
+    {
+     "lesson": "1-22",
+     "title": "錯誤處理：try／except／else／finally 與 raise",
+     "time": "1:32",
+     "chapter": "第①圈 讀 Traceback、try 和 except"
+    },
+    {
+     "lesson": "1-22",
+     "title": "錯誤處理：try／except／else／finally 與 raise",
+     "time": "4:20",
+     "chapter": "第①圈 else、finally、raise"
+    }
+   ],
+   "practice": "p_raise.py",
+   "how": "照檔案最上面的說明改好，再跑"
+  },
+  "dataclass": {
+   "name": "@dataclass 的 Entry：欄位一行一個，Entry(…) 照順序給值；sum 把每一筆的金額加起來",
+   "where": [
+    {
+     "lesson": "1-24",
+     "title": "類別與物件：Entry、Ledger、@dataclass",
+     "time": "2:45",
+     "chapter": "第①圈 少一個欄位、@dataclass 幫你寫了什麼（__init__、self）"
+    }
+   ],
+   "practice": "p_class.py",
+   "how": "照檔案最上面的說明寫好，再跑"
+  },
+  "anyall": {
+   "name": "any：只要有一個成立；all：每一個都成立",
+   "where": [
+    {
+     "lesson": "1-20",
+     "title": "看懂 AI 常用的寫法（下）：型別提示、lambda、sorted 的 key",
+     "time": "4:56",
+     "chapter": "第①圈 穩定排序、any／all、*args"
+    }
+   ],
+   "practice": "p_any.py",
+   "how": "先在紙上寫下每一行 print 印出什麼，再跑"
+  },
+  "readfile": {
+   "name": "一行一行讀檔：拿掉換行、用逗號切開、金額變成整數",
+   "where": [
+    {
+     "lesson": "1-23",
+     "title": "檔案讀寫：關掉程式，帳還在",
+     "time": "1:43",
+     "chapter": "第①圈 寫進檔案、讀回來"
+    }
+   ],
+   "practice": "p_readfile.py",
+   "how": "照檔案最上面的說明寫好函式，再跑"
+  },
+  "indent": {
+   "name": "拼圖：只做一次的放最上面，for、try 底下要做的往右縮四格",
+   "where": [
+    {
+     "lesson": "1-11",
+     "title": "for、range、enumerate 與兩層迴圈",
+     "time": "3:24",
+     "chapter": "第①圈 一週七天的花費：累加、計數、找最大值"
+    }
+   ],
+   "practice": "p_indent.py",
+   "how": "照檔案最上面的說明排好，再跑"
+  },
+  "tryloop": {
+   "name": "迴圈裡的 try：出錯的那一次跳到 except，迴圈繼續；return 跟 for 對齊，全部做完才交回",
+   "where": [
+    {
+     "lesson": "1-22",
+     "title": "錯誤處理：try／except／else／finally 與 raise",
+     "time": "1:32",
+     "chapter": "第①圈 讀 Traceback、try 和 except"
+    }
+   ],
+   "practice": "p_tryloop.py",
+   "how": "先在紙上寫下每一行 print 印出什麼，再跑"
+  },
+  "startswith": {
+   "name": "「有出現」和「開頭是」不一樣：in 和 startswith",
+   "where": [
+    {
+     "lesson": "1-5",
+     "title": "字串：索引、切片、方法、f-string",
+     "time": "3:26",
+     "chapter": "第①圈 strip、split、f-string，中文字對齊"
+    }
+   ],
+   "practice": "p_startswith.py",
+   "how": "先在紙上寫下每一行 print 印出什麼，再跑"
+  },
+  "default": {
+   "name": "預設值 [] 只做一次，沒給的呼叫共用同一個盒子；在函式裡做新的 list",
+   "where": [
+    {
+     "lesson": "1-19",
+     "title": "函式（下）：預設值、關鍵字參數、範圍",
+     "time": "4:15",
+     "chapter": "第①圈 預設值用 [] 的陷阱、拆成小函式"
+    }
+   ],
+   "practice": "p_default.py",
+   "how": "先在紙上寫下兩行印出什麼、跑一次對答案，再照官方寫法改好"
+  },
+  "biggest": {
+   "name": "找最大的那一個：比 best 大才換掉 best",
+   "where": [
+    {
+     "lesson": "1-11",
+     "title": "for、range、enumerate 與兩層迴圈",
+     "time": "3:24",
+     "chapter": "第①圈 一週七天的花費：累加、計數、找最大值"
+    }
+   ],
+   "practice": "p_biggest.py",
+   "how": "先在紙上寫下它交回哪一筆，再跑、再改好"
+  },
+  "yuan": {
+   "name": "拿掉逗號和「元」、用 int() 變成整數，再 return",
+   "where": [
+    {
+     "lesson": "1-5",
+     "title": "字串：索引、切片、方法、f-string",
+     "time": "3:26",
+     "chapter": "第①圈 strip、split、f-string，中文字對齊"
+    },
+    {
+     "lesson": "1-22",
+     "title": "錯誤處理：try／except／else／finally 與 raise",
+     "time": "4:20",
+     "chapter": "第①圈 else、finally、raise"
+    }
+   ],
+   "practice": "p_yuan.py",
+   "how": "照檔案最上面的說明寫好，再跑"
+  },
+  "raise": {
+   "name": "不合法就 raise ValueError，訊息裡放進那個值；int 自己丟的 ValueError 不要接住",
+   "where": [
+    {
+     "lesson": "1-22",
+     "title": "錯誤處理：try／except／else／finally 與 raise",
+     "time": "4:20",
+     "chapter": "第①圈 else、finally、raise"
+    }
+   ],
+   "practice": "p_raise.py",
+   "how": "照檔案最上面的說明改好，再跑"
+  },
+  "open": {
+   "name": "with open(…, \"w\", encoding=\"utf-8\") 整個重寫；一行一筆、後面加換行",
+   "where": [
+    {
+     "lesson": "1-23",
+     "title": "檔案讀寫：關掉程式，帳還在",
+     "time": "1:43",
+     "chapter": "第①圈 寫進檔案、讀回來"
+    },
+    {
+     "lesson": "1-23",
+     "title": "檔案讀寫：關掉程式，帳還在",
+     "time": "3:49",
+     "chapter": "第①圈 w 和 a、Windows 的預設編碼"
+    }
+   ],
+   "practice": "p_open.py",
+   "how": "照檔案最上面的說明寫好，再跑"
+  },
+  "totals": {
+   "name": "依分類加總：從空的 dict 開始，get(分類, 0) + 金額，全部加完才 return",
+   "where": [
+    {
+     "lesson": "1-15",
+     "title": "dict：用名字找資料",
+     "time": "4:22",
+     "chapter": "第①圈 各分類的小計、1-9 的燈號改成對照表"
+    }
+   ],
+   "practice": "p_totals.py",
+   "how": "照檔案最上面的說明寫好，再跑"
+  }
+ },
+ "items": {
+  "trace-t1": {
+   "label": "追蹤第 1 題",
+   "topics": [
+    "ref"
+   ]
+  },
+  "trace-t2": {
+   "label": "追蹤第 2 題",
+   "topics": [
+    "dict"
+   ]
+  },
+  "trace-t3": {
+   "label": "追蹤第 3 題",
+   "topics": [
+    "comp"
+   ]
+  },
+  "trace-t4": {
+   "label": "追蹤第 4 題",
+   "topics": [
+    "sortkey"
+   ]
+  },
+  "trace-t5": {
+   "label": "追蹤第 5 題",
+   "topics": [
+    "tryflow"
+   ]
+  },
+  "trace-t6": {
+   "label": "追蹤第 6 題",
+   "topics": [
+    "dataclass"
+   ]
+  },
+  "plain-p1": {
+   "label": "白話第 1 題",
+   "topics": [
+    "comp"
+   ]
+  },
+  "plain-p2": {
+   "label": "白話第 2 題",
+   "topics": [
+    "anyall"
+   ]
+  },
+  "plain-p3": {
+   "label": "白話第 3 題",
+   "topics": [
+    "readfile"
+   ]
+  },
+  "pz-order": {
+   "label": "拼圖：縮排和順序",
+   "topics": [
+    "indent"
+   ]
+  },
+  "pz-run": {
+   "label": "拼圖：跑出來的結果",
+   "topics": [
+    "tryloop"
+   ]
+  },
+  "fix-month": {
+   "label": "找 bug：11 月的帳",
+   "topics": [
+    "startswith"
+   ]
+  },
+  "fix-again": {
+   "label": "找 bug：再算一次",
+   "topics": [
+    "default"
+   ]
+  },
+  "fix-big": {
+   "label": "找 bug：最大的一筆",
+   "topics": [
+    "biggest"
+   ]
+  },
+  "v1-yuan": {
+   "label": "手寫：to_yuan",
+   "topics": [
+    "yuan"
+   ]
+  },
+  "v1-yuan-bad": {
+   "label": "手寫：不合法的金額",
+   "topics": [
+    "raise"
+   ]
+  },
+  "v1-load": {
+   "label": "手寫：load",
+   "topics": [
+    "readfile"
+   ]
+  },
+  "v1-save": {
+   "label": "手寫：save",
+   "topics": [
+    "open"
+   ]
+  },
+  "v1-totals": {
+   "label": "手寫：totals",
+   "topics": [
+    "totals"
+   ]
+  },
+  "v1-run": {
+   "label": "手寫：整支跑起來",
+   "topics": [
+    "dataclass"
+   ]
+  }
+ }
+}

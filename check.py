@@ -1061,7 +1061,12 @@ def gate_progress(base: grader.Lesson, ledger: Path, records: state.Records, now
     later = parts[1:]
     if just_copied:
         names = "第" + "、".join(p["part"].removeprefix("第").removesuffix("部分") for p in later) + "部分"   # 第二、三部分
-        print(f"{names}的檔案放進帳本了：{'、'.join(just_copied)}")
+        line = f"{names}的檔案放進帳本了：{'、'.join(just_copied)}"
+        if sum(2 if unicodedata.east_asian_width(ch) in ("W", "F") else 1 for ch in line) <= 70:
+            print(line)
+        else:   # 1-27 起（檔名多、70 欄寫不下的才會走到）：檔名換到下一行
+            print(f"{names}的檔案放進帳本了：")
+            print("  " + "、".join(just_copied))
         print(f"做完再打一次 uv run check.py {base.id}，檢查{names}和升級。")
         records.save_progress(prog)
         return bool(info.get("level_up"))
@@ -1073,12 +1078,15 @@ def gate_progress(base: grader.Lesson, ledger: Path, records: state.Records, now
             done.setdefault(p["part"], now_iso)
         head = f"{p['part']} {p['title']}："
         if p.get("self_check"):   # 自評：寫了就算交了，不打分數
-            print(head + ("✓ 交了（自評，內容 check 不改對錯）" if ok else "✗ 還沒寫完"))
+            print(head + ("✓ 交了（自評，內容 check 不改對錯）" if ok else
+                          "✗ 還沒寫（自評，不擋升級）" if p.get("optional") else "✗ 還沒寫完"))
         else:
             print(head + f"{'✓' if ok else '✗'} {out.passed}／{out.total}")
         for line in out.summaries:
             print(f"  {line}")
         failed = [r for r in out.results if not r.ok]
+        if failed and p.get("optional") and p["part"] not in done:   # 1-27 起：不擋升級的自評，沒寫就只說還沒寫
+            continue
         if failed and p["part"] in done:
             print(f"  （{mmdd(done[p['part']])} 就過了、記下來了；這次沒全過，不影響升級。）")
         elif failed and not (out.summaries and re.search(r"-m\d+$", failed[0].id)):
@@ -1086,17 +1094,24 @@ def gate_progress(base: grader.Lesson, ledger: Path, records: state.Records, now
     days = practice_days(records)
     need = int(base.meta.get("gate_days", 3))
     level = base.meta.get("level_name", "這一級")
-    finished = all(p["part"] in done for p in parts)
+    # 1-27 起（只對 gate_parts 寫了 optional 的關卡）：自評的那一部分只記錄、不擋升級（總企劃第七節）
+    required = [p for p in parts if not p.get("optional")]
+    finished = all(p["part"] in done for p in required)
+    names = ("三部分" if len(required) == len(parts) == 3 else
+             "第" + "、".join(p["part"].removeprefix("第").removesuffix("部分") for p in required) + "部分")   # 第一、三部分
     if info.get("level_up"):
         print(f"（{level}在 {mmdd(info['level_up'])} 就過關了。）")
     elif finished and days >= need:
         info["level_up"] = now_iso
-        print(f"★ {level}過關！三部分都過了，練習了 {days} 天，可以升級了。")
+        if len(required) == len(parts):
+            print(f"★ {level}過關！{names}都過了，練習了 {days} 天，可以升級了。")
+        else:   # 1-27 起：「第一、三部分」比「三部分」長，這一行要壓在 70 欄內（VHS 錄影）
+            print(f"★ {level}過關！{names}過了，練習 {days} 天，可以升級了。")
     elif finished:
-        print(f"三部分都過了！練習天數 {days}／{need} 天，再練 {need - days} 天就升級"
+        print(f"{names}都過了！練習天數 {days}／{need} 天，再練 {need - days} 天就升級"
               "（跑課號檢查或答回顧題，不同天都算）。")
     else:
-        marks = "  ".join(f"{p['part']} {'✓' if p['part'] in done else '✗'}" for p in parts)
+        marks = "  ".join(f"{p['part']} {'✓' if p['part'] in done else '✗'}" for p in required)
         print(f"升級還要：{marks}  練習 {days} 天（要滿 {need} 天）")
     records.save_progress(prog)
     return bool(info.get("level_up"))

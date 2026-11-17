@@ -1,0 +1,26 @@
+{
+  "id": "1-27B",
+  "title": "Lv1 下關卡：帳本 v1.0＋看得懂進度條 100%（卷 B）",
+  "paper_of": "1-27",
+  "paper": "B",
+  "minutes": 60,
+  "fast_minutes": 14,
+  "checkpoint": true,
+  "noun": "關卡",
+  "pass_at": 16,
+  "stages": [
+    "讀程式",
+    "手寫 v1.0"
+  ],
+  "answer_files": [
+    "trace.txt",
+    "plain.txt",
+    "parsons.py",
+    "fix.py",
+    "ledger_v1.py"
+  ],
+  "remedial": "../remedial.json",
+  "remedial_show": 2,
+  "practice": "../practice",
+  "after_start": "卷 B 開始了。第一部分是考卷：全程關掉 AI，參考 60 分鐘（只記錄）。\n  作答檔：lessons/1-27B/（五個檔，ledger_v1.py 是手寫）\n寫完回到課程資料夾打：uv run check.py 1-27B（交卷）"
+}

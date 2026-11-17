@@ -1,0 +1,9 @@
+{
+  "target": "budget_ai.py",
+  "note": "hint 是學員的檢查沒抓到這個壞版本時，畫面上顯示的提示（每行壓在 68 欄內；中文字一個佔兩欄）。三個都是 AI 照需求寫 set_budget 時可能出的錯（範例示意）：m1 金額 0 也收（<= 寫成 <）；m2 只看月份的格式、沒檢查月在 01 到 12（start_later/budget_ai.py 就是這一版）；m3 交回整數，存進 budgets 的卻是字串。起點檔的範例（只看交回的金額）三個都抓不到。",
+  "mutants": [
+    {"id": "m1", "file": "budget_ai_m1.py", "hint": "預算 0 元算不算合法？需求說金額要大於 0，0 應該丟 ValueError。", "what": "金額 0 也收下"},
+    {"id": "m2", "file": "budget_ai_m2.py", "hint": "月份寫成 2026-13 呢？需求說月要在 01 到 12。", "what": "沒檢查月在 01 到 12（2026-13 也收）"},
+    {"id": "m3", "file": "budget_ai_m3.py", "hint": "不只看交回的金額，也看 budgets 裡存了什麼：存的是整數 8000 嗎？", "what": "存進 budgets 的是字串，不是整數"}
+  ]
+}

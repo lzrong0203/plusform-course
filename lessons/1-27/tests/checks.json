@@ -1,0 +1,332 @@
+{
+ "note": "Lv1 下關卡（卷 A）的檢查。第一部分是考卷（關掉 AI，參考 60 分鐘，只記錄），20 題、第一次交卷過 16 題以上算過（lesson.json pass_at）：讀程式 14 題（trace.txt 追蹤 6 題、plain.txt 白話 3 題、parsons.py 拼圖 2 題、fix.py 找 bug 3 題：month in e.date 把 10/11 也算進 11 月、預設值 picked=[] 每次呼叫共用、biggest 的比較寫反），手寫 6 題（ledger_v1.py 帳本 v1.0：to_yuan 寫得對的四種、不合法的三種、load、save、totals 各一題（run 的 sandbox＋probe：課程準備的小程式載入學員的檔、另外擺資料試），最後一題整支跑起來：課程寫好的選單 main() 用到學員寫的五樣，記兩筆、打錯一次金額、分類加總、q 存檔）。讀程式和手寫是 14 比 6（70／30，仿 UCSD CS1-LLM 期末考的配比調整，第 1 級沒有可以用 AI 的段落）。gate_part 的兩項不算考卷：第二部分 explain.md（filled，自評，lesson.json 標 optional：只記錄、不擋升級）、第三部分每月預算設定（func_shape 看 docstring 的四個標籤＋chaff 的 assert 模式加 try_checks，學員的檢查要在正確版全過、3 個壞版本各至少錯一條）；它們的起點檔在 start_later/，第一次交卷以後才放進帳本。卷 B 在 B/，題目 id 跟卷 A 一樣，矯正包對照表共用。grader 沒有改（sandbox／probe 是 1-23、1-24 的，try_checks 是 1-22 的）。",
+ "checks": [
+  {
+   "type": "answers",
+   "id": "trace",
+   "file": "lessons/1-27/trace.txt",
+   "key": "answers/trace.json",
+   "group": "讀程式",
+   "stage": "讀程式"
+  },
+  {
+   "type": "answers",
+   "id": "plain",
+   "file": "lessons/1-27/plain.txt",
+   "key": "answers/plain.json",
+   "group": "讀程式",
+   "stage": "讀程式"
+  },
+  {
+   "type": "parsons",
+   "id": "pz",
+   "file": "lessons/1-27/parsons.py",
+   "group": "讀程式",
+   "stage": "讀程式",
+   "timeout": 5,
+   "lines": [
+    "bad = bad + 1",
+    "s, n = add_up([\"120\", \"abc\", \"80\"])",
+    "for t in texts:",
+    "except ValueError:",
+    "return total, bad",
+    "total = 0",
+    "try:",
+    "print(f\"合計 {s} 元，看不懂 {n} 筆\")",
+    "def add_up(texts):",
+    "total = total + int(t)",
+    "bad = 0"
+   ],
+   "expect_exact": [
+    "合計 200 元，看不懂 1 筆"
+   ],
+   "desc_order": "拼圖：十一行都用上、沒有改字，排好以後 Python 讀得懂",
+   "desc_run": "拼圖：排好跑出來是「合計 200 元，看不懂 1 筆」",
+   "hint": "def 底下先放只做一次的 total = 0、bad = 0；for 底下縮 try；try 底下是可能出錯的那一行，except 底下是出錯才做的；return 跟 for 對齊（全部加完才交回）；最後兩行不縮排。",
+   "missing_hint": "parsons.py 應該在帳本的 lessons/1-27/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-27。"
+  },
+  {
+   "type": "run",
+   "id": "fix-month",
+   "file": "lessons/1-27/fix.py",
+   "group": "讀程式",
+   "stage": "讀程式",
+   "timeout": 5,
+   "desc": "fix.py：第一行是 11 月共 3 筆，合計 415 元（10/11 那一筆不算 11 月）",
+   "expect_regex": [
+    "^11 月共 3 筆[，,]合計 415 元$"
+   ],
+   "hint": "month in e.date 是「11 有沒有出現在日期裡」：10/11 也有 11。要看的是日期的開頭是不是 11/（startswith，1-5）。",
+   "missing_hint": "fix.py 應該在帳本的 lessons/1-27/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-27。"
+  },
+  {
+   "type": "run",
+   "id": "fix-again",
+   "file": "lessons/1-27/fix.py",
+   "group": "讀程式",
+   "stage": "讀程式",
+   "timeout": 5,
+   "desc": "fix.py：同一個月再算一次，第二行跟第一行一模一樣（不會越加越多）",
+   "expect_regex": [
+    "^(11 月共 \\d+ 筆[，,]合計 \\d+ 元)\\n\\1$"
+   ],
+   "hint": "第二次呼叫 month_of，picked 是新的空 list 嗎？預設值 picked=[] 只在 Python 讀到 def 那一行時做一次，每次呼叫共用同一個（1-19）。"
+  },
+  {
+   "type": "run",
+   "id": "fix-big",
+   "file": "lessons/1-27/fix.py",
+   "group": "讀程式",
+   "stage": "讀程式",
+   "timeout": 5,
+   "desc": "fix.py：最大的一筆是電影 280 元",
+   "expect_contains": [
+    "最大的一筆：電影 280 元"
+   ],
+   "hint": "biggest 什麼時候把 best 換掉？「比 best 大」才換，比較的方向寫反了，找到的就是最小的。"
+  },
+  {
+   "type": "run",
+   "id": "v1-yuan",
+   "file": "lessons/1-27/ledger_v1.py",
+   "group": "手寫 v1.0",
+   "stage": "手寫 v1.0",
+   "desc": "ledger_v1.py：to_yuan 把 120、120元、1,200、2,050元 變成整數 120、120、1200、2050",
+   "timeout": 5,
+   "sandbox": {
+    "copy": [
+     "ledger_v1.py"
+    ],
+    "probe": {
+     "probe_yuan.py": "tests/probe_yuan.py"
+    },
+    "steps": [
+     {
+      "run": "probe_yuan.py",
+      "cwd": "lesson"
+     }
+    ]
+   },
+   "expect_exact": [
+    "to_yuan('120') → 120（int）",
+    "to_yuan('120元') → 120（int）",
+    "to_yuan('1,200') → 1200（int）",
+    "to_yuan('2,050元') → 2050（int）"
+   ],
+   "hint": "先用 replace 把逗號和「元」拿掉（1-5），再用 int() 變成整數（1-3），最後 return（1-18）。",
+   "missing_hint": "ledger_v1.py 應該在帳本的 lessons/1-27/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-27。"
+  },
+  {
+   "type": "run",
+   "id": "v1-yuan-bad",
+   "file": "lessons/1-27/ledger_v1.py",
+   "group": "手寫 v1.0",
+   "stage": "手寫 v1.0",
+   "desc": "ledger_v1.py：to_yuan 遇到八十、0、-35元 都丟出 ValueError，訊息裡有打進來的字",
+   "timeout": 5,
+   "sandbox": {
+    "copy": [
+     "ledger_v1.py"
+    ],
+    "probe": {
+     "probe_yuan_bad.py": "tests/probe_yuan_bad.py"
+    },
+    "steps": [
+     {
+      "run": "probe_yuan_bad.py",
+      "cwd": "lesson"
+     }
+    ]
+   },
+   "expect_exact": [
+    "to_yuan('八十') → ValueError，訊息裡有 八十",
+    "to_yuan('0') → ValueError，訊息裡有 0",
+    "to_yuan('-35元') → ValueError，訊息裡有 -35"
+   ],
+   "hint": "八十：int() 自己就會丟 ValueError，不要用 try 把它接住；0 和負數：if 金額 <= 0: raise ValueError(f\"金額要大於 0：{text}\")（1-22）。",
+   "missing_hint": "ledger_v1.py 應該在帳本的 lessons/1-27/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-27。"
+  },
+  {
+   "type": "run",
+   "id": "v1-load",
+   "file": "lessons/1-27/ledger_v1.py",
+   "group": "手寫 v1.0",
+   "stage": "手寫 v1.0",
+   "desc": "ledger_v1.py：load 讀回兩筆帳（金額是整數）；檔案不存在交回空的 list",
+   "timeout": 5,
+   "sandbox": {
+    "copy": [
+     "ledger_v1.py"
+    ],
+    "probe": {
+     "probe_load.py": "tests/probe_load.py"
+    },
+    "steps": [
+     {
+      "run": "probe_load.py",
+      "cwd": "lesson"
+     }
+    ]
+   },
+   "expect_exact": [
+    "讀回 2 筆",
+    "11/03 午餐 餐飲 120 int",
+    "11/04 公車 交通 15 int",
+    "不存在的檔： []"
+   ],
+   "hint": "檔案不存在：先用 path.exists() 看（1-23），不存在就 return []；存在就 with open(path, encoding=\"utf-8\") 一行一行讀，rstrip(\"\\n\") 拿掉換行、split(\",\") 切成四段，金額用 int() 變成整數，做成 Entry 放進 list，最後 return。",
+   "missing_hint": "ledger_v1.py 應該在帳本的 lessons/1-27/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-27。"
+  },
+  {
+   "type": "run",
+   "id": "v1-save",
+   "file": "lessons/1-27/ledger_v1.py",
+   "group": "手寫 v1.0",
+   "stage": "手寫 v1.0",
+   "desc": "ledger_v1.py：save 一行一筆、每行後面換行；再存一次是整個檔案重寫",
+   "timeout": 5,
+   "sandbox": {
+    "copy": [
+     "ledger_v1.py"
+    ],
+    "probe": {
+     "probe_save.py": "tests/probe_save.py"
+    },
+    "steps": [
+     {
+      "run": "probe_save.py",
+      "cwd": "lesson"
+     }
+    ]
+   },
+   "expect_exact": [
+    "存兩筆： '11/03,午餐,餐飲,120\\n11/04,公車,交通,15\\n'",
+    "再存一筆： '11/05,晚餐,餐飲,180\\n'"
+   ],
+   "hint": "with open(path, \"w\", encoding=\"utf-8\") as f:（\"w\" 是整個重寫，\"a\" 是接在後面，1-23），每一筆 f.write(f\"{e.date},{e.item},{e.category},{e.amount}\\n\")。",
+   "missing_hint": "ledger_v1.py 應該在帳本的 lessons/1-27/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-27。"
+  },
+  {
+   "type": "run",
+   "id": "v1-totals",
+   "file": "lessons/1-27/ledger_v1.py",
+   "group": "手寫 v1.0",
+   "stage": "手寫 v1.0",
+   "desc": "ledger_v1.py：totals 依分類加總，分類照第一次出現的順序；沒有帳交回 {}",
+   "timeout": 5,
+   "sandbox": {
+    "copy": [
+     "ledger_v1.py"
+    ],
+    "probe": {
+     "probe_totals.py": "tests/probe_totals.py"
+    },
+    "steps": [
+     {
+      "run": "probe_totals.py",
+      "cwd": "lesson"
+     }
+    ]
+   },
+   "expect_exact": [
+    "四筆： {'餐飲': 300, '交通': 15, '娛樂': 280}",
+    "沒有帳： {}"
+   ],
+   "hint": "從空的 dict 開始，每一筆 out[分類] = out.get(分類, 0) + 金額（1-15），全部加完才 return。",
+   "missing_hint": "ledger_v1.py 應該在帳本的 lessons/1-27/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-27。"
+  },
+  {
+   "type": "run",
+   "id": "v1-run",
+   "file": "lessons/1-27/ledger_v1.py",
+   "group": "手寫 v1.0",
+   "stage": "手寫 v1.0",
+   "timeout": 5,
+   "desc": "ledger_v1.py 整支跑起來：記兩筆（中間打錯一次金額）、分類加總、q 存檔，ledger_v1.txt 存了兩行",
+   "stdin": "1\n11/03\n午餐\n餐飲\n八十\n120\n1\n11/04\n公車\n交通\n15\n2\nq\n",
+   "sandbox": {
+    "copy": [
+     "ledger_v1.py"
+    ],
+    "steps": [
+     {
+      "run": "ledger_v1.py",
+      "cwd": "."
+     }
+    ],
+    "files": {
+     "ledger_v1.txt": [
+      "11/03,午餐,餐飲,120",
+      "11/04,公車,交通,15"
+     ]
+    },
+    "files_hint": "q 的時候課程的選單會呼叫你的 save(DATA, entries)：檢查 save 有沒有一行一筆、每行後面換行。"
+   },
+   "expect_contains": [
+    "讀到 0 筆",
+    "看不懂這個金額",
+    "記下了：午餐 120 元",
+    "記下了：公車 15 元",
+    "餐飲 120 元",
+    "交通 15 元",
+    "存好了，一共 2 筆。"
+   ],
+   "hint": "main() 是課程寫好的，不用改；它用到你寫的五樣。上面五題都過了，這一題通常也會過。",
+   "missing_hint": "ledger_v1.py 應該在帳本的 lessons/1-27/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-27。"
+  },
+  {
+   "type": "filled",
+   "id": "explain",
+   "file": "lessons/1-27/explain.md",
+   "gate_part": "第二部分",
+   "group": "第二部分",
+   "labels": [
+    "我講的函式：",
+    "怎麼講的：",
+    "它收什麼、交回什麼：",
+    "照執行的順序一行一行講：",
+    "舉一個例子，算出交回什麼：",
+    "一個特別的情況會怎樣：",
+    "為什麼這樣寫："
+   ],
+   "count": 1,
+   "item": "第二部分",
+   "min_chars": 1,
+   "desc": "explain.md：講了哪個函式、怎麼講的、五項自評都寫了（自評：內容不改對錯，不擋升級）",
+   "hint": "照補充.md 的評分量表，每一項寫 0、1 或 2。",
+   "missing_hint": "explain.md 在第一部分交卷以後，才會放進帳本的 lessons/1-27/。先把考卷寫完、交卷：uv run check.py 1-27。"
+  },
+  {
+   "type": "func_shape",
+   "id": "budget-doc",
+   "file": "lessons/1-27/budget.py",
+   "func": "set_budget",
+   "gate_part": "第三部分",
+   "group": "第三部分",
+   "docstring": [
+    "輸入：",
+    "輸出：",
+    "規則：",
+    "例子："
+   ],
+   "example": true,
+   "desc": "budget.py：set_budget 的 docstring 寫了輸入、輸出、規則、例子（例子是一次真的呼叫）",
+   "hint": "照 README 的需求卡，用自己的話寫；規則至少寫到月份、金額、不合法要怎樣。",
+   "missing_hint": "budget.py 在第一部分交卷以後，才會放進帳本的 lessons/1-27/。先把考卷寫完、交卷：uv run check.py 1-27。"
+  },
+  {
+   "type": "chaff",
+   "id": "r3",
+   "mode": "assert",
+   "try_checks": true,
+   "student_file": "lessons/1-27/checks_budget.py",
+   "module": "budget_ai",
+   "reference": "reference/budget_ai.py",
+   "mutants": "mutants/mutants.json",
+   "teacher_file": "answers/checks_budget.py",
+   "min_checks": 5,
+   "gate_part": "第三部分",
+   "group": "第三部分"
+  }
+ ]
+}

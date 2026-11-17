@@ -1,0 +1,20 @@
+{
+ "note": "1-27 第一部分（卷 B）：白話 3 題，每一題考的跟卷 A 同一題一樣：1-17（推導式翻成白話）、1-20（all）、1-23（\"a\" 是接在後面）。結果用 Python 3.13 實際跑過（facts_out.txt 的 B1～B3）。選擇題開 strict_choice。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {"id": "p1", "title": "第 1 題：names 這一行", "accept": ["B"],
+   "choices": {"A": "把 100 元以上的那幾筆，金額加起來", "B": "金額 100 元以上的那幾筆，把項目名稱照原本的順序放進一個新的 list", "C": "把每一筆的金額都改成 100"},
+   "hint": "推導式先看 for、再看 if、最後看最前面放進新 list 的是什麼（e.item 還是 e.amount？）。",
+   "explain": "for e in book 一筆一筆拿，if 只留金額 100 以上的，放進新 list 的是 e.item：B。它沒有加總（A），也沒有改任何一筆（C）。"},
+  {"id": "p2", "title": "第 2 題：all_paid", "accept": ["A"],
+   "choices": {"A": "每一筆的金額都大於 0，才交回 True", "B": "只要有一筆的金額大於 0，就交回 True", "C": "交回金額大於 0 的那幾筆"},
+   "hint": "any 和 all 差在哪？all 交回的是 True／False，還是一串東西？",
+   "explain": "all 要每一個都成立才交回 True：A。「只要有一筆」是 any（B）；all 交回的是 True／False，不是那幾筆（C）。"},
+  {"id": "p3", "title": "第 3 題：add_line", "accept": ["B"],
+   "choices": {"A": "把整個檔案換成這一行", "B": "在檔案最後面接上這一行再換行（檔案不存在就新建一個）", "C": "讀出檔案的最後一行"},
+   "hint": "\"w\" 和 \"a\" 差在哪（1-23）？",
+   "explain": "\"a\" 是接在後面（append），檔案不存在會新建；整個換掉的是 \"w\"（A）；它只寫、不讀（C）：B。"}
+ ]
+}

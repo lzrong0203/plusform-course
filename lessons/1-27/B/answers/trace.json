@@ -1,0 +1,26 @@
+{
+ "note": "1-27 第一部分（卷 B）：追蹤，三段 6 題，每一題考的跟卷 A 同一題一樣（題目 id 也一樣）：第一段 1-15、1-16（mine = week 是同一個 dict；copy() 是另一個；get 查不到交回預設值 10），第二段 1-17、1-20、1-14（zip、推導式、sorted 的 key 由小到大），第三段 1-24、1-22（兩百 不是 0 到 9 的數字 → raise ValueError，append 跳過）。答案用 Python 3.13 實際跑過（course/production/1-27/rec/src/facts_out.txt）。",
+ "normalize": "text",
+ "how": "答案（例如：1 2）",
+ "strict_choice": true,
+ "questions": [
+  {"id": "t1", "title": "第一段第 6 行印出什麼", "accept": ["75 120"], "keep_spaces": true,
+   "hint": "mine = week 有沒有做出另一個 dict？第 3 行改的是哪一個盒子？第 5 行改的又是哪一個？",
+   "explain": "mine = week 只是同一個 dict 多一張標籤，第 3 行改 mine 就是改 week：早餐 60 + 15 = 75；plan 是 copy() 做出的另一個 dict，第 5 行改它不影響 week，午餐還是 120：75 120。"},
+  {"id": "t2", "title": "第一段第 7 行印出什麼", "accept": ["2 10"], "keep_spaces": true,
+   "hint": "len 數的是 dict 裡有幾個鍵；get 查不到的鍵，交回第二個參數。",
+   "explain": "plan 有早餐、午餐兩個鍵：len 是 2；mine 裡沒有「晚餐」，get 交回預設值 10：2 10。"},
+  {"id": "t3", "title": "第二段第 6 行印出什麼", "accept": ["2 週一"], "keep_spaces": true,
+   "hint": "zip 把兩串配成一對對；推導式先看 for、再看 if，最後看放進去的是什麼。low[0] 是第一個。",
+   "explain": "pairs 是 (週一, 90)、(週二, 260)、(週三, 40)；s < 100 的是週一和週三，放進去的是 d：low 是 [週一, 週三]，len 2、第一個週一：2 週一。"},
+  {"id": "t4", "title": "第二段第 7 行印出什麼", "accept": ["週三 260"], "keep_spaces": true,
+   "hint": "key=lambda p: p[1] 照每一對的第二個（金額）排；沒寫 reverse，是小的在前。",
+   "explain": "照金額由小到大：(週三, 40)、(週一, 90)、(週二, 260)；top[0][0] 是週三，top[-1][1] 是最後一對的 260：週三 260。"},
+  {"id": "t5", "title": "第三段第 18 行印出什麼", "accept": ["跳過 兩百"], "keep_spaces": true,
+   "hint": "三個 text 哪一個讓 to_int 走到第 10 行？e 印出來就是 raise 時給的訊息。",
+   "explain": "45、60 都是數字；兩百 不是 0 到 9 的數字，第 10 行 raise ValueError(\"兩百\")，append 跳過、跳到 except：跳過 兩百。"},
+  {"id": "t6", "title": "第三段第 19 行印出什麼", "accept": ["2 105"], "keep_spaces": true,
+   "hint": "出錯的那一次，append 有做到嗎？book 裡有幾筆、加起來多少？",
+   "explain": "兩百那一次在 to_int 就出錯，append 沒做到；book 裡只有 45 和 60：2 105。"}
+ ]
+}

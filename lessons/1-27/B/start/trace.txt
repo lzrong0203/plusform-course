@@ -1,0 +1,64 @@
+# 1-27 第一部分（卷 B）　追蹤（6 題）
+# 全程關掉 AI。先不要跑程式，用眼睛從第一行往下追；可以在紙上畫：
+# 一個 list、dict 畫一個盒子，名字是貼在盒子上的標籤（b = a 是同一個盒子多一張標籤）；呼叫函式就畫一個小框。
+# 每一題在「答：」後面寫答案，存檔。一行印出好幾個值的，值和值中間空一格（例如 1 2）。
+# 不會的題目，也寫一個你覺得最可能的答案。
+
+第一段：
+  1  week = {"早餐": 60, "午餐": 120}
+  2  mine = week
+  3  mine["早餐"] = mine["早餐"] + 15
+  4  plan = week.copy()
+  5  plan["午餐"] = 0
+  6  print(week["早餐"], week["午餐"])
+  7  print(len(plan), mine.get("晚餐", 10))
+
+第 1 題：第 6 行印出什麼？
+答：
+
+第 2 題：第 7 行印出什麼？
+答：
+
+第二段：
+  1  days = ["週一", "週二", "週三"]
+  2  spent = [90, 260, 40]
+  3  pairs = list(zip(days, spent))
+  4  low = [d for d, s in pairs if s < 100]
+  5  top = sorted(pairs, key=lambda p: p[1])
+  6  print(len(low), low[0])
+  7  print(top[0][0], top[-1][1])
+
+第 3 題：第 6 行印出什麼？
+答：
+
+第 4 題：第 7 行印出什麼？
+答：
+
+第三段：
+  1  from dataclasses import dataclass
+  2
+  3  @dataclass
+  4  class Entry:
+  5      item: str
+  6      amount: int
+  7
+  8  def to_int(text):
+  9      if not text.isdigit():
+ 10          raise ValueError(text)
+ 11      return int(text)
+ 12
+ 13  book = []
+ 14  for text in ["45", "60", "兩百"]:
+ 15      try:
+ 16          book.append(Entry("點心", to_int(text)))
+ 17      except ValueError as e:
+ 18          print("跳過", e)
+ 19  print(len(book), sum(x.amount for x in book))
+
+（"兩百".isdigit() 是 False：isdigit 只認 0 到 9 這種數字。）
+
+第 5 題：第 18 行印出什麼？
+答：
+
+第 6 題：第 19 行印出什麼？
+答：

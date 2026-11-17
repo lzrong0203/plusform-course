@@ -1,0 +1,12 @@
+{
+  "note": "回顧題：通過 Lv1 下關卡（第一部分）以後，往後第 2 課和第 5 課的檢查會各帶一題（混合 1-16、1-19、1-22）。答案用 Python 3.13 實際跑過（course/production/1-27/rec/src/facts_out.txt）。",
+  "questions": [
+    {"id": "r1", "q": "a = {\"餐飲\": 100}\nb = a\nb[\"餐飲\"] = 0\nprint(a[\"餐飲\"]) 印出什麼？\n（寫數字）",
+     "accept": ["0"], "hint": "b = a 有沒有做出另一個 dict？", "explain": "b = a 只是同一個 dict 多一個名字，改 b 就是改 a：0。要另一個 dict 用 a.copy()。"},
+    {"id": "r2", "q": "def add(x, box=[]):\n    box.append(x)\n    return len(box)\n連續呼叫 add(1)、add(2)，第二次交回幾？\n（寫數字）",
+     "accept": ["2"], "hint": "預設值 [] 什麼時候做出來？每次呼叫都是新的嗎？", "explain": "預設值只在 Python 讀到 def 那一行時做一次，沒給 box 的呼叫共用同一個 list：第二次裡面有 1、2，交回 2。"},
+    {"id": "r3", "q": "下面哪一種寫法，會把錯吞掉、讓 bug 看不見？\nA. try: x = int(t) / except ValueError: print(\"看不懂\", t)\nB. try: x = int(t) / except: x = 0\nC. 不寫 try，讓 ValueError 丟出去\n（寫 A、B 或 C）",
+     "accept": ["B"], "choices": {"A": "except ValueError，印出看不懂哪一個", "B": "光禿禿的 except，交回 0", "C": "不寫 try，讓 ValueError 丟出去"},
+     "hint": "哪一種寫法，出錯了也看不出來？", "explain": "光禿禿的 except 什麼錯都接，還把 x 換成 0，看起來像正常的數字：B。A 只接 ValueError、說出哪一筆；C 讓錯誤訊息跳出來，都看得到。"}
+  ]
+}

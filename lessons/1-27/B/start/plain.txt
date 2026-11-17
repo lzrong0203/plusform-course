@@ -1,0 +1,34 @@
+# 1-27 第一部分（卷 B）　白話（3 題）
+# 全程關掉 AI。每一題是一小段程式（AI 很愛這樣寫），選出哪一句白話說得對。
+# 先自己用一句話講出這段在做什麼，再看選項。每一題在「答：」後面寫一個字母（A、B 或 C），存檔。
+# 三題的 book 都是一串 Entry，每一筆有 date、item、category、amount 四個欄位（1-24 的 @dataclass）。
+
+第 1 題：
+  1  names = [e.item for e in book if e.amount >= 100]
+
+    A. 把 100 元以上的那幾筆，金額加起來
+    B. 金額 100 元以上的那幾筆，把項目名稱照原本的順序放進一個新的 list
+    C. 把每一筆的金額都改成 100
+（寫 A、B 或 C）
+答：
+
+第 2 題：
+  1  def all_paid(book):
+  2      return all(e.amount > 0 for e in book)
+
+    A. 每一筆的金額都大於 0，才交回 True
+    B. 只要有一筆的金額大於 0，就交回 True
+    C. 交回金額大於 0 的那幾筆
+（寫 A、B 或 C）
+答：
+
+第 3 題：
+  1  def add_line(path, line):
+  2      with open(path, "a", encoding="utf-8") as f:
+  3          f.write(line + "\n")
+
+    A. 把整個檔案換成這一行
+    B. 在檔案最後面接上這一行再換行（檔案不存在就新建一個）
+    C. 讀出檔案的最後一行
+（寫 A、B 或 C）
+答：

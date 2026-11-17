@@ -1,0 +1,34 @@
+# 1-27 第一部分（卷 A）　白話（3 題）
+# 全程關掉 AI。每一題是一小段程式（AI 很愛這樣寫），選出哪一句白話說得對。
+# 先自己用一句話講出這段在做什麼，再看選項。每一題在「答：」後面寫一個字母（A、B 或 C），存檔。
+# 三題的 book 都是一串 Entry，每一筆有 date、item、category、amount 四個欄位（1-24 的 @dataclass）。
+
+第 1 題：
+  1  names = [e.item for e in book if e.category == "餐飲"]
+
+    A. 把分類是餐飲的那幾筆，金額加起來
+    B. 把每一筆的分類都改成「餐飲」
+    C. 分類是餐飲的那幾筆，把項目名稱照原本的順序放進一個新的 list
+（寫 A、B 或 C）
+答：
+
+第 2 題：
+  1  def over(book, limit):
+  2      return any(e.amount > limit for e in book)
+
+    A. 每一筆都超過 limit，才交回 True
+    B. 只要有一筆超過 limit，就交回 True；一筆都沒有，交回 False
+    C. 交回超過 limit 的那幾筆
+（寫 A、B 或 C）
+答：
+
+第 3 題：
+  1  def read_notes(path):
+  2      with open(path, encoding="utf-8") as f:
+  3          return [line.strip() for line in f if line.strip()]
+
+    A. 一行一行讀出來，拿掉頭尾的空白和換行，空白的行不要，交回一個 list
+    B. 只讀出第一行，拿掉頭尾的空白
+    C. 把每一行寫回檔案，空白的行刪掉
+（寫 A、B 或 C）
+答：

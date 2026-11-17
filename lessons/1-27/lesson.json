@@ -1,0 +1,47 @@
+{
+  "id": "1-27",
+  "title": "Lv1 下關卡：帳本 v1.0＋看得懂進度條 100%",
+  "minutes": 60,
+  "fast_minutes": 14,
+  "checkpoint": true,
+  "noun": "關卡",
+  "pass_at": 16,
+  "stages": [
+    "讀程式",
+    "手寫 v1.0"
+  ],
+  "answer_files": [
+    "trace.txt",
+    "plain.txt",
+    "parsons.py",
+    "fix.py",
+    "ledger_v1.py"
+  ],
+  "papers": [
+    "B"
+  ],
+  "remedial": "remedial.json",
+  "remedial_show": 2,
+  "practice": "practice",
+  "gate": true,
+  "gate_days": 14,
+  "level_name": "Lv1 下 看得懂（下）",
+  "gate_parts": [
+    {
+      "part": "第一部分",
+      "title": "考卷（關掉 AI）"
+    },
+    {
+      "part": "第二部分",
+      "title": "v1.0 講解",
+      "self_check": true,
+      "optional": true
+    },
+    {
+      "part": "第三部分",
+      "title": "每月預算設定"
+    }
+  ],
+  "later_dir": "start_later",
+  "after_start": "關卡開始了。第一部分是考卷：全程關掉 AI，參考 60 分鐘（只記錄）。\n  作答檔：lessons/1-27/（五個檔，ledger_v1.py 是手寫）\n寫完回到課程資料夾打：uv run check.py 1-27（交卷）"
+}
