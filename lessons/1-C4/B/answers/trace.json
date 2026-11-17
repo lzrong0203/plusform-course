@@ -1,0 +1,74 @@
+{
+ "note": "1-C4 卷 B 第一部分：跟卷 A 同樣的題型、題數和題目 id（矯正包對照表共用），數字和情境換掉。第一段 1-18、1-19（fee=3 關鍵字參數、區域的 count、say 沒有 return）；第二段 1-19、1-18（預設值 [] 共用、list 交進函式被改）；第三段 1-21、1-20（import tools 從頭跑一遍、__name__ 底下不跑；型別提示不檢查，\"七\" 照樣放進 f-string）。答案用 Python 3.13 實際跑過（course/production/1-C4/rec/src/facts_out.txt）。",
+ "normalize": "text",
+ "how": "答案（例如：1 2）",
+ "strict_choice": true,
+ "questions": [
+  {
+   "id": "t1",
+   "title": "第一段第 8 行印出什麼",
+   "accept": [
+    "付了 10"
+   ],
+   "hint": "第 8 行先算括號裡的 pay(7, fee=3)：fee 用關鍵字給了 3，就不用預設的 5。交回的值再交給 say。",
+   "explain": "pay(7, fee=3) 裡 fee 是 3，交回 10；say(10) 印出「付了 10」：付了 10。"
+  },
+  {
+   "id": "t2",
+   "title": "第一段第 9 行印出什麼",
+   "accept": [
+    "25 0 None"
+   ],
+   "keep_spaces": true,
+   "hint": "pay 裡的 count = … 是小框自己的，外面的 count 會變嗎？say 有沒有 return？三個值中間各空一格。",
+   "explain": "a = pay(20) 用預設的 fee=5，交回 25；函式裡給值的 count 是區域變數，外面的 count 還是 0；say 沒有 return，交回 None：25 0 None。"
+  },
+  {
+   "id": "t3",
+   "title": "第二段第 9 行印出什麼",
+   "accept": [
+    "1 2 3"
+   ],
+   "keep_spaces": true,
+   "hint": "預設值 tips=[] 只做一次，沒給 tips 的呼叫都共用同一個盒子。第 8 行給了 mine，那次的 tips 指著誰？",
+   "explain": "第 6、7 行共用同一個預設的盒子：1 筆、2 筆；第 8 行 tips 指著 mine，[40, 25] 加上 60 是 3 筆：1 2 3。"
+  },
+  {
+   "id": "t4",
+   "title": "第二段第 10 行印出什麼",
+   "accept": [
+    "[40, 25, 60]"
+   ],
+   "hint": "list 交進函式，函式裡的 tips 和外面的 mine 指著同一個盒子；append 改的是盒子裡面。",
+   "explain": "第 8 行 tips 和 mine 指著同一個 list，tips.append(60) 改的就是 mine：[40, 25, 60]。"
+  },
+  {
+   "id": "t5",
+   "title": "第三段：uv run app.py 一共印出幾行",
+   "accept": [
+    "C"
+   ],
+   "choices": {
+    "A": "4 行（載入 tools、第 1 筆、第 3 筆、第 七 筆）",
+    "B": "2 行（第 3 筆、第 七 筆）",
+    "C": "3 行（載入 tools、第 3 筆、第 七 筆）"
+   },
+   "hint": "import tools 會把 tools.py 從頭跑一遍；那時 tools.py 的 __name__ 是什麼？",
+   "explain": "import 會把 tools.py 從頭跑一遍，先印出「載入 tools」；被 import 的時候 __name__ 是 \"tools\"，第 6 行不跑；接著 app.py 印出第 3 筆、第 七 筆，一共 3 行。"
+  },
+  {
+   "id": "t6",
+   "title": "第三段：app.py 第 3 行印出什麼",
+   "accept": [
+    "B"
+   ],
+   "choices": {
+    "A": "出現錯誤訊息（\"七\" 不是 int）",
+    "B": "第 七 筆",
+    "C": "第 7 筆"
+   },
+   "hint": "n: int 是型別提示：Python 跑的時候會檢查嗎？會幫你把國字換成數字嗎？",
+   "explain": "型別提示只是說明，Python 跑的時候不檢查，也不會換成數字；f\"第 {n} 筆\" 照樣把「七」放進去：第 七 筆。"
+  }
+ ]
+}

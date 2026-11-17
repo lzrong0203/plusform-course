@@ -1,0 +1,23 @@
+# 檢核站 4 第三部分的參考答案：with open 一行一行讀（encoding="utf-8"），拿掉最後的換行、用逗號切開，金額變成整數加進 total；
+# 最後一行後面沒有換行也一樣（rstrip 沒東西可拿就不拿）；空的檔案 for 一圈都不跑，交回 0
+from pathlib import Path
+
+
+def file_total(path):
+    """把帳本檔案裡每一筆的金額加起來。
+
+    輸入：path，帳本檔案的位置。每一行是 日期,項目,金額（例如 11/03,午餐,120）。
+    輸出：所有金額加起來的整數。空的檔案交回 0。
+    例子：檔案有 11/03,午餐,120 和 11/04,公車,15 兩行，file_total(那個檔) 是 135。
+    """
+    total = 0
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            row = line.rstrip("\n")
+            d, item, amount = row.split(",")
+            total += int(amount)
+    return total
+
+
+if __name__ == "__main__":
+    print(file_total(Path(__file__).parent / "sample.txt"))

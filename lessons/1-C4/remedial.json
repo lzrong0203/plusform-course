@@ -1,0 +1,259 @@
+{
+ "note": "1-C4 矯正包的對照表（course/production/1-C4/tapes/tools/make_remedial.py 產生，不手改）：錯的題目（items）→ 主題（topics）→ 原課章節的時間碼與練習檔。時間碼用各課現在的時間軸照說明欄章節的算法重算（影片從那個時間開始看那一章）；練習檔在 practice/，交卷沒過時 check.py 把用得到的複製到帳本的 lessons/1-C4/practice/。卷 A、卷 B 共用（每一題考的概念一樣，題目 id 也一樣）。",
+ "topics": {
+  "kwargs": {
+   "name": "預設值和關鍵字參數：沒給的用預設值，用名字給的交給那個名字",
+   "where": [
+    {
+     "lesson": "1-19",
+     "title": "函式（下）：預設值、關鍵字參數、範圍",
+     "time": "1:34",
+     "chapter": "第①圈 預設值和關鍵字參數"
+    }
+   ],
+   "practice": "p_kwargs.py",
+   "how": "先在紙上寫下每一行 print 印出什麼，再跑"
+  },
+  "scope": {
+   "name": "函式裡給值的名字是區域變數，外面的不會變；沒有 return 交回 None",
+   "where": [
+    {
+     "lesson": "1-19",
+     "title": "函式（下）：預設值、關鍵字參數、範圍",
+     "time": "2:48",
+     "chapter": "第①圈 函式裡外的名字：區域變數和全域變數"
+    },
+    {
+     "lesson": "1-18",
+     "title": "函式（上）：def、參數、return",
+     "time": "3:38",
+     "chapter": "第①圈 print 和 return、list 交進函式"
+    }
+   ],
+   "practice": "p_scope.py",
+   "how": "先在紙上畫小框、寫下印出來的三行，再跑"
+  },
+  "default": {
+   "name": "預設值 [] 只做一次，沒給的呼叫共用同一個盒子；改成 None",
+   "where": [
+    {
+     "lesson": "1-19",
+     "title": "函式（下）：預設值、關鍵字參數、範圍",
+     "time": "4:15",
+     "chapter": "第①圈 預設值用 [] 的陷阱、拆成小函式"
+    }
+   ],
+   "practice": "p_default.py",
+   "how": "先在紙上寫下兩行印出什麼、跑一次對答案，再照官方寫法改好"
+  },
+  "listarg": {
+   "name": "list 交進函式：函式裡的名字和外面的指著同一個盒子",
+   "where": [
+    {
+     "lesson": "1-18",
+     "title": "函式（上）：def、參數、return",
+     "time": "3:38",
+     "chapter": "第①圈 print 和 return、list 交進函式"
+    }
+   ],
+   "practice": "p_listarg.py",
+   "how": "先在紙上寫下每一行 print 印出什麼，再跑"
+  },
+  "module": {
+   "name": "import 會把那個檔從頭跑一遍；if __name__ 底下的只有直接跑才跑",
+   "where": [
+    {
+     "lesson": "1-21",
+     "title": "模組與 import",
+     "time": "1:53",
+     "chapter": "第①圈 自己的模組、if __name__"
+    }
+   ],
+   "practice": "p_module.py",
+   "how": "先在紙上寫下兩種跑法各印出什麼，再照著打"
+  },
+  "hints": {
+   "name": "型別提示只是說明，Python 跑的時候不檢查",
+   "where": [
+    {
+     "lesson": "1-20",
+     "title": "看懂 AI 常用的寫法（下）：型別提示、lambda、sorted 的 key",
+     "time": "1:47",
+     "chapter": "第①圈 型別提示、sorted 的 key、lambda"
+    }
+   ],
+   "practice": "p_hints.py",
+   "how": "先在紙上寫下每一行 print 印出什麼，再跑"
+  },
+  "swallow": {
+   "name": "光禿禿的 except 把錯吞掉：交回一個看起來正常的值，看不出哪裡錯",
+   "where": [
+    {
+     "lesson": "1-22",
+     "title": "錯誤處理：try／except／else／finally 與 raise",
+     "time": "7:34",
+     "chapter": "第②圈 光禿禿的 except 為什麼危險"
+    },
+    {
+     "lesson": "1-22",
+     "title": "錯誤處理：try／except／else／finally 與 raise",
+     "time": "1:32",
+     "chapter": "第①圈 讀 Traceback、try 和 except"
+    }
+   ],
+   "practice": "p_swallow.py",
+   "how": "先在紙上寫下合計，再跑"
+  },
+  "broad": {
+   "name": "光禿禿的 except 什麼錯都接：打錯字的 NameError 也被藏起來",
+   "where": [
+    {
+     "lesson": "1-22",
+     "title": "錯誤處理：try／except／else／finally 與 raise",
+     "time": "7:34",
+     "chapter": "第②圈 光禿禿的 except 為什麼危險"
+    }
+   ],
+   "practice": "p_broad.py",
+   "how": "先在紙上寫下兩種寫法各會怎樣，再跑"
+  },
+  "raise": {
+   "name": "讓錯丟出去（raise ValueError），在外面只接 ValueError、說出哪一筆有問題",
+   "where": [
+    {
+     "lesson": "1-22",
+     "title": "錯誤處理：try／except／else／finally 與 raise",
+     "time": "4:20",
+     "chapter": "第①圈 else、finally、raise"
+    }
+   ],
+   "practice": "p_raise.py",
+   "how": "照檔案最上面的說明改好，再跑"
+  },
+  "open": {
+   "name": "with open(…, encoding=\"utf-8\") 打開檔案",
+   "where": [
+    {
+     "lesson": "1-23",
+     "title": "檔案讀寫：關掉程式，帳還在",
+     "time": "3:49",
+     "chapter": "第①圈 w 和 a、Windows 的預設編碼"
+    },
+    {
+     "lesson": "1-23",
+     "title": "檔案讀寫：關掉程式，帳還在",
+     "time": "1:43",
+     "chapter": "第①圈 寫進檔案、讀回來"
+    }
+   ],
+   "practice": "p_open.py",
+   "how": "照檔案最上面的說明寫好，再跑"
+  },
+  "readfile": {
+   "name": "一行一行讀檔：拿掉換行、用逗號切開、金額變成整數加起來，最後 return",
+   "where": [
+    {
+     "lesson": "1-23",
+     "title": "檔案讀寫：關掉程式，帳還在",
+     "time": "1:43",
+     "chapter": "第①圈 寫進檔案、讀回來"
+    }
+   ],
+   "practice": "p_readfile.py",
+   "how": "照檔案最上面的說明寫好函式，再跑"
+  },
+  "lastline": {
+   "name": "最後一行後面不一定有換行：用 rstrip(\"\\n\")，不要用 [:-1]",
+   "where": [
+    {
+     "lesson": "1-23",
+     "title": "檔案讀寫：關掉程式，帳還在",
+     "time": "1:43",
+     "chapter": "第①圈 寫進檔案、讀回來"
+    }
+   ],
+   "practice": "p_lastline.py",
+   "how": "先在紙上寫下兩種寫法各印出什麼，再跑"
+  }
+ },
+ "items": {
+  "trace-t1": {
+   "label": "追蹤第 1 題",
+   "topics": [
+    "kwargs"
+   ]
+  },
+  "trace-t2": {
+   "label": "追蹤第 2 題",
+   "topics": [
+    "scope"
+   ]
+  },
+  "trace-t3": {
+   "label": "追蹤第 3 題",
+   "topics": [
+    "default"
+   ]
+  },
+  "trace-t4": {
+   "label": "追蹤第 4 題",
+   "topics": [
+    "listarg"
+   ]
+  },
+  "trace-t5": {
+   "label": "追蹤第 5 題",
+   "topics": [
+    "module"
+   ]
+  },
+  "trace-t6": {
+   "label": "追蹤第 6 題",
+   "topics": [
+    "hints"
+   ]
+  },
+  "exc-e1": {
+   "label": "找問題第 1 題",
+   "topics": [
+    "swallow"
+   ]
+  },
+  "exc-e2": {
+   "label": "找問題第 2 題",
+   "topics": [
+    "broad"
+   ]
+  },
+  "exc-e3": {
+   "label": "找問題第 3 題",
+   "topics": [
+    "raise"
+   ]
+  },
+  "write-shape": {
+   "label": "手寫：with open 和 encoding",
+   "topics": [
+    "open"
+   ]
+  },
+  "write-basic": {
+   "label": "手寫：三筆的帳本",
+   "topics": [
+    "readfile"
+   ]
+  },
+  "write-nonl": {
+   "label": "手寫：最後一行沒換行",
+   "topics": [
+    "lastline"
+   ]
+  },
+  "write-empty": {
+   "label": "手寫：空的檔案",
+   "topics": [
+    "readfile"
+   ]
+  }
+ }
+}

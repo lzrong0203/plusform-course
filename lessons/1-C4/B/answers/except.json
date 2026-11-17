@@ -1,0 +1,45 @@
+{
+ "note": "1-C4 卷 B 第二部分：跟卷 A 一樣考 1-22（光禿禿的 except: 交回 1）：第 1 題把錯吞掉（三、0 都被當成 1 份，一共 8 份）；第 2 題什麼錯都接（打錯字的 NameError 也接住，四張都變 1 份，一共 4 份）；第 3 題改法（只有 A 兩個問題都解決）。答案用 Python 3.13 實際跑過。",
+ "normalize": "text",
+ "how": "答案（例如：一共 5 份）",
+ "strict_choice": true,
+ "questions": [
+  {
+   "id": "e1",
+   "title": "第 13 行印出什麼",
+   "accept": [
+    "一共 8 份"
+   ],
+   "hint": "三 int 看不懂、0 在第 5 行 raise ValueError：兩個都跳到第 7 行的 except，第 8 行交回什麼？",
+   "explain": "2 和 4 照常加進去；三變不成整數、0 被第 5 行 raise，兩個都被光禿禿的 except 接住、交回 1，當成 1 份加進去：一共 8 份。錯被吞掉了，印出來的份數看起來沒事。"
+  },
+  {
+   "id": "e2",
+   "title": "第 3 行打錯字，第 13 行印出什麼",
+   "accept": [
+    "C"
+   ],
+   "choices": {
+    "A": "不會印，跳出 NameError 的錯誤訊息",
+    "B": "一共 8 份",
+    "C": "一共 4 份"
+   },
+   "hint": "打錯字是 NameError。except 後面什麼都不寫，接不接 NameError？",
+   "explain": "txt 沒有這個名字，每一次都在第 3 行出 NameError；光禿禿的 except 什麼錯都接，連打錯字也接住、交回 1，四張都是 1 份：一共 4 份。"
+  },
+  {
+   "id": "e3",
+   "title": "第 7、8 行要怎麼改",
+   "accept": [
+    "A"
+   ],
+   "choices": {
+    "A": "to_count 裡不寫 try／except，錯就丟出去；第 12 行在外面用 try 包住，except ValueError 接住、印出哪一張看不懂",
+    "B": "第 7 行改成 except ValueError:，第 8 行照舊 return 1",
+    "C": "第 7 行改成 except Exception:，第 8 行改成 return 0"
+   },
+   "hint": "兩個問題都要解決：錯不能變成一個看起來正常的數字（吞掉），打錯字的 NameError 也不能被接住（接太廣）。",
+   "explain": "B 寫明了 ValueError，打錯字看得到了，可是三、0 還是當成 1 份（還是吞掉）；C 的 Exception 一樣接住打錯字；A 讓 to_count 把 ValueError 丟出去，外面只接 ValueError、印出哪一張看不懂，打錯字的 NameError 照樣跳出來：A。"
+  }
+ ]
+}

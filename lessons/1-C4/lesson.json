@@ -1,0 +1,14 @@
+{
+  "id": "1-C4",
+  "title": "檢核站 4",
+  "minutes": 30,
+  "fast_minutes": 7,
+  "checkpoint": true,
+  "pass_at": 11,
+  "stages": ["第一部分 追蹤", "第二部分 找問題", "第三部分 手寫"],
+  "answer_files": ["trace.txt", "except.txt", "write.py"],
+  "papers": ["B"],
+  "remedial": "remedial.json",
+  "practice": "practice",
+  "after_start": "檢核站開始了，全程關掉 AI。參考時間 30 分鐘（只記錄，不擋你）。\n  作答檔：帳本的 lessons/1-C4/（trace.txt、except.txt、write.py）\n做完回到課程資料夾打：uv run check.py 1-C4（交卷）"
+}

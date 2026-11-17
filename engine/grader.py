@@ -14,7 +14,9 @@ check.py（學員端）和 tools/validate_lesson.py（老師端）共用這一�
                 全部對才算對（1-C2 第三部分：邊界和區間中間的金額放同一題）
   call          呼叫學員寫的函式，比對回傳值（同一個檔案、同一個函式的題目在同一個程序裡照順序呼叫，所以「第一次對、第二次就錯」抓得到；
                 1-19 加兩個只對寫了它的題目生效的欄位：kwargs＝用關鍵字交的參數 {"limit": 100}；seq_as_list＝交回的 tuple 跟 JSON 的 list 比；
-                1-22 加 raises＝這一次呼叫應該丟出這一種錯（例如 "ValueError"，不寫 expect）、msg_has＝錯誤訊息裡要有這段字）
+                1-22 加 raises＝這一次呼叫應該丟出這一種錯（例如 "ValueError"，不寫 expect）、msg_has＝錯誤訊息裡要有這段字；
+                1-C4 加 files＝{檔名: 內容}：check 在系統的暫存資料夾寫好這幾個檔（一個字都不改，最後一行有沒有換行照寫的），
+                args 裡寫 {"tmp_file": 檔名} 的地方換成那個檔的完整路徑，在那個資料夾裡呼叫；不碰學員帳本）
   chaff         wheat/chaff：學員寫的檢查要在正確版全過、在每個壞版本至少錯一條
                 （1-22 在 assert 模式加 try_checks：最外層的 try（裡面有 assert）整個算一條檢查，學員用 try／except／else 寫「應該丟出 ValueError」）
                 （1-23 在 assert 模式加 tmp_cwd：學員的檢查檔複製到暫存資料夾、在那裡跑（檢查會寫檔案，不寫帳本）；min_crash_marks：
@@ -35,6 +37,7 @@ check.py（學員端）和 tools/validate_lesson.py（老師端）共用這一�
   func_shape    學員寫的函式長得對不對（1-18 起；只看程式的樣子、不跑）：有沒有 def 那個名字、docstring 有沒有寫輸入／輸出／例子、
                 有沒有用 return 交回一個值（只 print 不 return，外面拿到的是 None）
                 （1-20 加 annotated＝每個參數和交回的值都寫了型別提示，只對寫了它的題目生效）
+                （1-C4 加 ast_require＝跟 run 的 ast_require 同一套規則，例如 with_open、open_utf8，只對寫了它的題目生效）
 
 學員寫的檔案一律用 utf-8-sig 讀（Windows 記事本會在最前面加看不見的 BOM），
 讀不懂（例如存成 Big5）就給白話的說明，不噴 Traceback。
@@ -364,8 +367,8 @@ class Env:
         # 1-23：cwd＝在哪個資料夾跑（chaff 的 tmp_cwd 用暫存資料夾）；沒寫照舊是帳本
         return self._run_runner(self.python_cmd() + ["-B"], request, timeout or self.timeout, cwd=cwd)
 
-    def runner(self, request: dict, timeout: float | None = None) -> dict:
-        reply = self.runner_raw(request, timeout)
+    def runner(self, request: dict, timeout: float | None = None, cwd: Path | None = None) -> dict:
+        reply = self.runner_raw(request, timeout, cwd=cwd)   # 1-C4：cwd＝在哪個資料夾跑（call 的 files 用暫存資料夾）；沒寫照舊是帳本
         if reply.result is None:
             if reply.proc.timed_out:
                 raise RunnerTrouble(f"跑了 {timeout or self.timeout:.0f} 秒還沒結束，可能有無窮迴圈。")
@@ -452,10 +455,34 @@ def args_text(args: list) -> str:
     return ", ".join(repr(a) for a in args)
 
 
+def _is_tmp_file(a) -> bool:
+    """1-C4 call 的 files：args 裡的 {"tmp_file": 檔名}＝check 寫在暫存資料夾的那個檔的路徑。"""
+    return isinstance(a, dict) and set(a) == {"tmp_file"}
+
+
 def call_args_text(spec: dict) -> str:
-    """call 題的括號裡（1-19：kwargs 寫成 limit=100 接在後面；沒寫 kwargs 的題目跟 args_text 一樣）。"""
-    parts = [repr(a) for a in spec.get("args", [])] + [f"{k}={v!r}" for k, v in (spec.get("kwargs") or {}).items()]
+    """call 題的括號裡（1-19：kwargs 寫成 limit=100 接在後面；沒寫 kwargs 的題目跟 args_text 一樣；1-C4：暫存檔寫成「檔案」）。"""
+    parts = ["檔案" if _is_tmp_file(a) else repr(a) for a in spec.get("args", [])] + [f"{k}={v!r}" for k, v in (spec.get("kwargs") or {}).items()]
     return ", ".join(parts)
+
+
+def tmp_file_text(spec: dict) -> str:
+    """1-C4 call 的 files：說明 check 交給函式的檔案長怎樣（每一行、最後一行後面有沒有換行、空的檔）。"""
+    out = []
+    for a in spec.get("args", []):
+        if not _is_tmp_file(a):
+            continue
+        body = (spec.get("files") or {}).get(a["tmp_file"], "")
+        if body == "":
+            out.append("  check 交給它的檔案：空的檔案（一個字都沒有）")
+            continue
+        rows = body.split("\n")
+        tail_nl = rows[-1] == ""
+        if tail_nl:
+            rows.pop()
+        out.append("  check 交給它的檔案（每一行如下）：\n" + "\n".join("    " + r for r in rows)
+                   + ("" if tail_nl else "\n  （最後一行後面沒有換行）"))
+    return "\n".join(out)
 
 
 def output_lines(text: str) -> list[str]:
@@ -1414,6 +1441,11 @@ class FuncShapeCheck(Check):
                 r.detail = (f"{func} 裡沒有 return：算好的值要用 return 交回去。"
                             + ("print 只會印在終端機給人看，呼叫的地方拿到的是 None。" if prints else "沒有 return，呼叫的地方拿到的是 None。"))
                 return
+        if s.get("ast_require"):   # 1-C4（只對寫了它的題目）：跟 run 的 ast_require 同一套（例如 with_open、open_utf8），只看這個函式裡面
+            probs = ast_problems(ast.unparse(fn), s["ast_require"])
+            if probs:
+                r.detail = probs[0] + (f"\n  提示：{s['hint']}" if s.get("hint") else "")
+                return
         r.ok = True
         if s.get("note"):
             r.note = s["note"]
@@ -1440,16 +1472,33 @@ class CallCheck(Check):
         if not path.is_file():
             data = {"missing": True}
         else:
-            reply = self.ctx.env.runner({
-                "op": "call",
-                "file": str(path),
-                "module": s["module"],
-                "func": s["func"],
-                "cases": [{"args": c.get("args", []), "expect": c.get("expect"), **({"kwargs": c["kwargs"]} if c.get("kwargs") else {}),
-                           **({k: c[k] for k in ("raises", "msg_has") if c.get(k)})} for c in specs],   # 1-22：raises／msg_has 只對寫了它的題目
-                # 1-19：kwargs＝用關鍵字交的參數（只對寫了它的題目生效）；seq_as_list＝交回 tuple 時跟 JSON 的 list 比（同一個函式只要有一題寫了就一起用）
-                **({"seq_as_list": True} if any(c.get("seq_as_list") for c in specs) else {}),
-            })
+            # 1-C4 files（只對寫了它的題目）：同一個函式的題目要的檔，全部寫進同一個暫存資料夾（照 bytes 寫，最後一行有沒有換行照原樣），
+            # args 裡的 {"tmp_file": 檔名} 換成完整路徑，在那個資料夾裡呼叫；跑完整個刪掉，學員帳本一個檔都不動
+            files: dict[str, str] = {}
+            for c in specs:
+                for name, body in (c.get("files") or {}).items():
+                    if files.setdefault(name, body) != body:
+                        raise RunnerTrouble(f"checks.json：暫存檔 {name} 在兩題裡內容不一樣（老師端的錯）")
+            tmp = Path(tempfile.mkdtemp(prefix="plusform-files-")) if files else None
+            try:
+                for name, body in files.items():
+                    (tmp / name).write_bytes(body.encode("utf-8"))
+
+                def real(args: list) -> list:
+                    return [str(tmp / a["tmp_file"]) if tmp and _is_tmp_file(a) else a for a in args]
+                reply = self.ctx.env.runner({
+                    "op": "call",
+                    "file": str(path.resolve()) if tmp else str(path),   # 1-C4：在暫存資料夾跑，相對路徑要先換成完整路徑
+                    "module": s["module"],
+                    "func": s["func"],
+                    "cases": [{"args": real(c.get("args", [])), "expect": c.get("expect"), **({"kwargs": c["kwargs"]} if c.get("kwargs") else {}),
+                               **({k: c[k] for k in ("raises", "msg_has") if c.get(k)})} for c in specs],   # 1-22：raises／msg_has 只對寫了它的題目
+                    # 1-19：kwargs＝用關鍵字交的參數（只對寫了它的題目生效）；seq_as_list＝交回 tuple 時跟 JSON 的 list 比（同一個函式只要有一題寫了就一起用）
+                    **({"seq_as_list": True} if any(c.get("seq_as_list") for c in specs) else {}),
+                }, cwd=tmp)
+            finally:
+                if tmp:
+                    shutil.rmtree(tmp, ignore_errors=True)
             data = {"reply": reply, "ids": [c["id"] for c in specs]}
         self.ctx._call_cache[key] = data
         return data
@@ -1500,6 +1549,8 @@ class CallCheck(Check):
             r.detail = f"{call} 應該回傳{show(s['expect'])}，你的回傳{show(case.get('got'))}"
             if case.get("got") is None:
                 r.detail += "\n  回傳 None，常常是用了 print，而不是 return。"
+        if s.get("files"):   # 1-C4：交給它的是哪一個檔（每一行、最後有沒有換行、空的檔）
+            r.detail += "\n" + tmp_file_text(s)
         if s.get("hint"):
             r.detail += f"\n  提示：{s['hint']}"
 

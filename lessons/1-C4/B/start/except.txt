@@ -1,0 +1,36 @@
+# 檢核站 4　卷 B　第二部分：找出 except 的問題（3 題）
+# 全程關掉 AI。先不要跑，用眼睛追。
+# 提醒：try 裡面出錯，那一行後面的就跳過，跳到對得上的 except；except 後面什麼都不寫，什麼錯都接住。
+# 每一題在「答：」後面寫答案，存檔。
+
+下面這段想把四張單子的份數加起來。to_count 把文字變成整數，看不懂的、不到 1 份的，都在第 7、8 行處理掉。
+  1  def to_count(text):
+  2      try:
+  3          n = int(text)
+  4          if n <= 0:
+  5              raise ValueError(f"份數要大於 0：{n}")
+  6          return n
+  7      except:
+  8          return 1
+  9
+ 10  total = 0
+ 11  for t in ["2", "三", "0", "4"]:
+ 12      total = total + to_count(t)
+ 13  print("一共", total, "份")
+
+第 1 題：第 13 行印出什麼？
+答：
+
+第 2 題：如果第 3 行把 text 打錯成 txt，第 13 行會印出什麼？
+    A. 不會印，跳出 NameError 的錯誤訊息
+    B. 一共 8 份
+    C. 一共 4 份
+（寫 A、B 或 C）
+答：
+
+第 3 題：第 7、8 行要怎麼改，才不會把錯吞掉、也不會什麼錯都接？
+    A. to_count 裡不寫 try／except，錯就丟出去；第 12 行在外面用 try 包住，except ValueError 接住、印出哪一張看不懂
+    B. 第 7 行改成 except ValueError:，第 8 行照舊 return 1
+    C. 第 7 行改成 except Exception:，第 8 行改成 return 0
+（寫 A、B 或 C）
+答：

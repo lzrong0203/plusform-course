@@ -1,0 +1,103 @@
+{
+ "note": "1-C4 檢核站 4（卷 B）：跟卷 A 同樣的題型、題數和題目 id（矯正包對照表共用），數字和情境換掉。一共 13 題，第一次交卷過 11 題以上算過。第一部分追蹤 6 題、第二部分找出 except 的問題 3 題（對答）；第三部分手寫 write.py 的 pay_total 4 題：func_shape（with open、encoding=\"utf-8\"、有 return）＋ call 三次（三筆有換行 390 → 兩筆最後一行沒換行 1240 → 空的檔 0；line[:-1] 的寫法第二題會變 1204）。",
+ "checks": [
+  {
+   "type": "answers",
+   "id": "trace",
+   "file": "lessons/1-C4B/trace.txt",
+   "key": "answers/trace.json",
+   "group": "第一部分 追蹤",
+   "stage": "第一部分 追蹤"
+  },
+  {
+   "type": "answers",
+   "id": "exc",
+   "file": "lessons/1-C4B/except.txt",
+   "key": "answers/except.json",
+   "group": "第二部分 找問題",
+   "stage": "第二部分 找問題"
+  },
+  {
+   "type": "func_shape",
+   "id": "write-shape",
+   "file": "lessons/1-C4B/write.py",
+   "func": "pay_total",
+   "must_return": true,
+   "group": "第三部分 手寫",
+   "stage": "第三部分 手寫",
+   "desc": "write.py：pay_total 用 with open(…, encoding=\"utf-8\") 打開檔案，用 return 交回",
+   "ast_require": [
+    {
+     "name": "open",
+     "kind": "with_open"
+    },
+    {
+     "name": "open",
+     "kind": "open_utf8"
+    }
+   ],
+   "hint": "with open(path, encoding=\"utf-8\") as f: 下面空四格，一行一行讀；全部加完 return total。",
+   "missing_hint": "write.py 應該在帳本的 lessons/1-C4B/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-C4B。"
+  },
+  {
+   "type": "call",
+   "id": "write-basic",
+   "file": "lessons/1-C4B/write.py",
+   "module": "c4b_write",
+   "func": "pay_total",
+   "group": "第三部分 手寫",
+   "stage": "第三部分 手寫",
+   "desc": "write.py：三筆、每一行後面都有換行的紀錄，pay_total 交回 390",
+   "args": [
+    {
+     "tmp_file": "a3.txt"
+    }
+   ],
+   "files": {
+    "a3.txt": "11/03,現金,65\n11/04,悠遊卡,25\n11/05,信用卡,300\n"
+   },
+   "expect": 390,
+   "hint": "with open(path, encoding=\"utf-8\") as f: 一行一行讀；row = line.rstrip(\"\\n\") 拿掉換行；d, way, amount = row.split(\",\")；total += int(amount)；全部讀完 return total。"
+  },
+  {
+   "type": "call",
+   "id": "write-nonl",
+   "file": "lessons/1-C4B/write.py",
+   "module": "c4b_write",
+   "func": "pay_total",
+   "group": "第三部分 手寫",
+   "stage": "第三部分 手寫",
+   "desc": "write.py：最後一行後面沒有換行，也要算對（兩筆，交回 1240）",
+   "args": [
+    {
+     "tmp_file": "b2.txt"
+    }
+   ],
+   "files": {
+    "b2.txt": "12/01,現金,1200\n12/02,悠遊卡,40"
+   },
+   "expect": 1240,
+   "hint": "最後一行後面沒有換行。line[:-1] 會把金額的最後一個字切掉；用 line.rstrip(\"\\n\")，沒有換行就什麼都不拿。"
+  },
+  {
+   "type": "call",
+   "id": "write-empty",
+   "file": "lessons/1-C4B/write.py",
+   "module": "c4b_write",
+   "func": "pay_total",
+   "group": "第三部分 手寫",
+   "stage": "第三部分 手寫",
+   "desc": "write.py：空的檔案，pay_total 交回 0",
+   "args": [
+    {
+     "tmp_file": "c0.txt"
+    }
+   ],
+   "files": {
+    "c0.txt": ""
+   },
+   "expect": 0,
+   "hint": "空的檔案，for line in f 一圈都不跑；total 從 0 開始，最後交回 0。不要先拿第一行（readline、[0]），空的檔案沒有第一行。"
+  }
+ ]
+}

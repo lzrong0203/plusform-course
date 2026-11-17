@@ -1,0 +1,69 @@
+# 檢核站 4　卷 B　第一部分：追蹤函式呼叫（6 題）
+# 全程關掉 AI。先不要跑程式，用眼睛從第一行往下追；可以在紙上畫：
+# 呼叫一個函式，就在旁邊畫一個小框，參數的值放進框裡；函式裡給了值的名字是框自己的，外面那個不會變。
+# 跑完 return 交回後面的值，框就收掉；沒有 return，交回的是 None。
+# 每一題在「答：」後面寫答案，存檔。一行印出好幾個值的，值和值中間空一格（例如 1 2）。
+# 不會的題目，也寫一個你覺得最可能的答案。
+
+第一段：
+  1  count = 0
+  2  def pay(price, fee=5):
+  3      count = price + fee
+  4      return count
+  5  def say(x):
+  6      print("付了", x)
+  7  a = pay(20)
+  8  b = say(pay(7, fee=3))
+  9  print(a, count, b)
+
+第 1 題：第 8 行印出什麼？
+答：
+
+第 2 題：第 9 行印出什麼？
+答：
+
+第二段：
+  1  def add_tip(tip, tips=[]):
+  2      tips.append(tip)
+  3      return len(tips)
+  4
+  5  mine = [40, 25]
+  6  a = add_tip(10)
+  7  b = add_tip(20)
+  8  c = add_tip(60, mine)
+  9  print(a, b, c)
+ 10  print(mine)
+
+第 3 題：第 9 行印出什麼？
+答：
+
+第 4 題：第 10 行印出什麼？
+答：
+
+第三段：tools.py 和 app.py 放在同一個資料夾。
+tools.py：
+  1  def label(n: int) -> str:
+  2      return f"第 {n} 筆"
+  3
+  4  print("載入 tools")
+  5  if __name__ == "__main__":
+  6      print(label(1))
+
+app.py：
+  1  import tools
+  2  print(tools.label(3))
+  3  print(tools.label("七"))
+
+第 5 題：在那個資料夾打 uv run app.py，一共印出幾行？
+    A. 4 行（載入 tools、第 1 筆、第 3 筆、第 七 筆）
+    B. 2 行（第 3 筆、第 七 筆）
+    C. 3 行（載入 tools、第 3 筆、第 七 筆）
+（寫 A、B 或 C）
+答：
+
+第 6 題：app.py 第 3 行印出什麼？
+    A. 出現錯誤訊息（"七" 不是 int）
+    B. 第 七 筆
+    C. 第 7 筆
+（寫 A、B 或 C）
+答：

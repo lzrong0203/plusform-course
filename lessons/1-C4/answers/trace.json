@@ -1,0 +1,74 @@
+{
+ "note": "1-C4 第一部分（卷 A）：追蹤函式呼叫，三段 6 題。第一段考 1-18、1-19（預設值與關鍵字參數 tip=2；函式裡給值的 total 是區域變數，外面的 total 不變；show 沒有 return 交回 None），第二段考 1-19、1-18（預設值 [] 只做一次、每次呼叫共用；list 交進函式，函式裡 append 改的是外面那一個），第三段考 1-21、1-20（import 會把 money.py 從頭跑一遍、if __name__ == \"__main__\": 底下的不跑；型別提示 Python 跑的時候不檢查）。答案用 Python 3.13 實際跑過（course/production/1-C4/rec/src/facts_out.txt）。選擇題開 strict_choice；一行印好幾個值的第 2、3 題開 keep_spaces（「1 2 2」跟「122」不一樣）。",
+ "normalize": "text",
+ "how": "答案（例如：1 2）",
+ "strict_choice": true,
+ "questions": [
+  {
+   "id": "t1",
+   "title": "第一段第 8 行印出什麼",
+   "accept": [
+    "收到 3"
+   ],
+   "hint": "第 8 行先算括號裡的 add(1, tip=2)：tip 用關鍵字給了 2，就不用預設的 10。交回的值再交給 show。",
+   "explain": "add(1, tip=2) 裡 tip 是 2（關鍵字參數蓋過預設的 10），交回 3；show(3) 印出「收到 3」：收到 3。"
+  },
+  {
+   "id": "t2",
+   "title": "第一段第 9 行印出什麼",
+   "accept": [
+    "15 0 None"
+   ],
+   "keep_spaces": true,
+   "hint": "add 裡的 total = … 是小框自己的，外面的 total 會變嗎？show 有沒有 return？三個值中間各空一格。",
+   "explain": "a = add(5) 用預設的 tip=10，交回 15；函式裡給值的 total 是區域變數，外面的 total 還是 0；show 沒有 return，交回 None，所以 b 是 None：15 0 None。"
+  },
+  {
+   "id": "t3",
+   "title": "第二段第 9 行印出什麼",
+   "accept": [
+    "1 2 2"
+   ],
+   "keep_spaces": true,
+   "hint": "預設值 day=[] 只在 Python 讀到 def 那一行時做一次，沒給 day 的呼叫都共用同一個盒子。第 8 行給了 week，那次的 day 指著誰？",
+   "explain": "第 6、7 行都沒給 day，共用同一個預設的盒子：放進 50 是 1 筆、再放進 80 是 2 筆；第 8 行 day 指著 week，[100] 加上 30 是 2 筆：1 2 2。"
+  },
+  {
+   "id": "t4",
+   "title": "第二段第 10 行印出什麼",
+   "accept": [
+    "[100, 30]"
+   ],
+   "hint": "list 交進函式，函式裡的 day 和外面的 week 指著同一個盒子；append 改的是盒子裡面。",
+   "explain": "第 8 行 day 和 week 指著同一個 list，day.append(30) 改的就是 week：[100, 30]。"
+  },
+  {
+   "id": "t5",
+   "title": "第三段：uv run main.py 一共印出幾行",
+   "accept": [
+    "B"
+   ],
+   "choices": {
+    "A": "2 行（120 元、2.5 元）",
+    "B": "3 行（載入 money、120 元、2.5 元）",
+    "C": "4 行（載入 money、1000 元、120 元、2.5 元）"
+   },
+   "hint": "from money import fmt 會把 money.py 從頭跑一遍；那時 money.py 的 __name__ 是什麼？",
+   "explain": "import 會把 money.py 從頭跑一遍，所以先印出「載入 money」；被 import 的時候 __name__ 是 \"money\"，不是 \"__main__\"，第 6 行不跑；接著 main.py 印出 120 元、2.5 元，一共 3 行。"
+  },
+  {
+   "id": "t6",
+   "title": "第三段：main.py 第 3 行印出什麼",
+   "accept": [
+    "A"
+   ],
+   "choices": {
+    "A": "2.5 元",
+    "B": "2 元",
+    "C": "出現錯誤訊息（2.5 不是 int）"
+   },
+   "hint": "n: int 是型別提示：Python 跑的時候會檢查嗎？",
+   "explain": "型別提示只是說明，Python 跑的時候不檢查，也不會幫你換成整數；f\"{n} 元\" 照樣把 2.5 放進去：2.5 元。"
+  }
+ ]
+}

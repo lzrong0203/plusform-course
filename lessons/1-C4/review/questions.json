@@ -1,0 +1,42 @@
+{
+  "note": "回顧題：通過檢核站 4 以後，往後第 2 課和第 5 課的檢查會各帶一題（混合 1-18～1-23）。答案用 Python 3.13 實際跑過。",
+  "questions": [
+    {
+      "id": "r1",
+      "q": "下面這段最後印出什麼？\n  def add(x, book=[]):\n      book.append(x)\n      return book\n  add(1)\n  print(add(2))\nA. [2]\nB. [1, 2]\nC. None\n（寫 A、B 或 C）",
+      "accept": [
+        "B"
+      ],
+      "choices": {
+        "A": "[2]",
+        "B": "[1, 2]",
+        "C": "None"
+      },
+      "hint": "預設值 [] 什麼時候做出來？兩次呼叫用的是不是同一個盒子？",
+      "explain": "預設值只在 Python 讀到 def 那一行時做一次，兩次呼叫都沒給 book，共用同一個 list：第一次放進 1、第二次放進 2，交回 [1, 2]。"
+    },
+    {
+      "id": "r2",
+      "q": "下面這段印出什麼？\n  try:\n      n = int(\"八\")\n      print(\"記下\", n)\n  except ValueError:\n      print(\"看不懂\")\n（寫印出來的字）",
+      "accept": [
+        "看不懂"
+      ],
+      "hint": "int 看得懂國字的八嗎？try 裡面出錯，那一行後面的會不會跑？",
+      "explain": "int(\"八\") 丟出 ValueError，try 裡後面的 print 跳過，跳到 except ValueError：看不懂。"
+    },
+    {
+      "id": "r3",
+      "q": "帳本檔 ledger.txt 有兩行：11/03,午餐,120 和 11/04,公車,15（第二行後面沒有換行）。\n  with open(\"ledger.txt\", encoding=\"utf-8\") as f:\n      for line in f:\n          print(line[:-1])\n第二行印出什麼？\nA. 11/04,公車,15\nB. 11/04,公車,1\nC. 什麼都不印\n（寫 A、B 或 C）",
+      "accept": [
+        "B"
+      ],
+      "choices": {
+        "A": "11/04,公車,15",
+        "B": "11/04,公車,1",
+        "C": "什麼都不印"
+      },
+      "hint": "line[:-1] 一律切掉最後一個字。最後一行後面有沒有換行？",
+      "explain": "第二行後面沒有換行，line[:-1] 切掉的是 15 的 5：11/04,公車,1。用 line.rstrip(\"\\n\")，沒有換行就什麼都不拿。"
+    }
+  ]
+}
