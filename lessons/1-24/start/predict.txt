@@ -1,0 +1,43 @@
+# 1-24 第①圈：先猜。先不要跑，用眼睛想（隨片測驗）。
+# 在「答：」後面寫 A、B 或 C，存檔。
+# 三題都用這個 Entry（除非題目另外說）：
+#   @dataclass
+#   class Entry:
+#       date: str
+#       item: str
+#       amount: int
+
+第 1 題：
+#   dinner = Entry("11/05", "晚餐")
+# 少給了金額，這一行會怎樣？
+#   A. dinner.amount 是 0
+#   B. dinner.amount 是 None
+#   C. 這一行就跳出 TypeError
+答：
+
+第 2 題：
+# 這次的 Entry 沒有 @dataclass，只寫了 __init__：
+#   class Entry:
+#       def __init__(self, date, item, amount):
+#           self.date = date
+#           self.item = item
+#           self.amount = amount
+#   a = Entry("11/03", "午餐", 120)
+#   b = Entry("11/03", "午餐", 120)
+#   print(a == b)
+# 印出什麼？
+#   A. True
+#   B. False
+#   C. 跳出錯誤訊息
+答：
+
+第 3 題：
+#   lunch = Entry("11/03", "午餐", 120)
+#   bus = Entry("11/04", "公車", 15)
+#   bus.amount = 30
+#   print(lunch.amount)
+# 印出什麼？
+#   A. 120
+#   B. 30
+#   C. 跳出錯誤訊息
+答：

@@ -1,0 +1,25 @@
+# 1-24 第③圈：AI 交回的 ledger_ai.py，收不收？
+# 先跑你的 checks_ledger.py（測試都過了），再打開 ledger_ai.py 從頭讀一遍，回答下面三題。
+# 在「答：」後面寫 A、B 或 C，存檔。
+
+第 1 題：
+# 熊的需求只有 biggest。ledger_ai.py 的測試都過了，
+# 可是多了 BaseLedger、MonthlyLedger、FoodLedger 三個類別。收不收？
+#   A. 收：測試都過了
+#   B. 收：多的類別以後用得到
+#   C. 不收：多寫了需求沒有要的東西
+答：
+
+第 2 題：
+# ledger_ai.py 裡的 class MonthlyLedger(Ledger): 是什麼意思？
+#   A. MonthlyLedger 是一種 Ledger：Ledger 有的方法，它都有
+#   B. MonthlyLedger 裡面放了一本 Ledger
+#   C. 先跑 Ledger，再跑 MonthlyLedger
+答：
+
+第 3 題：
+# book = MonthlyLedger("11")，再 book.add(Entry("12/01", "書", 450))。會怎樣？
+#   A. 跳出錯誤訊息
+#   B. 什麼都沒說，這一筆沒有收進去
+#   C. 收進去了，book 裡有一筆
+答：

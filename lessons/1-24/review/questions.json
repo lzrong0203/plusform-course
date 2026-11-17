@@ -1,0 +1,44 @@
+{
+ "note": "回顧題：學員通過這課以後，往後第 2 課和第 5 課的 check 會各帶一題。",
+ "questions": [
+  {
+   "id": "r1",
+   "q": "class Ledger:\n    def __init__(self):\n        self.entries = []\n    def add(self, entry):\n        self.entries.append(entry)\nnov = Ledger()\ndec = Ledger()\nnov.add(\"午餐\")\n跑最後一行 nov.add(\"午餐\") 的時候，add 裡的 self 是誰？\nA. Ledger 這個類別\nB. nov 這本帳本\nC. dec 這本帳本\n（寫 A、B 或 C）",
+   "accept": [
+    "B"
+   ],
+   "explain": "呼叫方法時，點前面的那一個物件會交給 self：nov.add(...) 的 self 就是 nov（官方教學 9.3.4：x.f() 跟 MyClass.f(x) 一樣）。",
+   "choices": {
+    "A": "Ledger 這個類別",
+    "B": "nov 這本帳本",
+    "C": "dec 這本帳本"
+   }
+  },
+  {
+   "id": "r2",
+   "q": "class Ledger:\n    entries = []\n    def add(self, entry):\n        self.entries.append(entry)\nnov = Ledger()\ndec = Ledger()\nnov.add(\"午餐\")\nprint(len(dec.entries)) 印出什麼？\nA. 0\nB. 1\nC. 跳出錯誤訊息\n（寫 A、B 或 C）",
+   "accept": [
+    "B"
+   ],
+   "explain": "寫在 class 下面的 entries 只有一個，每本帳本共用（官方教學 9.3.5 的 tricks 例子）；nov 加進去的，dec 也看得到。要每本各一個，在 __init__ 裡寫 self.entries = []。",
+   "choices": {
+    "A": "0",
+    "B": "1",
+    "C": "跳出錯誤訊息"
+   }
+  },
+  {
+   "id": "r3",
+   "q": "@dataclass\nclass Entry:\n    date: str\n    item: str\n    amount: int\nprint(Entry(\"11/03\", \"午餐\", 120) == Entry(\"11/03\", \"午餐\", 120)) 印出什麼？\nA. True\nB. False\nC. 跳出錯誤訊息\n（寫 A、B 或 C）",
+   "accept": [
+    "A"
+   ],
+   "explain": "@dataclass 會幫你寫一個比每個欄位的 __eq__，三個欄位都一樣就是 True；沒有 @dataclass 的話，== 比的是不是同一個物件，會是 False。",
+   "choices": {
+    "A": "True",
+    "B": "False",
+    "C": "跳出錯誤訊息"
+   }
+  }
+ ]
+}

@@ -30,6 +30,8 @@ check.py（學員端）和 tools/validate_lesson.py（老師端）共用這一�
                 （1-23 在 run 加 sandbox：把學員的檔複製到系統的暫存資料夾（帳本最上層／lessons/<課號> 的樣子）照步驟跑，可以從不同資料夾跑、
                   檢查寫出來的檔案內容、不該出現的檔案；不碰學員帳本裡真的 ledger.txt。ast_require 加 with_open（open 要寫在 with 後面）、
                   open_utf8（每個 open 都要寫 encoding="utf-8"））
+                （1-24 在 run 的 sandbox 加 probe：{檔名: 課程這一課資料夾裡的路徑}，課程準備的小程式複製進暫存資料夾，
+                  步驟跑它：它 import 學員的檔（例如 entry.py 的 Entry）另外做幾筆資料試試看，印出來的照一般的 expect_* 比）
   func_shape    學員寫的函式長得對不對（1-18 起；只看程式的樣子、不跑）：有沒有 def 那個名字、docstring 有沒有寫輸入／輸出／例子、
                 有沒有用 return 交回一個值（只 print 不 return，外面拿到的是 None）
                 （1-20 加 annotated＝每個參數和交回的值都寫了型別提示，只對寫了它的題目生效）
@@ -949,6 +951,11 @@ class RunCheck(Check):
                     return None, [self.ctx.missing((rel_dir / name).as_posix(), self.spec.get("missing_hint"))], ""
                 originals[name] = read_student_text(f)
                 (les / name).write_text(originals[name], encoding="utf-8")
+            # 1-24 probe（只對寫了它的題目）：{檔名: 課程這一課資料夾裡的路徑}，課程準備的小程式（學員不用改）複製到同一個資料夾，
+            # 步驟可以跑它：它 import 學員的檔、另外做幾筆資料試試看（學員的檔最下面自己印的不算），印出來的交給一般的 expect_* 比
+            probes = sb.get("probe") or {}
+            for name, rel in probes.items():
+                (les / name).write_text(self.ctx.course(rel).read_text(encoding="utf-8"), encoding="utf-8")
             swapped: dict[str, str] = {}
             if swap:
                 target = sb.get("swap_file", path.name)
@@ -966,7 +973,10 @@ class RunCheck(Check):
                 cwd = tmp if st.get("cwd", ".") == "." else les
                 where = cmd_dir.get(st.get("cwd", "."), "帳本資料夾")
                 cmd = f"uv run {(rel_dir / name).as_posix()}" if cwd == tmp else f"uv run {name}"
-                how.append(f"{k}. 在{where}打 {cmd}" + ("（換過資料的那一份）" if st.get("swap") else ""))
+                if name in probes:   # 1-24：課程準備的小程式，學員的資料夾裡沒有它，說明照實寫
+                    how.append(f"{k}. 用課程準備的小程式 {name} 載入你的 {'、'.join(sb.get('copy', [path.name]))}，另外做幾筆資料試試看")
+                else:
+                    how.append(f"{k}. 在{where}打 {cmd}" + ("（換過資料的那一份）" if st.get("swap") else ""))
                 p = self.ctx.env.run_file(les / name, stdin=stdin if k == len(steps) else st.get("stdin", ""), cwd=cwd, timeout=self.own_timeout())
                 if p.timed_out or p.overflow or p.returncode != 0:
                     if k < len(steps):

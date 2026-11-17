@@ -1,0 +1,20 @@
+{
+ "note": "1-24 第③圈：AI 多做了沒要求的繼承架構，判定不收（對答 3 題，都是選擇題）。第 1 題是判斷，第 2、3 題確認讀得懂繼承（看得懂就好）和多做的東西藏了什麼行為。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {"id": "v1", "title": "多做的不收", "accept": ["C"],
+   "choices": {"A": "收：測試都過了", "B": "收：多的類別以後用得到", "C": "不收：多寫了需求沒有要的東西"},
+   "hint": "需求只要 biggest。多出來的三個類別，是誰要的？",
+   "explain": "測試只證明 biggest 是對的；需求沒有要的類別，多一個就多一份要讀、要測、可能藏錯的程式（MonthlyLedger 的 add 會默默丟掉別的月份的帳）。少做不收、做錯不收，多做了沒要求的也不收：退回去，請它只照 docstring 寫 biggest。"},
+  {"id": "v2", "title": "看得懂繼承", "accept": ["A"],
+   "choices": {"A": "MonthlyLedger 是一種 Ledger：Ledger 有的方法，它都有", "B": "MonthlyLedger 裡面放了一本 Ledger", "C": "先跑 Ledger，再跑 MonthlyLedger"},
+   "hint": "class 名字後面的括號裡寫另一個類別，叫做繼承。",
+   "explain": "class MonthlyLedger(Ledger): 是繼承：MonthlyLedger 是一種 Ledger，自己沒寫的方法（biggest）就往上一層找（官方教學 9.5：if a requested attribute is not found in the class, the search proceeds to look in the base class）；它自己寫的 add 會蓋掉上一層的。"},
+  {"id": "v3", "title": "多做的藏了什麼", "accept": ["B"],
+   "choices": {"A": "跳出錯誤訊息", "B": "什麼都沒說，這一筆沒有收進去", "C": "收進去了，book 裡有一筆"},
+   "hint": "讀 MonthlyLedger 的 add：日期不是 11/ 開頭的時候，它做了什麼？",
+   "explain": "MonthlyLedger 的 add 只在日期是 11/ 開頭時才呼叫上一層的 add；12/01 的帳什麼都不做，也不說一聲，所以 book 還是空的。這就是多做的東西藏起來的行為：沒人要求，出事也不容易發現。"}
+ ]
+}

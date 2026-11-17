@@ -1,0 +1,20 @@
+{
+ "note": "1-24 第①圈：先猜（對答 3 題，都是選擇題；隨片測驗：少給欄位、沒有 @dataclass 的 ==、兩個物件各有各的屬性）。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {"id": "p1", "title": "少給欄位", "accept": ["C"],
+   "choices": {"A": "dinner.amount 是 0", "B": "dinner.amount 是 None", "C": "這一行就跳出 TypeError"},
+   "hint": "@dataclass 幫 Entry 寫的 __init__ 有三個參數。只給兩個，Python 會怎樣？",
+   "explain": "@dataclass 幫你寫的 __init__ 要三個參數，少給一個，做物件的那一行就跳出 TypeError: Entry.__init__() missing 1 required positional argument: 'amount'。dict 少一個鍵不會擋，要等到用那個鍵才 KeyError。"},
+  {"id": "p2", "title": "沒有 @dataclass 的 ==", "accept": ["B"],
+   "choices": {"A": "True", "B": "False", "C": "跳出錯誤訊息"},
+   "hint": "a 和 b 是兩個物件。沒有人寫「比每個欄位」的 ==，Python 會比什麼？",
+   "explain": "沒有 @dataclass、也沒有自己寫 __eq__，== 比的是「是不是同一個物件」（像 1-16 的 is），a 和 b 是兩個物件，所以是 False。加上 @dataclass，它會幫你寫一個比每個欄位的 __eq__，就是 True。"},
+  {"id": "p3", "title": "各有各的屬性", "accept": ["A"],
+   "choices": {"A": "120", "B": "30", "C": "跳出錯誤訊息"},
+   "hint": "lunch 和 bus 是同一個物件，還是照同一個類別做出來的兩個物件？",
+   "explain": "lunch 和 bus 是照 Entry 做出來的兩個物件，各有各的屬性；改 bus.amount 只改到 bus，lunch.amount 還是 120。"}
+ ]
+}

@@ -1,0 +1,140 @@
+{
+ "note": "1-24 的檢查：第①圈 predict.txt（隨片測驗 3 題：少給欄位 TypeError、沒有 @dataclass 的 == 是 False、兩個物件各有各的屬性）；entry.py 跑起來印出三行（起點檔最下面的 print）；Entry 的欄位與相等比較（sandbox＋probe：課程準備的 probe_entry.py 載入學員的 entry.py，另外做 12/01 書 450 試屬性、印出來的樣子、== 比每個欄位、少給金額 TypeError）。第②圈 ledger.py 跑起來（兩本帳本各有自己的 entries、total）；Ledger.add 與加總（probe_ledger.py：新的帳本 total 是 0、a 加兩筆 b 還是 0 筆、最後一筆是剛加的、合計 510）；tutor.md（filled 四個標籤，自評）。第③圈 checks_ledger.py（chaff 的 assert 模式：學員的檢查拿去跑正確版和 3 個 AI 寫錯的 biggest：m1 交回最後一筆、m2 空的帳本當掉、m3 方向寫反）；review.txt（對答 3 題：AI 多做了沒要求的繼承架構，判定不收；看得懂繼承；多做的 MonthlyLedger 默默不收別的月份）。grader 加的東西（只對寫了它的題目生效）：run 的 sandbox 加 probe（課程準備的小程式複製進暫存資料夾、載入學員的檔來跑）。",
+ "checks": [
+  {
+   "type": "answers",
+   "id": "predict",
+   "file": "lessons/1-24/predict.txt",
+   "key": "answers/predict.json",
+   "group": "第一圈"
+  },
+  {
+   "type": "run",
+   "id": "entry-1",
+   "file": "lessons/1-24/entry.py",
+   "group": "第一圈",
+   "desc": "entry.py：寫好 @dataclass 的 Entry，跑起來印出三行",
+   "timeout": 5,
+   "expect_exact": [
+    "Entry(date='11/03', item='午餐', amount=120)",
+    "公車 15",
+    "135"
+   ],
+   "hint": "在註解下面寫：@dataclass，下一行 class Entry:，再空四格寫 date: str、item: str、amount: int 三行。",
+   "missing_hint": "entry.py 應該在帳本的 lessons/1-24/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-24。"
+  },
+  {
+   "type": "run",
+   "id": "entry-2",
+   "file": "lessons/1-24/entry.py",
+   "group": "第一圈",
+   "desc": "Entry 的欄位與相等比較：另外做一筆 12/01 書 450，屬性、印出來的樣子、== 比每個欄位、少給金額要擋下來",
+   "timeout": 5,
+   "sandbox": {
+    "copy": [
+     "entry.py"
+    ],
+    "probe": {
+     "probe_entry.py": "tests/probe_entry.py"
+    },
+    "steps": [
+     {
+      "run": "probe_entry.py",
+      "cwd": "lesson"
+     }
+    ]
+   },
+   "expect_exact": [
+    "屬性： 12/01 書 450",
+    "印出來： Entry(date='12/01', item='書', amount=450)",
+    "一樣的兩筆用 == 比： True",
+    "金額不一樣用 == 比： False",
+    "少給金額：TypeError"
+   ],
+   "hint": "Entry 上面要有 @dataclass（它會幫你寫 __init__、印出來的樣子和比每個欄位的 ==）；三個欄位的順序是 date、item、amount。",
+   "missing_hint": "entry.py 應該在帳本的 lessons/1-24/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-24。"
+  },
+  {
+   "type": "run",
+   "id": "ledger-1",
+   "file": "lessons/1-24/ledger.py",
+   "group": "第二圈",
+   "desc": "ledger.py：nov 加兩筆、dec 還是空的，印出 2 0 和 135 0",
+   "timeout": 5,
+   "expect_exact": [
+    "2 0",
+    "135 0"
+   ],
+   "hint": "entries 要在 def __init__(self): 裡面寫 self.entries = []（寫在 class 下面的話，每本帳本共用同一個 list）；add 寫 self.entries.append(entry)；total 把每一筆的 amount 加起來交回。",
+   "missing_hint": "ledger.py 應該在帳本的 lessons/1-24/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-24。"
+  },
+  {
+   "type": "run",
+   "id": "ledger-2",
+   "file": "lessons/1-24/ledger.py",
+   "group": "第二圈",
+   "desc": "Ledger.add 與加總：另外做兩本帳本，a 加兩筆、b 還是空的，total 算對（空的帳本是 0）",
+   "timeout": 5,
+   "sandbox": {
+    "copy": [
+     "ledger.py"
+    ],
+    "probe": {
+     "probe_ledger.py": "tests/probe_ledger.py"
+    },
+    "steps": [
+     {
+      "run": "probe_ledger.py",
+      "cwd": "lesson"
+     }
+    ]
+   },
+   "expect_exact": [
+    "新的帳本 total()： 0",
+    "a 有幾筆： 2",
+    "b 有幾筆： 0",
+    "a 最後一筆： 咖啡",
+    "a.total()： 510",
+    "b.total()： 0"
+   ],
+   "hint": "每本帳本要有自己的 list：def __init__(self): 裡面寫 self.entries = []；add 用 self.entries.append(entry) 放到最後面；total 一筆一筆把 amount 加起來，最後 return。",
+   "missing_hint": "ledger.py 應該在帳本的 lessons/1-24/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-24。"
+  },
+  {
+   "type": "filled",
+   "id": "tutor",
+   "file": "lessons/1-24/tutor.md",
+   "group": "第二圈",
+   "labels": [
+    "我先寫的：",
+    "家教怎麼說：",
+    "我跑出來的：",
+    "我最後改成："
+   ],
+   "count": 1,
+   "item": "",
+   "desc": "tutor.md：跟家教一起寫 Ledger（帶我寫），四個標籤都寫了（自評，內容不改對錯）",
+   "hint": "照 tutor.md 上面的步驟問家教；每一步你先說、先寫，它說不對的地方自己跑跑看，把結果寫在「我跑出來的」。",
+   "missing_hint": "tutor.md 應該在帳本的 lessons/1-24/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-24。"
+  },
+  {
+   "type": "chaff",
+   "id": "r3",
+   "mode": "assert",
+   "student_file": "lessons/1-24/checks_ledger.py",
+   "module": "ledger_ai",
+   "reference": "reference/ledger_ai.py",
+   "mutants": "mutants/mutants.json",
+   "teacher_file": "answers/checks_ledger.py",
+   "min_checks": 3,
+   "group": "第三圈"
+  },
+  {
+   "type": "answers",
+   "id": "review",
+   "file": "lessons/1-24/review.txt",
+   "key": "answers/review.json",
+   "group": "第三圈"
+  }
+ ]
+}

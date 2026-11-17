@@ -1,0 +1,7 @@
+{
+ "id": "1-24",
+ "title": "類別與物件：Entry、Ledger、@dataclass",
+ "minutes": 45,
+ "fast_minutes": 8,
+ "after_start": "接下來，用 VS Code 打開帳本，找到 lessons/1-24：\n  1. 第一圈：predict.txt 先別跑、先猜 3 題；entry.py 在註解下面寫 @dataclass 和 class Entry（date、item、amount 三個欄位），跑起來印出三行\n  2. 第二圈：照 tutor.md 跟家教一起寫 ledger.py 的 Ledger（每一步你先說、先寫），記在 tutor.md\n  3. 第三圈：在 checks_ledger.py 寫 assert 驗收 biggest，抓到 3 個 AI 寫錯的版本；讀 ledger_ai.py，在 review.txt 判斷收不收\n做完回到課程資料夾打：uv run check.py 1-24"
+}
