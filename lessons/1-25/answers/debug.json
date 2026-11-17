@@ -1,0 +1,24 @@
+{
+ "note": "1-25 第①圈：用 debugger 和編輯器導覽找答案（對答 4 題，都是選擇題）。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {"id": "d1", "title": "亮起來的那一行還沒跑", "accept": ["B"],
+   "choices": {"A": "第 7 行已經跑完了，變數面板裡有 d", "B": "第 7 行還沒跑，它是下一個要跑的那一行", "C": "第 7 行跑到一半"},
+   "hint": "停下來的時候，變數面板裡有沒有 d？按一下 F10 再看一次。",
+   "explain": "停在中斷點時，亮起來的那一行是下一個要跑的（VS Code 官方文件：The highlighted execution line is the line that runs next.）；按 F10 跑完它，變數面板才多出 d。"},
+  {"id": "d2", "title": "呼叫堆疊最上面", "accept": ["A"],
+   "choices": {"A": "next_month（dates.py）", "B": "<module>（report.py）", "C": "print"},
+   "hint": "F11 走進了哪個檔的哪個函式？CALL STACK 由上往下是「現在在哪裡、是誰呼叫它的」。",
+   "explain": "CALL STACK 最上面是現在正在跑的函式 next_month（dates.py），下面一列是呼叫它的 report.py（最外層叫 <module>）。print 是 Python 內建的，不會出現在這裡。"},
+  {"id": "d3", "title": "移至定義", "accept": ["C"],
+   "choices": {"A": "card.py 第 5 行", "B": "report.py 第 2 行", "C": "settings.py 第 2 行：PAY_DAY = 15"},
+   "hint": "PAY_DAY 是在哪個檔裡第一次被定出來的？",
+   "explain": "Go to Definition（F12）跳到 PAY_DAY 定出來的地方：settings.py 第 2 行 PAY_DAY = 15。"},
+  {"id": "d4", "title": "尋找所有參考", "accept": ["B"],
+   "choices": {"A": "settings.py 第 2 行", "B": "card.py 第 5 行", "C": "report.py 第 7 行"},
+   "hint": "Find All References 會列出每一個用到 PAY_DAY 的地方；哪一行在等號左邊？",
+   "explain": "列出來的三個地方裡，card.py 第 5 行 settings.PAY_DAY = 31 在等號左邊，就是它改的（信用卡：月底扣款）。settings.py 是定出來的地方，report.py 第 7 行只是拿來用。"}
+ ]
+}

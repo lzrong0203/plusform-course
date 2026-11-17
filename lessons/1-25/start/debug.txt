@@ -1,0 +1,36 @@
+# 1-25 第①圈：用 debugger 和編輯器導覽找答案。每一題都在 VS Code 裡自己做一次再寫。
+# 在「答：」後面寫 A、B 或 C，存檔。
+# 按鍵（Mac 和 Windows 一樣；Mac 筆電按了沒反應，先按住 fn 再按）：
+#   F9 設中斷點（或在行號左邊點一下）　F5 開始 debug　F10 Step Over　F11 Step Into　F12 Go to Definition（移至定義）
+#   Find All References（尋找所有參考）：Mac ⇧⌥F12｜Windows Shift+Alt+F12（也可以按右鍵選）
+# 按 F5 的時候，編輯區要是 report.py（它會跑「現在開著的那個檔」）。
+
+第 1 題：
+# 中斷點設在 report.py 第 7 行：d = date(2026, 1, settings.PAY_DAY)
+# 按 F5，程式停下來、第 7 行亮起來的時候：
+#   A. 第 7 行已經跑完了，變數面板裡有 d
+#   B. 第 7 行還沒跑，它是下一個要跑的那一行
+#   C. 第 7 行跑到一半
+答：
+
+第 2 題：
+# 停在 report.py 第 9 行，按 F11（Step Into）走進 next_month。
+# 這時候 CALL STACK（呼叫堆疊）最上面那一列是：
+#   A. next_month（dates.py）
+#   B. <module>（report.py）
+#   C. print
+答：
+
+第 3 題：
+# 在 report.py 第 7 行的 PAY_DAY 上按 F12（Go to Definition，移至定義），會跳到哪裡？
+#   A. card.py 第 5 行
+#   B. report.py 第 2 行
+#   C. settings.py 第 2 行：PAY_DAY = 15
+答：
+
+第 4 題：
+# 在 PAY_DAY 上按右鍵，選 Find All References（尋找所有參考）。把它改成 31 的是哪裡？
+#   A. settings.py 第 2 行
+#   B. card.py 第 5 行
+#   C. report.py 第 7 行
+答：

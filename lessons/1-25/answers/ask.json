@@ -1,0 +1,20 @@
+{
+ "note": "1-25 第②圈：只指著一行問家教（對答 3 題，都是選擇題）。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {"id": "a1", "title": "只指一行問", "accept": ["B"],
+   "choices": {"A": "整支程式貼上去：「幫我把它修好」", "B": "只指一行：「dates.py 第 3 行 return d.replace(month=d.month + 1)，這一行在做什麼？」", "C": "「為什麼會當掉？直接給我正確的程式」"},
+   "hint": "這一課的規則：只能指著某一行，問「這一行在做什麼」。",
+   "explain": "只指一行問「這一行在做什麼」：你知道自己卡在哪一行，家教也只能解釋那一行；請它整支修好，它改完了，你還是不知道錯在哪。"},
+  {"id": "a2", "title": "replace 想做出哪一天", "accept": ["C"],
+   "choices": {"A": "2026 年 2 月 28 日", "B": "2026 年 3 月 3 日", "C": "2026 年 2 月 31 日：這一天不存在，所以出現 ValueError"},
+   "hint": "replace 只換掉你寫的那一個（month），年和日呢？",
+   "explain": "replace 照原本的年和日、只換掉月份（官方文件：Return a new date object with the same values, but with specified parameters updated.），想做出 2 月 31 日；2 月沒有 31 號，所以 ValueError: day is out of range for month。"},
+  {"id": "a3", "title": "用 debugger 確認", "accept": ["A"],
+   "choices": {"A": "自己用 debugger 停在那一行，看變數面板的 d，再按 F10 看會怎樣", "B": "再問它一次同樣的問題", "C": "它是 AI，說的一定對"},
+   "hint": "家教說的是「這一行會怎樣」；你的電腦上，有什麼工具能讓程式停在那一行給你看？",
+   "explain": "停在那一行看變數面板（d 是 2026-01-31），再按 F10：真的出現 ValueError，就確認了家教說的。再問一次同樣的問題，它可能換個說法，但不會多一個證據。"}
+ ]
+}

@@ -1,0 +1,7 @@
+{
+ "id": "1-25",
+ "title": "Debugger 與編輯器導覽",
+ "minutes": 45,
+ "fast_minutes": 8,
+ "after_start": "接下來，用 VS Code 打開帳本，找到 lessons/1-25（report.py 跑起來會當掉）：\n  1. 第一圈：在 report.py 設中斷點、按 F5，用 F10、F11 一步一步走，看變數面板和呼叫堆疊；用 Go to Definition、Find All References 找出 PAY_DAY 在哪裡被改；debug.txt 4 題\n  2. 第二圈：只指著一行問家教「這一行在做什麼」，用 debugger 對照，記在 tutor.md；ask.txt 3 題\n  3. 第三圈：用 Markdown 寫 bug_report.md（重現步驟、預期、實際）；report.py 改用課程的修正版 dates_fixed.py，照你的重現步驟跑一次；把重現步驟寫成 checks_dates.py\n做完回到課程資料夾打：uv run check.py 1-25"
+}

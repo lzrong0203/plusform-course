@@ -25,6 +25,7 @@ check.py（學員端）和 tools/validate_lesson.py（老師端）共用這一�
   git_commits   帳本是 git 存放庫，而且至少有幾個存檔點（commit）
   parsons       拼圖（Parsons，1-11 起）：把打亂的程式行排回去、自己縮排；行都要是題目給的（不能改字、多寫、少寫），排好跑出來要跟範例一樣
   filled        自評的表單寫了沒（1-12 起）：每個標籤（例如「家教問：」「我的回答：」）後面都寫了字就算交了，內容不改對錯
+                （1-25 加 md_list：這幾個標籤（例如 bug 回報的「## 重現步驟」）底下至少一行 Markdown 編號步驟「1. …」）
   either        兩條路選一條（1-17 起）：每條路是一串上面這些檢查、題數一樣；照學員做的那一條判（answer.py 的測試，或選擇題版）
                 （run 在 1-17 另加兩個只對寫了它的題目生效的欄位：loose＝比的時候空格不算；ast_require＝規定用推導式／迴圈＋append 寫）
                 （1-20 在 ast_require 加兩種：keyfunc＝sorted 的 key 要交一個用 def 寫的函式、不能用 lambda；flagloop＝要先給 True／False，再在 for 迴圈裡改，不能用 any／all）
@@ -1319,7 +1320,8 @@ class FilledCheck(Check):
     """自評的表單（例如 1-12 第二部分的 tutor.md）：每個標籤都要出現 count 次，每一次後面都要寫了字（至少 min_chars 個字，空白不算）。
     標籤後面的字可以寫在同一行，也可以往下接著寫，寫到下一個標籤、# 開頭的行或「- [」開頭的勾選行為止。
     只看寫了沒，內容不改對錯（自評，總企劃第七節：自評只記錄、不擋升級；交了才算）。
-    spec：file、labels（例如 ["家教問：", "我的回答："]）、count、min_chars（預設 2）、desc、missing_hint、item（第幾題的叫法，預設「第 {n} 題」）。"""
+    spec：file、labels（例如 ["家教問：", "我的回答："]）、count、min_chars（預設 2）、desc、missing_hint、item（第幾題的叫法，預設「第 {n} 題」）。
+    1-25 加 md_list（只對寫了它的題目生效）：[標籤, …]，這幾個標籤底下至少要有一行 Markdown 的編號步驟（「1. 打開…」這種，編號後面要有字）。"""
 
     def run(self, results):
         r = results[0]
@@ -1334,6 +1336,7 @@ class FilledCheck(Check):
         item = self.spec.get("item", "第 {n} 題")
         lines = [unicodedata.normalize("NFKC", ln) for ln in read_student_text(path).splitlines()]
         found: dict[str, list[str]] = {lab: [] for lab in labels}
+        rows: dict[str, list[list[str]]] = {lab: [] for lab in labels}   # 1-25 md_list：每一次標籤底下的每一行（照原樣，只去頭尾空白）
         current = None
         for raw in lines:
             text = raw.strip()
@@ -1341,10 +1344,13 @@ class FilledCheck(Check):
             if hit is not None:
                 current = hit
                 found[hit].append(text[len(hit):])
+                rows[hit].append([text[len(hit):].strip()])
             elif text.startswith("#") or text.startswith("- ["):
                 current = None
             elif current is not None:
                 found[current][-1] += text
+                rows[current][-1].append(text)
+        md_list = {unicodedata.normalize("NFKC", x) for x in self.spec.get("md_list", [])}
         name = Path(rel).name
         for n in range(1, count + 1):
             for lab, shown in zip(labels, self.spec["labels"]):
@@ -1356,6 +1362,10 @@ class FilledCheck(Check):
                 if len(body) < need:
                     r.detail = f"{name}：{where}的「{shown}」後面還空着。寫完存檔，再打一次。" + (
                         f"\n  提示：{self.spec['hint']}" if self.spec.get("hint") else "")
+                    return
+                if lab in md_list and not any(re.match(r"\d+[.)]\s*\S", x) for x in rows[lab][n - 1]):
+                    r.detail = (f"{name}：「{shown}」底下要寫成有編號的步驟：一行一步，開頭寫 1. 2. 3.（Markdown 的編號清單，"
+                                "數字和點後面空一格再寫字）。")
                     return
         r.ok = True
         if self.spec.get("note"):

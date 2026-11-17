@@ -1,0 +1,45 @@
+{
+ "note": "1-25 的檢查：第①圈 debug.txt（4 題選擇題：亮起來的那一行還沒跑、F11 走進去以後呼叫堆疊最上面、F12 移至定義跳到哪、Find All References 找出 card.py 第 5 行改了 PAY_DAY）；第②圈 tutor.md（filled：只指一行問家教、家教怎麼說、用 debugger 看到的，自評）、ask.txt（3 題：哪一種問法照規則、replace 想做出 2 月 31 日、用 debugger 確認）；第③圈 bug_report.md（filled 三段：重現步驟、預期、實際；md_list：重現步驟要寫成 Markdown 編號步驟）、report.py（改用課程的修正版：from dates_fixed import next_month，照重現步驟跑，印出這期扣款 2026-01-31、下期扣款 2026-02-28）、checks_dates.py（chaff 的 assert 模式：學員把重現步驟寫成 assert，在課程的修正版 dates_fixed.py 上全部成立＝修正版測試全綠，在 3 個 AI 修錯的版本上至少一條不成立）。grader 加的東西（只對寫了它的題目生效）：filled 的 md_list。",
+ "checks": [
+  {"type": "answers", "id": "debug", "file": "lessons/1-25/debug.txt", "key": "answers/debug.json", "group": "第一圈"},
+  {
+   "type": "filled", "id": "tutor", "file": "lessons/1-25/tutor.md", "group": "第二圈",
+   "labels": ["我指的那一行：", "家教怎麼說：", "我用 debugger 看到的："],
+   "count": 1, "item": "",
+   "desc": "tutor.md：只指著一行問家教、再用 debugger 對照，三個標籤都寫了（自評，內容不改對錯）",
+   "hint": "照 tutor.md 上面的步驟：只貼一行、問「這一行在做什麼」；它說的，用 debugger 停在那一行對照，看到什麼寫在最後一個標籤。",
+   "missing_hint": "tutor.md 應該在帳本的 lessons/1-25/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-25。"
+  },
+  {"type": "answers", "id": "ask", "file": "lessons/1-25/ask.txt", "key": "answers/ask.json", "group": "第二圈"},
+  {
+   "type": "filled", "id": "bug-report", "file": "lessons/1-25/bug_report.md", "group": "第三圈",
+   "labels": ["## 重現步驟", "## 預期", "## 實際"],
+   "count": 1, "item": "", "min_chars": 4,
+   "md_list": ["## 重現步驟"],
+   "desc": "bug_report.md：用 Markdown 寫 bug 回報，重現步驟（編號步驟）、預期、實際三段都寫了（寫得好不好照最下面的自評表）",
+   "hint": "每一段寫在那個標題的下一行。重現步驟一行一步、開頭寫 1. 2.；預期寫應該印出什麼；實際貼上錯誤訊息的最後一行（前後各一行三個反引號 ```）。",
+   "missing_hint": "bug_report.md 應該在帳本的 lessons/1-25/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-25。"
+  },
+  {
+   "type": "run", "id": "report-fixed", "file": "lessons/1-25/report.py", "group": "第三圈", "timeout": 5,
+   "desc": "report.py 改用課程的修正版（from dates_fixed import next_month），照重現步驟跑：不再當掉，下期扣款是 2026-02-28",
+   "ast_require": [
+    {"name": "dates_fixed", "kind": "imports", "names": ["next_month"],
+     "msg": "report.py 第 4 行改成 from dates_fixed import next_month（從課程的修正版拿 next_month），再照你的重現步驟跑一次。"}
+   ],
+   "expect_exact": ["這期扣款 2026-01-31", "下期扣款 2026-02-28"],
+   "hint": "dates_fixed.py 是課程的修正版，不要改它；report.py 只改第 4 行。settings.py、card.py 也不要改（PAY_DAY 改成 31 是故意的：信用卡月底扣款）。",
+   "missing_hint": "report.py 應該在帳本的 lessons/1-25/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-25。"
+  },
+  {
+   "type": "chaff", "id": "r3", "mode": "assert",
+   "student_file": "lessons/1-25/checks_dates.py",
+   "module": "dates_fixed",
+   "reference": "reference/dates_fixed.py",
+   "mutants": "mutants/mutants.json",
+   "teacher_file": "answers/checks_dates.py",
+   "min_checks": 3,
+   "group": "第三圈"
+  }
+ ]
+}

@@ -1,0 +1,26 @@
+{
+ "note": "回顧題：學員通過這課以後，往後第 2 課和第 5 課的 check 會各帶一題。",
+ "questions": [
+  {
+   "id": "r1",
+   "q": "用 VS Code 的 debugger，程式停在中斷點，第 7 行亮起來。這時候第 7 行：\nA. 已經跑完了\nB. 跑到一半\nC. 還沒跑，它是下一個要跑的那一行\n（寫 A、B 或 C）",
+   "accept": ["C"],
+   "explain": "亮起來的那一行是下一個要跑的（VS Code 官方文件：The highlighted execution line is the line that runs next.）；按 F10 才把它跑完。",
+   "choices": {"A": "已經跑完了", "B": "跑到一半", "C": "還沒跑，它是下一個要跑的那一行"}
+  },
+  {
+   "id": "r2",
+   "q": "停在 print(\"下期扣款\", next_month(d)) 這一行。想看 next_month 裡面一行一行怎麼跑，要按：\nA. F11（Step Into）\nB. F10（Step Over）\nC. F5（Continue）\n（寫 A、B 或 C）",
+   "accept": ["A"],
+   "explain": "F11 走進這一行呼叫的函式；F10 把整行跑完（裡面的函式也一起跑完）；F5 一路跑到下一個中斷點或結束。",
+   "choices": {"A": "F11（Step Into）", "B": "F10（Step Over）", "C": "F5（Continue）"}
+  },
+  {
+   "id": "r3",
+   "q": "一份 bug 回報最少要有哪三段？\nA. 我的心情、截圖、請快點修\nB. 重現步驟、預期、實際\nC. 程式全文、錯誤訊息、修法\n（寫 A、B 或 C）",
+   "accept": ["B"],
+   "explain": "重現步驟（別人照做就看得到同一個錯）、預期（應該是什麼）、實際（現在發生什麼，貼錯誤訊息）。修法交給修的人；你的重現步驟，之後拿來驗收修好的版本。",
+   "choices": {"A": "我的心情、截圖、請快點修", "B": "重現步驟、預期、實際", "C": "程式全文、錯誤訊息、修法"}
+  }
+ ]
+}
