@@ -61,13 +61,13 @@ assert next_month(date(2026, 1, 31)) == date(2026, 2, 28)
 | Find All References（尋找所有參考） | ⇧⌥F12 | Shift+Alt+F12 |
 | Markdown 預覽開在旁邊 | ⌘K 放開再按 V | Ctrl+K 放開再按 V |
 
-  Mac 筆電最上面一排預設是亮度、音量：Apple 官方說明是**按住功能（Fn）／地球鍵，同時按下 F5**；也可以在「系統設定」→「鍵盤」→「鍵盤快速鍵」→「功能鍵」選取「使用 F1、F2 等按鍵作為標準功能鍵」。按鍵記不住也沒關係：在名字上按右鍵，選單裡就有 Go to Definition 和 Find All References；debug 的時候，上方的小工具列有 Continue、Step Over、Step Into 的按鈕。
+  Mac 筆電按 F5 沒有開始 debug，多半是最上面一排被設成亮度、音量這些系統功能：Apple 官方說明是**按住功能（Fn）／地球鍵，同時按下 F5**；也可以在「系統設定」→「鍵盤」→「鍵盤快速鍵」→「功能鍵」選取「使用 F1、F2 等按鍵作為標準功能鍵」。按鍵記不住也沒關係：在名字上按右鍵，選單裡就有 Go to Definition 和 Find All References；debug 的時候，上方的小工具列有 Continue、Step Over、Step Into 的按鈕。
 - **亮起來的那一行還沒跑：** VS Code 官方文件：The highlighted execution line is the line that runs next.
 - **F10 和 F11：** F10 把這一行整個跑完（裡面呼叫的函式也一起跑完）；F11 走進那個函式，從它的第一行開始一步一步跑。print 這種 Python 內建的，F11 不會走進去。
 - **按 F5 跑的是「現在開著的那個檔」：** 編輯區開著 `dates.py` 按 F5，它就去跑 `dates.py`（什麼都不會發生）。先點回 `report.py` 再按。
 - **Traceback 和 debugger：** Traceback 告訴你在哪一行當掉；debugger 讓你停在那一行之前，看那一刻每個變數是多少。
 - **replace：** `d.replace(month=2)` 做出一個新的日期，只換掉月份，年和日照舊（官方文件：Return a new date object with the same values, but with specified parameters updated.）。1 月 31 日換成 2 月，就是 2 月 31 日，這一天不存在，所以 `ValueError: day is out of range for month`。
-- **Markdown：** 用普通符號標出格式的寫法，GitHub、很多筆記軟體都看得懂。這課用三個：一到六個 `#` 開頭是標題（`##` 是第二層）；`1.` 開頭是有順序的步驟；三個反引號包起來的是程式碼或錯誤訊息，照原樣顯示。（GitHub Docs〈Basic writing and formatting syntax〉）
+- **Markdown：** 用普通符號標出格式的寫法，GitHub、很多筆記軟體都看得懂。這課用三個：一到六個 `#` 開頭是標題（`##` 是第二層，`#` 後面要空一格）；`1.` 開頭是有順序的步驟（點後面一樣空一格）；前後各一行三個反引號，中間包起來的是程式碼或錯誤訊息，照原樣顯示。（GitHub Docs〈Basic writing and formatting syntax〉、CommonMark 規格 0.31.2）
 - **為什麼要寫重現步驟：** 修的人照做一次，就看得到同一個錯；修好以後，你再照同樣的步驟跑一次，就知道修好了沒。
 
 ## 3. 開始前要打的指令
@@ -128,7 +128,7 @@ bug 回報寫得好不好，check 不改對錯：照 `bug_report.md` 最下面�
 |---|---|---|
 | 按 F5 什麼都沒發生、或程式沒停 | 編輯區開著的不是 report.py，或沒有紅點 | 點回 report.py；在第 7 行的行號左邊點一下 |
 | 紅點是空心的灰色圈 | 那一行沒有可以跑的程式（例如空行、註解） | 點在有程式的那一行 |
-| 按 F5 跳出音量或亮度 | Mac 筆電的 F 鍵預設是亮度、音量 | 按住 Fn 再按 F5 |
+| 按 F5 跳出音量或亮度 | Mac 筆電的 F 鍵被設成亮度、音量這些系統功能 | 按住 Fn 再按 F5，或在系統設定改成標準功能鍵 |
 | 選單裡沒有 Python Debugger | 還沒裝 Python 擴充 | 照 0-6 裝 Python 擴充（它會一起裝 Python Debugger） |
 | `ModuleNotFoundError: No module named 'dates_fixed'` | 第 4 行的名字打錯，或檔案不在 lessons/1-25 | 名字是 dates_fixed（底線）；不要搬動檔案 |
 | 下期扣款 2026-02-15 | 把 card.py 的 31 改掉了 | card.py、settings.py 不要改：31 是故意的（信用卡月底扣款） |
