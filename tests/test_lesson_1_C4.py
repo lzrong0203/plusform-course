@@ -59,6 +59,11 @@ BODY = {
     "print_only": ("    total = 0\n    with open(path, encoding=\"utf-8\") as f:\n        for line in f:\n            d, item, amount = line.rstrip(\"\\n\").split(\",\")\n"
                    "            total += int(amount)\n    print(total)\n"),
     "hardcode": "    with open(path, encoding=\"utf-8\") as f:\n        pass\n    return 315\n",
+    # Codex 影片第一輪：金額用 float 加，交回 315.0（strict_type 擋）；encoding 用變數交進去（讀得到，可是這一題看寫法）
+    "float": ("    total = 0\n    with open(path, encoding=\"utf-8\") as f:\n        for line in f:\n            d, item, amount = line.rstrip(\"\\n\").split(\",\")\n"
+              "            total += float(amount)\n    return total\n"),
+    "enc_var": ("    total = 0\n    enc = \"utf-8\"\n    with open(path, encoding=enc) as f:\n        for line in f:\n            d, item, amount = line.rstrip(\"\\n\").split(\",\")\n"
+                "            total += int(amount)\n    return total\n"),
     "here_path": ("    total = 0\n    p = Path(__file__).parent / path\n    with open(p, encoding=\"utf-8\") as f:\n        for line in f:\n"
                   "            d, item, amount = line.rstrip(\"\\n\").split(\",\")\n            total += int(amount)\n    return total\n"),
 }
@@ -70,6 +75,7 @@ WANT = {   # [寫法, 三筆, 最後一行沒換行, 空的]
     "cut_last": [True, True, False, True], "read_split": [True, False, True, False], "first_line": [True, False, False, False],
     "no_int": [True, False, False, False], "no_encoding": [False, True, True, True], "no_with": [False, True, True, True],
     "print_only": [False, False, False, False], "hardcode": [True, True, False, False], "here_path": [True, True, True, True],
+    "float": [True, False, False, True], "enc_var": [False, True, True, True],
 }
 
 
@@ -216,6 +222,11 @@ class Grading(unittest.TestCase):
         write(L / "lessons/1-C4/write.py", with_body(START_A, BODY["no_encoding"]))
         r = part(ev("1-C4", ["write-shape"]), "write-shape")
         self.assertIn('encoding="utf-8"', r.detail)
+        write(L / "lessons/1-C4/write.py", with_body(START_A, BODY["float"]))
+        r = part(ev("1-C4", ["write-basic"]), "write-basic")
+        self.assertIn("型別不一樣：應該是整數 int，你交回的是小數 float", r.detail)
+        write(L / "lessons/1-C4/write.py", with_body(START_A, BODY["enc_var"]))
+        self.assertIn('直接寫 encoding="utf-8"', part(ev("1-C4", ["write-shape"]), "write-shape").detail)
         write(L / "lessons/1-C4/write.py", with_body(START_A, BODY["no_with"]))
         self.assertIn("with 後面", part(ev("1-C4", ["write-shape"]), "write-shape").detail)
         write(L / "lessons/1-C4/write.py", with_body(START_A, BODY["print_only"]))

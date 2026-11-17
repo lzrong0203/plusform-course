@@ -28,7 +28,7 @@
 （寫 A、B 或 C）
 答：
 
-第 3 題：第 7、8 行要怎麼改，才不會把錯吞掉、也不會什麼錯都接？
+第 3 題：整段程式要怎麼改，才不會把錯吞掉、也不會什麼錯都接？
     A. 第 7 行改成 except ValueError:，第 8 行照舊 return 0
     B. 第 7 行改成 except Exception:，第 8 行改成 return -1
     C. to_yuan 裡不寫 try／except，錯就丟出去；第 12 行在外面用 try 包住，except ValueError 接住、印出哪一筆看不懂

@@ -16,7 +16,8 @@ check.py（學員端）和 tools/validate_lesson.py（老師端）共用這一�
                 1-19 加兩個只對寫了它的題目生效的欄位：kwargs＝用關鍵字交的參數 {"limit": 100}；seq_as_list＝交回的 tuple 跟 JSON 的 list 比；
                 1-22 加 raises＝這一次呼叫應該丟出這一種錯（例如 "ValueError"，不寫 expect）、msg_has＝錯誤訊息裡要有這段字；
                 1-C4 加 files＝{檔名: 內容}：check 在系統的暫存資料夾寫好這幾個檔（一個字都不改，最後一行有沒有換行照寫的），
-                args 裡寫 {"tmp_file": 檔名} 的地方換成那個檔的完整路徑，在那個資料夾裡呼叫；不碰學員帳本）
+                args 裡寫 {"tmp_file": 檔名} 的地方換成那個檔的完整路徑，在那個資料夾裡呼叫；不碰學員帳本；
+                strict_type＝交回的型別也要一樣（315.0、"315" 不算 315；同一個函式只要有一題寫了就一起用））
   chaff         wheat/chaff：學員寫的檢查要在正確版全過、在每個壞版本至少錯一條
                 （1-22 在 assert 模式加 try_checks：最外層的 try（裡面有 assert）整個算一條檢查，學員用 try／except／else 寫「應該丟出 ValueError」）
                 （1-23 在 assert 模式加 tmp_cwd：學員的檢查檔複製到暫存資料夾、在那裡跑（檢查會寫檔案，不寫帳本）；min_crash_marks：
@@ -1505,6 +1506,8 @@ class CallCheck(Check):
                                **({k: c[k] for k in ("raises", "msg_has") if c.get(k)})} for c in specs],   # 1-22：raises／msg_has 只對寫了它的題目
                     # 1-19：kwargs＝用關鍵字交的參數（只對寫了它的題目生效）；seq_as_list＝交回 tuple 時跟 JSON 的 list 比（同一個函式只要有一題寫了就一起用）
                     **({"seq_as_list": True} if any(c.get("seq_as_list") for c in specs) else {}),
+                    # 1-C4 strict_type（只對寫了它的題目）：型別也要一樣（交回 315.0、"315" 不算 315）；同一個函式只要有一題寫了就一起用
+                    **({"strict_type": True} if any(c.get("strict_type") for c in specs) else {}),
                 }, cwd=tmp)
             finally:
                 if tmp:
@@ -1559,6 +1562,9 @@ class CallCheck(Check):
             r.detail = f"{call} 應該回傳{show(s['expect'])}，你的回傳{show(case.get('got'))}"
             if case.get("got") is None:
                 r.detail += "\n  回傳 None，常常是用了 print，而不是 return。"
+            elif s.get("strict_type") and case.get("type") and case["type"] != type(s["expect"]).__name__:   # 1-C4：值看起來一樣、型別不一樣
+                kinds = {"int": "整數 int", "float": "小數 float", "str": "字串 str"}
+                r.detail += f"\n  型別不一樣：應該是{kinds.get(type(s['expect']).__name__, type(s['expect']).__name__)}，你交回的是{kinds.get(case['type'], case['type'])}。"
         if s.get("files"):   # 1-C4：交給它的是哪一個檔（每一行、最後有沒有換行、空的檔）
             r.detail += "\n" + tmp_file_text(s)
         if s.get("hint"):

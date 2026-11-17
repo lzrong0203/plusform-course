@@ -1,5 +1,5 @@
 {
- "note": "1-C4 檢核站 4（卷 A）：關掉 AI，30 分鐘（只記錄、不擋）。一共 13 題，第一次交卷過 11 題以上算過（lesson.json pass_at，八成以上）。第一部分追蹤函式呼叫 6 題（對答，1-18～1-21）；第二部分找出 except 的問題 3 題（對答，1-22：第 1 題把錯吞掉、第 2 題什麼錯都接、第 3 題改法）；第三部分手寫 write.py 的 file_total 4 題（1-23）：func_shape 看寫法（with open、encoding=\"utf-8\"、有 return；ast_require 只看這個函式裡面），call 直接呼叫三次：三筆、每一行後面都有換行（315）→ 兩筆、最後一行後面沒有換行（510）→ 空的檔案（0）。三個檔由 check 寫在系統的暫存資料夾（files，照 bytes 寫，最後一行有沒有換行照原樣），不碰學員帳本；同一個程序照順序呼叫，所以結果存在函式外面、第二次就錯的也抓得到。常見寫錯會被抓到：line[:-1] 切掉換行 → 最後一行沒換行那題錯（510 變 456）；read().split(\"\\n\") → 三筆和空的檔錯（多一個空字串，拆不開）；只讀第一行 → 三題都錯；金額沒轉成整數 → 三題都錯；預設值 [] 存金額 → 第二次以後都錯；沒寫 encoding 或沒用 with → 寫法那題錯（Windows 預設 cp950 讀 UTF-8 的中文會 UnicodeDecodeError）。",
+ "note": "1-C4 檢核站 4（卷 A）：關掉 AI，30 分鐘（只記錄、不擋）。一共 13 題，第一次交卷過 11 題以上算過（lesson.json pass_at，八成以上）。第一部分追蹤函式呼叫 6 題（對答，1-18～1-21）；第二部分找出 except 的問題 3 題（對答，1-22：第 1 題把錯吞掉、第 2 題什麼錯都接、第 3 題改法）；第三部分手寫 write.py 的 file_total 4 題（1-23）：func_shape 看寫法（with open、encoding=\"utf-8\"、有 return；ast_require 只看這個函式裡面），call 直接呼叫三次：三筆、每一行後面都有換行（315）→ 兩筆、最後一行後面沒有換行（510）→ 空的檔案（0）。三個檔由 check 寫在系統的暫存資料夾（files，照 bytes 寫，最後一行有沒有換行照原樣），不碰學員帳本；同一個程序照順序呼叫，所以結果存在函式外面、第二次就錯的也抓得到。常見寫錯會被抓到：line[:-1] 切掉換行 → 最後一行沒換行那題錯（510 變 456）；read().split(\"\\n\") → 三筆和空的檔錯（多一個空字串，拆不開）；只讀第一行 → 三題都錯；金額沒轉成整數 → 三題都錯；預設值 [] 存金額 → 第二次以後都錯；沒寫 encoding 或沒用 with → 寫法那題錯（Windows 預設 cp950 讀 UTF-8 的中文會 UnicodeDecodeError）。（Codex 影片第一輪：int 寫成 float 交回 315.0 也全對 → call 加 strict_type（grader 1-C4：同一個函式只要有一題寫了就一起用，型別也要一樣，315.0、\"315\" 都不算）；encoding 用變數交進去被判成沒寫 → 回饋明說這一題要直接寫 encoding=\"utf-8\"。）",
  "checks": [
   {
    "type": "answers",
@@ -33,7 +33,8 @@
     },
     {
      "name": "open",
-     "kind": "open_utf8"
+     "kind": "open_utf8",
+     "msg": "open(…) 裡要直接寫 encoding=\"utf-8\"（這一題看寫法：沒寫、或用變數交進去，都不算）。沒寫的話，很多 Windows 電腦會用系統預設的編碼讀，中文可能讀錯或跳出 UnicodeDecodeError。"
     }
    ],
    "hint": "with open(path, encoding=\"utf-8\") as f: 下面空四格，一行一行讀；全部加完 return total。",
@@ -57,7 +58,8 @@
     "a3.txt": "11/03,午餐,120\n11/04,公車,15\n11/05,晚餐,180\n"
    },
    "expect": 315,
-   "hint": "with open(path, encoding=\"utf-8\") as f: 一行一行讀；row = line.rstrip(\"\\n\") 拿掉換行；d, item, amount = row.split(\",\")；total += int(amount)；全部讀完 return total。"
+   "hint": "with open(path, encoding=\"utf-8\") as f: 一行一行讀；row = line.rstrip(\"\\n\") 拿掉換行；d, item, amount = row.split(\",\")；total += int(amount)；全部讀完 return total。",
+   "strict_type": true
   },
   {
    "type": "call",
@@ -77,7 +79,8 @@
     "b2.txt": "12/01,書,450\n12/02,咖啡,60"
    },
    "expect": 510,
-   "hint": "最後一行後面沒有換行。line[:-1] 會把金額的最後一個字切掉；用 line.rstrip(\"\\n\")，沒有換行就什麼都不拿。"
+   "hint": "最後一行後面沒有換行。line[:-1] 會把金額的最後一個字切掉；用 line.rstrip(\"\\n\")，沒有換行就什麼都不拿。",
+   "strict_type": true
   },
   {
    "type": "call",
@@ -97,7 +100,8 @@
     "c0.txt": ""
    },
    "expect": 0,
-   "hint": "空的檔案，for line in f 一圈都不跑；total 從 0 開始，最後交回 0。不要先拿第一行（readline、[0]），空的檔案沒有第一行。"
+   "hint": "空的檔案，for line in f 一圈都不跑；total 從 0 開始，最後交回 0。不要先拿第一行（readline、[0]），空的檔案沒有第一行。",
+   "strict_type": true
   }
  ]
 }

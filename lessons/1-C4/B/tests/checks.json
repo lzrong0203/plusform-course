@@ -1,5 +1,5 @@
 {
- "note": "1-C4 檢核站 4（卷 B）：跟卷 A 同樣的題型、題數和題目 id（矯正包對照表共用），數字和情境換掉。一共 13 題，第一次交卷過 11 題以上算過。第一部分追蹤 6 題、第二部分找出 except 的問題 3 題（對答）；第三部分手寫 write.py 的 pay_total 4 題：func_shape（with open、encoding=\"utf-8\"、有 return）＋ call 三次（三筆有換行 390 → 兩筆最後一行沒換行 1240 → 空的檔 0；line[:-1] 的寫法第二題會變 1204）。",
+ "note": "1-C4 檢核站 4（卷 B）：跟卷 A 同樣的題型、題數和題目 id（矯正包對照表共用），數字和情境換掉。一共 13 題，第一次交卷過 11 題以上算過。第一部分追蹤 6 題、第二部分找出 except 的問題 3 題（對答）；第三部分手寫 write.py 的 pay_total 4 題：func_shape（with open、encoding=\"utf-8\"、有 return）＋ call 三次（三筆有換行 390 → 兩筆最後一行沒換行 1240 → 空的檔 0；line[:-1] 的寫法第二題會變 1204）。（Codex 影片第一輪：int 寫成 float 交回 315.0 也全對 → call 加 strict_type（grader 1-C4：同一個函式只要有一題寫了就一起用，型別也要一樣，315.0、\"315\" 都不算）；encoding 用變數交進去被判成沒寫 → 回饋明說這一題要直接寫 encoding=\"utf-8\"。）",
  "checks": [
   {
    "type": "answers",
@@ -33,7 +33,8 @@
     },
     {
      "name": "open",
-     "kind": "open_utf8"
+     "kind": "open_utf8",
+     "msg": "open(…) 裡要直接寫 encoding=\"utf-8\"（這一題看寫法：沒寫、或用變數交進去，都不算）。沒寫的話，很多 Windows 電腦會用系統預設的編碼讀，中文可能讀錯或跳出 UnicodeDecodeError。"
     }
    ],
    "hint": "with open(path, encoding=\"utf-8\") as f: 下面空四格，一行一行讀；全部加完 return total。",
@@ -57,7 +58,8 @@
     "a3.txt": "11/03,現金,65\n11/04,悠遊卡,25\n11/05,信用卡,300\n"
    },
    "expect": 390,
-   "hint": "with open(path, encoding=\"utf-8\") as f: 一行一行讀；row = line.rstrip(\"\\n\") 拿掉換行；d, way, amount = row.split(\",\")；total += int(amount)；全部讀完 return total。"
+   "hint": "with open(path, encoding=\"utf-8\") as f: 一行一行讀；row = line.rstrip(\"\\n\") 拿掉換行；d, way, amount = row.split(\",\")；total += int(amount)；全部讀完 return total。",
+   "strict_type": true
   },
   {
    "type": "call",
@@ -77,7 +79,8 @@
     "b2.txt": "12/01,現金,1200\n12/02,悠遊卡,40"
    },
    "expect": 1240,
-   "hint": "最後一行後面沒有換行。line[:-1] 會把金額的最後一個字切掉；用 line.rstrip(\"\\n\")，沒有換行就什麼都不拿。"
+   "hint": "最後一行後面沒有換行。line[:-1] 會把金額的最後一個字切掉；用 line.rstrip(\"\\n\")，沒有換行就什麼都不拿。",
+   "strict_type": true
   },
   {
    "type": "call",
@@ -97,7 +100,8 @@
     "c0.txt": ""
    },
    "expect": 0,
-   "hint": "空的檔案，for line in f 一圈都不跑；total 從 0 開始，最後交回 0。不要先拿第一行（readline、[0]），空的檔案沒有第一行。"
+   "hint": "空的檔案，for line in f 一圈都不跑；total 從 0 開始，最後交回 0。不要先拿第一行（readline、[0]），空的檔案沒有第一行。",
+   "strict_type": true
   }
  ]
 }

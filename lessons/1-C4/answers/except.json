@@ -1,5 +1,5 @@
 {
- "note": "1-C4 第二部分（卷 A）：找出 except 的問題，3 題，考 1-22。to_yuan 用光禿禿的 except: 把錯接住、交回 0：第 1 題看「把錯吞掉」（一百、-35 都被當成 0 加進合計，印出合計 200，看起來沒事）；第 2 題看「什麼錯都接」（第 3 行打錯字的 NameError 也被接住，四筆都變 0，印出合計 0，看不到打錯字）；第 3 題選改法（只有 C 兩個問題都解決：to_yuan 不接、讓 ValueError 丟出去，外面用 except ValueError 接住、印出哪一筆看不懂；A 只寫明 ValueError，還是交回 0 把錯吞掉；B 的 Exception 一樣什麼錯都接）。答案用 Python 3.13 實際跑過（facts_out.txt，含三個選項各自加上打錯字的結果）。選擇題開 strict_choice。",
+ "note": "1-C4 第二部分（卷 A）：找出 except 的問題，3 題，考 1-22。to_yuan 用光禿禿的 except: 把錯接住、交回 0：第 1 題看「把錯吞掉」（一百、-35 都被當成 0 加進合計，印出合計 200，看起來沒事）；第 2 題看「什麼錯都接」（第 3 行打錯字的 NameError 也被接住，四筆都變 0，印出合計 0，看不到打錯字）；第 3 題選改法（只有 C 兩個問題都解決：to_yuan 不接、讓 ValueError 丟出去，外面用 except ValueError 接住、印出哪一筆看不懂；A 只寫明 ValueError，還是交回 0 把錯吞掉；B 的 Exception 一樣什麼錯都接）。答案用 Python 3.13 實際跑過（facts_out.txt，含三個選項各自加上打錯字的結果）。選擇題開 strict_choice。（Codex 影片第一輪：第 3 題題幹原本寫「第 7、8 行要怎麼改」，正解要動到 to_yuan 裡的 try 和外面第 12 行 → 改成「整段程式要怎麼改」，答案不變。）",
  "normalize": "text",
  "how": "答案（例如：合計 100）",
  "strict_choice": true,
@@ -29,7 +29,7 @@
   },
   {
    "id": "e3",
-   "title": "第 7、8 行要怎麼改",
+   "title": "整段程式要怎麼改",
    "accept": [
     "C"
    ],
