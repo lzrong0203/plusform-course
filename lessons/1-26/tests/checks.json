@@ -1,0 +1,102 @@
+{
+ "note": "1-26 的檢查：第①圈 read.txt（關掉 AI 讀 old_ledger.py，對答 10 題：從哪裡讀起、呼叫圖、@command、yield、re、logging、編號和索引差一）；delete 指令（run 的 sandbox：把學員的 old_ledger.py 和課程原本的三筆帳放進暫存資料夾，餵 show、delete 2、y、show、q，刪完第二次 show 要接連印出 1. 11/03 午餐 120、2. 11/05 晚餐 180）；delete 刪對、存檔（sandbox＋probe：課程準備的 probe_delete.py 載入學員的 old_ledger.py，在暫存資料夾擺三筆帳，呼叫 COMMANDS[\"delete\"] 刪第 2 筆兩次，看剩下哪幾筆、檔案裡存了什麼）。第②圈 tutor.md（filled 四個標籤，自評）。第③圈 checks_delete.py（chaff 的 assert 模式＋try_checks：學員的檢查拿去跑 delete_entry 的正確版和 3 個 AI 寫錯的版本：m1 編號當索引差一、m2 沒確認也刪、m3 編號 0 刪到最後一筆）。grader 沒有加新的東西（run 的 sandbox／probe 是 1-23、1-24 的，try_checks 是 1-22 的）。",
+ "checks": [
+  {
+   "type": "answers",
+   "id": "read",
+   "file": "lessons/1-26/read.txt",
+   "key": "answers/read.json",
+   "group": "第一圈"
+  },
+  {
+   "type": "run",
+   "id": "delete-1",
+   "file": "lessons/1-26/old_ledger.py",
+   "group": "第一圈",
+   "desc": "old_ledger.py 加上 delete 指令：show、delete 2、show，第 2 筆公車不見了（用課程原本的三筆帳，不碰你的 old_ledger.txt）",
+   "timeout": 5,
+   "stdin": "show\ndelete 2\ny\nshow\nq\n",
+   "sandbox": {
+    "copy": [
+     "old_ledger.py"
+    ],
+    "probe": {
+     "old_ledger.txt": "start/old_ledger.txt"
+    },
+    "steps": [
+     {
+      "run": "old_ledger.py",
+      "cwd": "."
+     }
+    ]
+   },
+   "expect_regex": [
+    "1\\. 11/03 午餐 120\\n2\\. 11/05 晚餐 180$"
+   ],
+   "hint": "照 add 的樣子，在 total 下面寫 @command 和 def delete(entries, arg):；arg 是打進來的字（例如 \"2\"），先用 int(arg) 變成數字；show 的編號從 1 開始，所以要拿掉的是 entries.pop(no - 1)；最後 save(entries) 存回檔案。",
+   "missing_hint": "old_ledger.py 應該在帳本的 lessons/1-26/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-26。"
+  },
+  {
+   "type": "run",
+   "id": "delete-2",
+   "file": "lessons/1-26/old_ledger.py",
+   "group": "第一圈",
+   "desc": "delete 刪對那一筆、存回檔案：另外擺三筆帳，刪第 2 筆兩次，剩下哪幾筆、檔案裡存了什麼",
+   "timeout": 5,
+   "stdin": "y\ny\n",
+   "sandbox": {
+    "copy": [
+     "old_ledger.py"
+    ],
+    "probe": {
+     "probe_delete.py": "tests/probe_delete.py",
+     "old_ledger.txt": "start/old_ledger.txt"
+    },
+    "steps": [
+     {
+      "run": "probe_delete.py",
+      "cwd": "lesson"
+     }
+    ]
+   },
+   "expect_exact": [
+    "有 delete 這個指令： True",
+    "刪掉第 2 筆以後： ['午餐', '晚餐']",
+    "存進檔案的： ['11/03 午餐 120', '11/05 晚餐 180']",
+    "再刪第 2 筆以後： ['午餐']"
+   ],
+   "hint": "delete 上面要有 @command（才會放進 COMMANDS）；編號從 1 開始，拿掉的是 entries.pop(no - 1)；刪完要 save(entries)，檔案才會跟着改。",
+   "missing_hint": "old_ledger.py 應該在帳本的 lessons/1-26/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-26。"
+  },
+  {
+   "type": "filled",
+   "id": "tutor",
+   "file": "lessons/1-26/tutor.md",
+   "group": "第二圈",
+   "labels": [
+    "家教出的三題：",
+    "我的回答：",
+    "它說哪裡不對：",
+    "我回去對照看到的："
+   ],
+   "count": 1,
+   "item": "",
+   "desc": "tutor.md：請家教出 3 題「這段在做什麼」考你，四個標籤都寫了（自評，內容不改對錯）",
+   "hint": "照 tutor.md 上面的步驟問家教；先自己答、不要跑，答錯的那一題回 VS Code 對照，寫在「我回去對照看到的」。",
+   "missing_hint": "tutor.md 應該在帳本的 lessons/1-26/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 1-26。"
+  },
+  {
+   "type": "chaff",
+   "id": "r3",
+   "mode": "assert",
+   "student_file": "lessons/1-26/checks_delete.py",
+   "module": "delete_ai",
+   "reference": "reference/delete_ai.py",
+   "mutants": "mutants/mutants.json",
+   "teacher_file": "answers/checks_delete.py",
+   "min_checks": 3,
+   "try_checks": true,
+   "group": "第三圈"
+  }
+ ]
+}

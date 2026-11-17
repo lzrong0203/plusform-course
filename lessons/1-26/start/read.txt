@@ -1,0 +1,77 @@
+# 1-26 第①圈：關掉 AI，讀 old_ledger.py（10 題）
+# 打開 old_ledger.py 從呼叫圖讀起；可以跑它、可以用移至定義、尋找所有參考，不要問 AI。
+# 在「答：」後面寫 A、B 或 C，存檔。
+
+第 1 題：
+# 第一次打開 old_ledger.py，想知道它怎麼跑，第一個該看哪裡？
+#   A. 第 1 行，一行一行讀到最後一行
+#   B. 最下面的 if __name__ == "__main__":，它呼叫了 main()
+#   C. class Entry 那一段
+答：
+
+第 2 題：
+# main 的第一行是 entries = load()。load 又呼叫了哪一個函式？
+#   A. read_entries
+#   B. save
+#   C. add
+答：
+
+第 3 題：
+# 打 add 11/06 咖啡 85，add 呼叫了哪兩個函式？（print、fmt 不算）
+#   A. load 和 save
+#   B. parse 和 read_entries
+#   C. parse 和 save
+答：
+
+第 4 題：
+#   @command
+#   def total(entries, arg):
+#       ...
+# 上面的 @command，等於在 def total 那一段後面多寫了哪一行？
+#   A. total = command(total)
+#   B. command = total(command)
+#   C. total()
+答：
+
+第 5 題：
+# 打 total 按 Enter，main 是怎麼找到 total 這個函式的？
+#   A. COMMANDS["total"]：@command 早就用名字把它放進 COMMANDS
+#   B. main 裡面有一行 if name == "total"
+#   C. Python 會自己去找跟指令同名的函式
+答：
+
+第 6 題：
+# read_entries 裡的 yield parse(line) 會怎樣？
+#   A. 交出第一筆就結束，後面的行都不讀了
+#   B. 先把每一行讀完，一次交回一整個 list
+#   C. 交出一筆、停在這裡；要下一筆的時候，從這裡接着讀下一行
+答：
+
+第 7 題：
+#   LINE = re.compile(r"(\d+/\d+) (\S+) (\d+)")
+# parse 收到哪一行，不會丟 ValueError？
+#   A. 11/06 咖啡 八十五
+#   B. 11/06 咖啡 85
+#   C. 咖啡 11/06 85
+答：
+
+第 8 題：
+# 跑起來以後打 add 11/06 咖啡 八十五，會怎樣？
+#   A. 跳出 Traceback，程式結束
+#   B. 印出 WARNING:root:看不懂：11/06 咖啡 八十五，接着問下一個指令
+#   C. 印出 記好了： 4. 11/06 咖啡 八十五
+答：
+
+第 9 題：
+# load 裡的 logging.info(f"讀了 {len(entries)} 筆")，跑起來會印出來嗎？
+#   A. 不會：logging 沒有另外設定時，只印 WARNING 以上的
+#   B. 會：印出 INFO:root:讀了 3 筆
+#   C. 會跳出錯誤訊息：用 info 之前一定要先設定
+答：
+
+第 10 題：
+# 要加一個指令 delete 2，刪掉 show 印的第 2 筆。entries 要拿掉哪一個？
+#   A. entries[2]
+#   B. entries[1]
+#   C. entries[3]
+答：

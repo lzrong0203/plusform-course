@@ -1,0 +1,26 @@
+{
+ "note": "回顧題：學員通過這課以後，往後第 2 課和第 5 課的 check 會各帶一題。",
+ "questions": [
+  {
+   "id": "r1",
+   "q": "COMMANDS = {}\ndef command(func):\n    COMMANDS[func.__name__] = func\n    return func\n@command\ndef show():\n    print(\"列出每一筆\")\nCOMMANDS[\"show\"]() 會怎樣？\nA. 跳出 KeyError：COMMANDS 是空的\nB. 印出 列出每一筆\nC. 什麼都不會發生\n（寫 A、B 或 C）",
+   "accept": ["B"],
+   "explain": "@command 等於 show = command(show)：def show 一跑完，show 就被放進 COMMANDS[\"show\"]（官方術語表 decorator 條）。用名字查出來再加括號，就是呼叫 show。",
+   "choices": {"A": "跳出 KeyError：COMMANDS 是空的", "B": "印出 列出每一筆", "C": "什麼都不會發生"}
+  },
+  {
+   "id": "r2",
+   "q": "def count():\n    yield 1\n    yield 2\nfor n in count():\n    print(n)\n印出什麼？\nA. 1\nB. 1 和 2（兩行）\nC. 跳出錯誤訊息\n（寫 A、B 或 C）",
+   "accept": ["B"],
+   "explain": "有 yield 的函式一次交出一個值、停在那裡，for 迴圈要下一個時從停下來的地方接着跑（官方術語表 generator 條），所以兩個值都會交出來。",
+   "choices": {"A": "1", "B": "1 和 2（兩行）", "C": "跳出錯誤訊息"}
+  },
+  {
+   "id": "r3",
+   "q": "entries = [\"午餐\", \"公車\", \"晚餐\"]\nfor no, e in enumerate(entries, start=1):\n    print(no, e)\n要刪掉印出來的第 3 筆，該寫哪一行？\nA. entries.pop(3)\nB. entries.pop(2)\nC. entries.pop(-3)\n（寫 A、B 或 C）",
+   "accept": ["B"],
+   "explain": "編號從 1 開始（start=1），索引從 0 開始，第 3 筆是索引 2：entries.pop(no - 1)。pop(3) 超出範圍會 IndexError；pop(-3) 是第 1 筆。",
+   "choices": {"A": "entries.pop(3)", "B": "entries.pop(2)", "C": "entries.pop(-3)"}
+  }
+ ]
+}

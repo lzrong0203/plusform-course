@@ -1,0 +1,7 @@
+{
+ "id": "1-26",
+ "title": "讀別人的程式：100 行陌生程式加一個功能",
+ "minutes": 45,
+ "fast_minutes": 8,
+ "after_start": "接下來，用 VS Code 打開帳本，找到 lessons/1-26：\n  1. 第一圈：關掉 AI 讀 old_ledger.py，先畫呼叫圖，read.txt 答 10 題；再照 add 的樣子加上 delete 指令（刪掉 show 印的第幾筆）\n  2. 第二圈：請家教出 3 題「這段在做什麼」考你，記在 tutor.md\n  3. 第三圈：在 checks_delete.py 寫 assert 驗收 AI 交回的 delete_entry（刪除前要先確認），抓到 3 個寫錯的版本\n做完回到課程資料夾打：uv run check.py 1-26"
+}
