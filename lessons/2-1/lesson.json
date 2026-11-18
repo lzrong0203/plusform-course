@@ -1,0 +1,7 @@
+{
+ "id": "2-1",
+ "title": "開 GitHub 帳號，第一次讓 AI 碰你的專案",
+ "minutes": 50,
+ "fast_minutes": 8,
+ "after_start": "接下來，照 README 一步一步做（影片裡熊也是這個順序）：\n  1. 第一圈：開 GitHub 帳號、開兩步驟驗證，把 git 的信箱換成 noreply 信箱（先不開帳號的話，寫 account.md）；在 VS Code 打開 AI 功能、登入 Copilot；先手寫 expected.txt（報表對齊以後的樣子）\n  2. 第二圈：commands.txt 4 題，agent 要執行的指令會做什麼、按不按同意\n  3. 第三圈：先按存檔點，再請 Copilot 的 agent 把 report.py 改成對齊（不裝套件），它要執行的指令一個一個看懂再按同意；看 diff、跑檢查，決定收不收，寫在 decision.md，收了再按一個存檔點\n做完回到課程資料夾打：uv run check.py 2-1"
+}

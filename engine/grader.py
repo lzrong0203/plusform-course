@@ -24,6 +24,8 @@ check.py（學員端）和 tools/validate_lesson.py（老師端）共用這一�
                   至少幾行標「已知會當掉」；mark_note：標對了以後多印的一句）
   script_match  學員改過的腳本，在假的資料夾裡跑起來要跟安全版一樣
   git_commits   帳本是 git 存放庫，而且至少有幾個存檔點（commit）
+                （2-1 加兩個只對寫了它的題目生效的欄位：email_suffix＝git 的信箱要用這個結尾（GitHub 的 noreply 信箱）；
+                  saved_before＝{file, start}：存檔點裡找得到這個檔原本的樣子（跟課程的起點檔一樣）＝交給 AI 改之前先存檔；ok_note＝過了印的那一句）
   parsons       拼圖（Parsons，1-11 起）：把打亂的程式行排回去、自己縮排；行都要是題目給的（不能改字、多寫、少寫），排好跑出來要跟範例一樣
   filled        自評的表單寫了沒（1-12 起）：每個標籤（例如「家教問：」「我的回答：」）後面都寫了字就算交了，內容不改對錯
                 （1-25 加 md_list：這幾個標籤（例如 bug 回報的「## 重現步驟」）底下至少一行 Markdown 編號步驟「1. …」）
@@ -34,6 +36,7 @@ check.py（學員端）和 tools/validate_lesson.py（老師端）共用這一�
                 （1-23 在 run 加 sandbox：把學員的檔複製到系統的暫存資料夾（帳本最上層／lessons/<課號> 的樣子）照步驟跑，可以從不同資料夾跑、
                   檢查寫出來的檔案內容、不該出現的檔案；不碰學員帳本裡真的 ledger.txt。ast_require 加 with_open（open 要寫在 with 後面）、
                   open_utf8（每個 open 都要寫 encoding="utf-8"））
+                （2-1 在 run 加 exact_spaces：expect_exact 的行內空格要一模一樣（對齊的報表；一般的比法會把連續空白併成一個））
                 （1-24 在 run 的 sandbox 加 probe：{檔名: 課程這一課資料夾裡的路徑}，課程準備的小程式複製進暫存資料夾，
                   步驟跑它：它 import 學員的檔（例如 entry.py 的 Entry）另外做幾筆資料試試看，印出來的照一般的 expect_* 比）
   func_shape    學員寫的函式長得對不對（1-18 起；只看程式的樣子、不跑）：有沒有 def 那個名字、docstring 有沒有寫輸入／輸出／例子、
@@ -929,7 +932,23 @@ class RunCheck(Check):
             problems.extend(ast_problems(read_student_text(path), self.spec["ast_require"]))
         if self.spec.get("sandbox"):   # 1-23：寫出來的檔案（內容、位置）先報，再報印出來的字
             problems.extend(self._sb_problems)
-        if "expect_exact" in self.spec:
+        if "expect_exact" in self.spec and self.spec.get("exact_spaces"):
+            # 2-1 起（只對寫了 exact_spaces 的題目）：對齊的報表，行內的空格要一模一樣（NFKC、去掉行尾空白、空行不算；
+            # 一般的 expect_exact 會把連續空白併成一個，看不出對不對齊）
+            src = "\n".join(self.spec["expect_exact"]) if isinstance(self.spec["expect_exact"], list) else self.spec["expect_exact"]
+            want_x = [unicodedata.normalize("NFKC", ln).rstrip() for ln in src.splitlines() if ln.strip()]
+            got_x = [unicodedata.normalize("NFKC", ln).rstrip() for ln in _text(p.stdout).splitlines() if ln.strip()]
+            if got_x != want_x:
+                k = next((i for i, (a, b) in enumerate(zip(got_x, want_x)) if a != b), min(len(got_x), len(want_x)))
+                if k < len(want_x) and k < len(got_x):
+                    where = f"第 {k + 1} 行應該是「{want_x[k]}」，你的是「{got_x[k]}」（空格的數目也要一樣，才會對齊）。"
+                elif k < len(want_x):
+                    where = f"少印了第 {k + 1} 行「{want_x[k]}」。"
+                else:
+                    where = f"多印了第 {k + 1} 行「{got_x[k]}」。"
+                problems.append("印出來的跟應該的不一樣：" + where + "\n  應該是：\n" + "\n".join("    " + w for w in want_x)
+                                + "\n  你的印出：\n" + "\n".join("    " + g for g in got_x))
+        elif "expect_exact" in self.spec:
             want = output_lines("\n".join(self.spec["expect_exact"]) if isinstance(self.spec["expect_exact"], list) else self.spec["expect_exact"])
             # 1-17 起（只對寫了 loose 的題目）：空格不算（AI 照描述寫的程式，「2 筆」跟「2筆」都對）；全形半形照舊用 NFKC 當成一樣
             same = [re.sub(r"\s+", "", x) for x in got] == [re.sub(r"\s+", "", x) for x in want] if self.spec.get("loose") else got == want
@@ -2751,6 +2770,31 @@ class GitCheck(Check):
             r.detail = (f"帳本現在有 {count} 個存檔點，這一關要至少 {need} 個。"
                         "在 VS Code 的「原始碼控制」面板寫一句說明、按存檔點（commit）。")
             return
+        suffix = self.spec.get("email_suffix")
+        if suffix:   # 2-1 起（只對寫了它的題目）：git 的信箱（在帳本裡看到的，--global 也算）換成 GitHub 的 noreply 信箱
+            p = procs.run([git, "config", "user.email"], cwd=ledger, env=env, timeout=30)
+            email = p.stdout.strip() if p.returncode == 0 else ""
+            if not email.lower().endswith(suffix.lower()):
+                now = f"現在是 {email}" if email else "現在還沒設"
+                r.detail = (f"git 的信箱{now}，還不是 GitHub 的 noreply 信箱（…{suffix}）。\n"
+                            "  在 GitHub 的 Settings → Emails 勾 Keep my email addresses private，複製那個信箱，"
+                            "再打：git config --global user.email 那個信箱")
+                return
+        saved = self.spec.get("saved_before")
+        if saved:   # 2-1 起（只對寫了它的題目）：交給 AI 改之前先存檔：存檔點裡找得到這個檔「原本的樣子」（跟課程的起點檔一樣）
+            rel = saved["file"]
+            want = _plain_text(self.ctx.course(saved["start"]).read_text(encoding="utf-8"))
+            p = procs.run([git, "log", "--format=%H", "--", rel], cwd=ledger, env=env, timeout=30)
+            found = False
+            for h in (p.stdout.split() if p.returncode == 0 else []):
+                q = procs.run([git, "show", f"{h}:./{rel}"], cwd=ledger, env=env, timeout=30)
+                if q.returncode == 0 and _plain_text(q.stdout) == want:
+                    found = True
+                    break
+            if not found:
+                r.detail = (f"存檔點裡找不到 {Path(rel).name} 原本的樣子：交給 AI 改之前，要先按一個存檔點。\n"
+                            "  已經改了也沒關係：在原始碼控制面板放棄這個檔的改動（Discard Changes），按存檔點，再交給 AI 改一次。")
+                return
         for rel in self.spec.get("committed", []):
             p = procs.run([git, "status", "--porcelain", "--", rel], cwd=ledger, env=env, timeout=30)
             if p.returncode == 0 and p.stdout.strip():
@@ -2758,7 +2802,15 @@ class GitCheck(Check):
                 r.detail = f"{rel} 改過之後還沒按存檔點。到原始碼控制面板按存檔點（commit）。"
                 return
         r.ok = True
-        r.note = f"帳本有 {count} 個存檔點"
+        r.note = self.spec.get("ok_note") or f"帳本有 {count} 個存檔點"
+
+
+def _plain_text(text: str) -> list[str]:
+    """2-1 saved_before：比兩份程式是不是同一份（換行符號、行尾空白、最後的空行不算）。"""
+    lines = [ln.rstrip() for ln in text.replace("\r\n", "\n").replace("\r", "\n").split("\n")]
+    while lines and not lines[-1]:
+        lines.pop()
+    return lines
 
 
 CHECKERS = {

@@ -1,0 +1,82 @@
+{
+ "note": "2-1 的檢查：第①圈 expected.txt（chaff 的 expected_text：學員手寫報表對齊以後的樣子，要跟正確版一行一行、連空格都一樣，也要抓得到 3 個看起來對齊的版本：m1 金額靠左、m2 沒有千分位、m3 合計那一行沒對齊）；git 的信箱換成 GitHub 的 noreply 信箱（either：先不開帳號的寫 account.md）。第②圈 commands.txt（對答 4 題：uv run、pip install、git checkout -- .、rm 要執行的指令會做什麼、按不按同意）。第③圈 交辦前先存檔（git_commits 的 saved_before：存檔點裡找得到 report.py 原本的樣子；收下以後 report.py 也存進存檔點）；report.py 印出對齊的報表（run 的 exact_spaces：行內的空格要一模一樣）；decision.md（filled 五個標籤，自評）。grader 加的東西（只對寫了它的題目生效）：run 的 exact_spaces、git_commits 的 email_suffix 與 saved_before。",
+ "checks": [
+  {
+   "type": "chaff",
+   "id": "r1",
+   "mode": "expected_text",
+   "student_file": "lessons/2-1/expected.txt",
+   "reference": "reference/report.py",
+   "mutants": "mutants/mutants.json",
+   "teacher_file": "answers/expected.txt",
+   "min_checks": 6,
+   "group": "第一圈"
+  },
+  {
+   "type": "either",
+   "id": "email",
+   "group": "第一圈",
+   "descs": ["git 的信箱換成 GitHub 的 noreply 信箱（先不開帳號的話：account.md）"],
+   "neither": "git 的信箱還不是 GitHub 的 noreply 信箱（照 README 第 1 節 B）。先不開帳號的話，在 account.md 寫下原因和第③圈改用什麼。",
+   "paths": [
+    {"name": "換成 noreply 信箱", "touch": "lessons/2-1/.noreply", "checks": [
+     {"type": "git_commits", "id": "noreply", "min": 1, "email_suffix": "@users.noreply.github.com",
+      "desc": "git 的信箱換成 GitHub 的 noreply 信箱", "ok_note": "git 的信箱是 GitHub 的 noreply 信箱"}
+    ]},
+    {"name": "先不開帳號", "touch": "lessons/2-1/account.md", "checks": [
+     {"type": "filled", "id": "account", "file": "lessons/2-1/account.md", "labels": ["先不開帳號，因為：", "第③圈改用："], "count": 1, "item": "",
+      "desc": "account.md：先不開帳號的原因和第③圈改用什麼（自評）",
+      "missing_hint": "account.md 應該在帳本的 lessons/2-1/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-1。"}
+    ]}
+   ]
+  },
+  {
+   "type": "answers",
+   "id": "commands",
+   "file": "lessons/2-1/commands.txt",
+   "key": "answers/commands.json",
+   "group": "第二圈"
+  },
+  {
+   "type": "git_commits",
+   "id": "saved",
+   "group": "第三圈",
+   "min": 2,
+   "saved_before": {"file": "lessons/2-1/report.py", "start": "start/report.py"},
+   "committed": ["lessons/2-1/report.py"],
+   "desc": "交給 AI 改之前先存檔：存檔點裡有 report.py 原本的樣子；收下以後也存進存檔點",
+   "ok_note": "交辦前存過檔，收下的版本也存進存檔點了"
+  },
+  {
+   "type": "run",
+   "id": "report",
+   "file": "lessons/2-1/report.py",
+   "group": "第三圈",
+   "desc": "report.py 印出每一行對齊的報表（空格也要一樣）",
+   "timeout": 5,
+   "exact_spaces": true,
+   "expect_exact": [
+    "11 月月報",
+    "餐飲  1,250 元",
+    "交通    320 元",
+    "娛樂    480 元",
+    "其他     95 元",
+    "合計  2,145 元"
+   ],
+   "hint": "要跟你手寫的 expected.txt 一模一樣：金額加千分位逗號、靠右對齊，合計那一行也要對齊。印出來不一樣，就把 check 說的那一行貼回給 AI，請它照 expected.txt 改。",
+   "missing_hint": "report.py 應該在帳本的 lessons/2-1/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-1。"
+  },
+  {
+   "type": "filled",
+   "id": "decision",
+   "file": "lessons/2-1/decision.md",
+   "group": "第三圈",
+   "labels": ["它要執行的指令：", "我按了同意還是拒絕：", "diff 改了哪幾行：", "check 的結果：", "收不收，為什麼："],
+   "count": 1,
+   "item": "",
+   "desc": "decision.md：交辦的過程和收不收（自評，內容不改對錯）",
+   "hint": "照第③圈的順序寫：它要執行了哪些指令、你按了什麼、diff 改了哪幾行、check 印了什麼、最後收不收。",
+   "missing_hint": "decision.md 應該在帳本的 lessons/2-1/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-1。"
+  }
+ ]
+}

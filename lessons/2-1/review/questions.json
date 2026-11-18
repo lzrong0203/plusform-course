@@ -1,0 +1,26 @@
+{
+ "note": "回顧題：學員通過這課以後，往後第 2 課和第 5 課的 check 會各帶一題。",
+ "questions": [
+  {
+   "id": "r1",
+   "q": "agent 想執行：pip install requests\n這門課的規矩，你該按什麼？\nA. 同意：裝套件很正常\nB. 拒絕：先問它為什麼要裝；這門課裝套件一律用 uv add\nC. 同意：反正可以按 Undo\n（寫 A、B 或 C）",
+   "accept": ["B"],
+   "explain": "pip install 是從網路下載、安裝套件。交辦時沒說要裝就不能讓它裝；這門課裝套件一律用 uv add（2-2）。Undo 只還原它改的檔，終端機跑過的指令收不回來。",
+   "choices": {"A": "同意：裝套件很正常", "B": "拒絕：先問它為什麼要裝；這門課裝套件一律用 uv add", "C": "同意：反正可以按 Undo"}
+  },
+  {
+   "id": "r2",
+   "q": "讓 agent 動手改你的檔案之前，要先做哪一件事？\nA. 按一個存檔點（commit）\nB. 把 VS Code 關掉再打開\nC. 把作業刪掉重來\n（寫 A、B 或 C）",
+   "accept": ["A"],
+   "explain": "先按存檔點：它改壞了，可以回到交辦前的樣子（0-7）。VS Code 的 Undo、Restore Checkpoint 只管它用編輯工具改的檔，收不回終端機裡跑過的指令。",
+   "choices": {"A": "按一個存檔點（commit）", "B": "把 VS Code 關掉再打開", "C": "把作業刪掉重來"}
+  },
+  {
+   "id": "r3",
+   "q": "把 git 的信箱換成 GitHub 的 noreply 信箱以後，以前按過的存檔點，記的是哪一個信箱？\nA. 全部自動換成 noreply 信箱\nB. 還是舊的信箱，只有之後的存檔點用新的\nC. 以前的存檔點會被刪掉\n（寫 A、B 或 C）",
+   "accept": ["B"],
+   "explain": "GitHub 官方文件：Any commits you made prior to changing your commit email address are still associated with your previous email address。換了以後只影響之後的存檔點。",
+   "choices": {"A": "全部自動換成 noreply 信箱", "B": "還是舊的信箱，只有之後的存檔點用新的", "C": "以前的存檔點會被刪掉"}
+  }
+ ]
+}
