@@ -6,8 +6,8 @@
  "questions": [
   {"id": "q1", "title": "從哪裡讀起", "accept": ["B"],
    "choices": {"A": "第 1 行，一行一行讀到最後一行", "B": "最下面的 if __name__ == \"__main__\":，它呼叫了 main()", "C": "class Entry 那一段"},
-   "hint": "上面的 def 只是先把函式記下來。真的開始做事的，是哪一行呼叫？",
-   "explain": "上面的 import、def、class 只是先把東西記下來；最下面 if __name__ == \"__main__\": 底下的 main() 一呼叫，程式才開始問指令。從這裡往下追 main 呼叫了誰，就是呼叫圖的起點。"},
+   "hint": "上面的 def 大多只是先把函式記下來。開始問你要打什麼指令的，是哪一行呼叫？",
+   "explain": "上面的 import、def、class 大多只是先把東西記下來（@command 定義時就登記指令，是例外）；最下面 if __name__ == \"__main__\": 底下的 main() 一呼叫，程式才開始問指令。從這裡往下追 main 呼叫了誰，就是呼叫圖的起點。"},
   {"id": "q2", "title": "load 呼叫誰", "accept": ["A"],
    "choices": {"A": "read_entries", "B": "save", "C": "add"},
    "hint": "在 load 那一段找有括號的名字。",

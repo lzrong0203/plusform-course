@@ -44,7 +44,7 @@ B. 加上 `delete` 指令：打 `delete 2`，刪掉 `show` 印的第 2 筆，存
 
 ## 2. 提示
 
-- **從哪裡讀起：** 不要從第 1 行一路讀到最後。上面的 `import`、`def`、`class` 只是先把東西記下來，最下面的 `main()` 一呼叫，程式才開始做事。從 main 往下追「誰呼叫了誰」，畫成呼叫圖；看不懂的那一行先猜大意，用到再查。
+- **從哪裡讀起：** 不要從第 1 行一路讀到最後。上面的 `import`、`def`、`class` 大多只是先把東西記下來（`@command` 是例外：定義的時候就把函式登記進 `COMMANDS`），最下面的 `main()` 一呼叫，程式才開始問你要打什麼指令。從 main 往下追「誰呼叫了誰」，畫成呼叫圖；看不懂的那一行先猜大意，用到再查。
 - **`@command`（decorator，看得懂就好）：** 寫在 `def` 上面的 `@名字`，等於在那一段後面多寫一行 `show = command(show)`：把下面的函式交給 command 處理一次（官方術語表：merely syntactic sugar）。這支程式的 command 把函式用名字放進 `COMMANDS` 這個 dict，所以 main 用 `COMMANDS[name](entries, arg)` 就呼叫得到。對 `show` 按「尋找所有參考」，找不到別人呼叫它，原因就在這裡。1-24 的 `@dataclass` 也是一種 decorator。
 - **`yield`（generator，看得懂就好）：** 有 `yield` 的函式，一次交出一個值、停在那裡；要下一個的時候，從停下來的地方接着跑（官方術語表：picks up where it left off）。`list(read_entries(DATA))` 會一直要下一筆，直到檔案讀完。
 - **`re`（看得懂就好）：** `re.compile(r"(\d+/\d+) (\S+) (\d+)")` 是在描述「一行長什麼樣子」：`\d` 是一個數字、`+` 是一個以上、`\S` 是一個不是空白的字，括號圍起來的三段可以用 `m.group(1)`、`group(2)`、`group(3)` 拿出來。`fullmatch` 要整行都對得上，對不上交回 None。
