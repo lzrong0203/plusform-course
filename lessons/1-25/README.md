@@ -61,7 +61,7 @@ assert next_month(date(2026, 1, 31)) == date(2026, 2, 28)
 | Find All References（尋找所有參考） | ⇧⌥F12 | Shift+Alt+F12 |
 | Markdown 預覽開在旁邊 | ⌘K 放開再按 V | Ctrl+K 放開再按 V |
 
-  Mac 筆電按 F5 沒有開始 debug，多半是最上面一排被設成亮度、音量這些系統功能：Apple 官方說明是**按住功能（Fn）／地球鍵，同時按下 F5**；也可以在「系統設定」→「鍵盤」→「鍵盤快速鍵」→「功能鍵」選取「使用 F1、F2 等按鍵作為標準功能鍵」。按鍵記不住也沒關係：在名字上按右鍵，選單裡就有 Go to Definition 和 Find All References；debug 的時候，上方的小工具列有 Continue、Step Over、Step Into 的按鈕。
+  Mac 筆電按 F5 沒有開始 debug，可能是最上面一排被設成亮度、音量這些系統功能：Apple 官方說明是**按住功能（Fn）／地球鍵，同時按下 F5**；也可以在「系統設定」→「鍵盤」→「鍵盤快速鍵」→「功能鍵」選取「使用 F1、F2 等按鍵作為標準功能鍵」。按鍵記不住也沒關係：在名字上按右鍵，選單裡就有 Go to Definition 和 Find All References；debug 的時候，上方的小工具列有 Continue、Step Over、Step Into 的按鈕。
 - **亮起來的那一行還沒跑：** VS Code 官方文件：The highlighted execution line is the line that runs next.
 - **F10 和 F11：** F10 把這一行整個跑完（裡面呼叫的函式也一起跑完）；F11 走進那個函式，從它的第一行開始一步一步跑。print 這種 Python 內建的，F11 不會走進去。
 - **按 F5 跑的是「現在開著的那個檔」：** 編輯區開著 `dates.py` 按 F5，它就去跑 `dates.py`（什麼都不會發生）。先點回 `report.py` 再按。
