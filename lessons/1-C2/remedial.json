@@ -7,7 +7,7 @@
     {
      "lesson": "1-5",
      "title": "字串：索引、切片、方法、f-string",
-     "time": "1:14",
+     "time": "1:15",
      "chapter": "第①圈 索引、切片，先猜 d[::-1]"
     }
    ],
@@ -20,7 +20,7 @@
     {
      "lesson": "1-5",
      "title": "字串：索引、切片、方法、f-string",
-     "time": "3:26",
+     "time": "3:28",
      "chapter": "第①圈 strip、split、f-string，中文字對齊"
     }
    ],
@@ -33,7 +33,7 @@
     {
      "lesson": "1-6",
      "title": "input、型別轉換，第一次認識函式呼叫",
-     "time": "3:40",
+     "time": "3:42",
      "chapter": "第①圈 input 交回字串、熊的記帳程式"
     }
    ],
@@ -46,13 +46,13 @@
     {
      "lesson": "1-8",
      "title": "比較、邏輯與 assert",
-     "time": "1:16",
+     "time": "1:17",
      "chapter": "第①圈 比較，先猜四行"
     },
     {
      "lesson": "1-8",
      "title": "比較、邏輯與 assert",
-     "time": "4:04",
+     "time": "4:05",
      "chapter": "第①圈 and、or、not、真假值"
     }
    ],
@@ -65,13 +65,13 @@
     {
      "lesson": "1-9",
      "title": "if／elif／else：預算燈號與 BMI",
-     "time": "2:26",
+     "time": "2:27",
      "chapter": "第①圈 預算燈號：elif 從上往下看"
     },
     {
      "lesson": "1-9",
      "title": "if／elif／else：預算燈號與 BMI",
-     "time": "1:22",
+     "time": "1:23",
      "chapter": "第①圈 if 和 else"
     }
    ],
@@ -84,13 +84,13 @@
     {
      "lesson": "1-7",
      "title": "讀懂錯誤訊息：Traceback 從最下面看",
-     "time": "3:40",
+     "time": "3:42",
      "chapter": "第①圈 跑到才當掉的錯、錯在別的地方"
     },
     {
      "lesson": "1-6",
      "title": "input、型別轉換，第一次認識函式呼叫",
-     "time": "3:40",
+     "time": "3:42",
      "chapter": "第①圈 input 交回字串、熊的記帳程式"
     }
    ],
@@ -103,7 +103,7 @@
     {
      "lesson": "1-6",
      "title": "input、型別轉換，第一次認識函式呼叫",
-     "time": "6:41",
+     "time": "6:43",
      "chapter": "第②圈 ValueError 是什麼意思？自己修"
     }
    ],
@@ -129,7 +129,7 @@
     {
      "lesson": "1-7",
      "title": "讀懂錯誤訊息：Traceback 從最下面看",
-     "time": "3:40",
+     "time": "3:42",
      "chapter": "第①圈 跑到才當掉的錯、錯在別的地方"
     }
    ],
@@ -142,13 +142,13 @@
     {
      "lesson": "1-8",
      "title": "比較、邏輯與 assert",
-     "time": "1:16",
+     "time": "1:17",
      "chapter": "第①圈 比較，先猜四行"
     },
     {
      "lesson": "1-9",
      "title": "if／elif／else：預算燈號與 BMI",
-     "time": "10:46",
+     "time": "10:51",
      "chapter": "第③圈 用 assert 驗收 BMI 分級（邊界 24）"
     }
    ],
@@ -161,13 +161,13 @@
     {
      "lesson": "1-9",
      "title": "if／elif／else：預算燈號與 BMI",
-     "time": "4:11",
+     "time": "4:12",
      "chapter": "第①圈 果凍兔把順序寫反、熊自己寫"
     },
     {
      "lesson": "1-6",
      "title": "input、型別轉換，第一次認識函式呼叫",
-     "time": "3:40",
+     "time": "3:42",
      "chapter": "第①圈 input 交回字串、熊的記帳程式"
     }
    ],

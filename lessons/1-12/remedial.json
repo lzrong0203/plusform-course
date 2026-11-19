@@ -7,13 +7,13 @@
     {
      "lesson": "1-10",
      "title": "while 迴圈",
-     "time": "7:09",
+     "time": "7:11",
      "chapter": "第①圈 break 和 continue"
     },
     {
      "lesson": "1-10",
      "title": "while 迴圈",
-     "time": "1:17",
+     "time": "1:18",
      "chapter": "第①圈 while：迴圈跑幾次"
     }
    ],
@@ -26,7 +26,7 @@
     {
      "lesson": "1-11",
      "title": "for、range、enumerate 與兩層迴圈",
-     "time": "6:02",
+     "time": "6:01",
      "chapter": "第①圈 enumerate 編號、兩層迴圈"
     }
    ],
@@ -39,13 +39,13 @@
     {
      "lesson": "1-9",
      "title": "if／elif／else：預算燈號與 BMI",
-     "time": "2:26",
+     "time": "2:27",
      "chapter": "第①圈 預算燈號：elif 從上往下看"
     },
     {
      "lesson": "1-11",
      "title": "for、range、enumerate 與兩層迴圈",
-     "time": "6:02",
+     "time": "6:01",
      "chapter": "第①圈 enumerate 編號、兩層迴圈"
     }
    ],
@@ -58,13 +58,13 @@
     {
      "lesson": "1-5",
      "title": "字串：索引、切片、方法、f-string",
-     "time": "1:14",
+     "time": "1:15",
      "chapter": "第①圈 索引、切片，先猜 d[::-1]"
     },
     {
      "lesson": "1-4",
      "title": "數字與運算：分帳的零頭",
-     "time": "1:45",
+     "time": "1:46",
      "chapter": "第①圈 /、//、%、**，先猜 -7 // 2"
     }
    ],
@@ -90,13 +90,13 @@
     {
      "lesson": "1-10",
      "title": "while 迴圈",
-     "time": "3:14",
+     "time": "3:15",
      "chapter": "第①圈 記到打 q 為止、果凍兔停不下來（Control C）"
     },
     {
      "lesson": "1-6",
      "title": "input、型別轉換，第一次認識函式呼叫",
-     "time": "3:40",
+     "time": "3:42",
      "chapter": "第①圈 input 交回字串、熊的記帳程式"
     }
    ],
@@ -109,7 +109,7 @@
     {
      "lesson": "1-10",
      "title": "while 迴圈",
-     "time": "7:09",
+     "time": "7:11",
      "chapter": "第①圈 break 和 continue"
     }
    ],
@@ -135,7 +135,7 @@
     {
      "lesson": "1-7",
      "title": "讀懂錯誤訊息：Traceback 從最下面看",
-     "time": "3:40",
+     "time": "3:42",
      "chapter": "第①圈 跑到才當掉的錯、錯在別的地方"
     }
    ],
@@ -148,13 +148,13 @@
     {
      "lesson": "1-10",
      "title": "while 迴圈",
-     "time": "8:53",
+     "time": "8:55",
      "chapter": "第②圈 帶我寫：跟家教寫最多記 10 筆"
     },
     {
      "lesson": "1-10",
      "title": "while 迴圈",
-     "time": "7:09",
+     "time": "7:11",
      "chapter": "第①圈 break 和 continue"
     }
    ],
@@ -167,7 +167,7 @@
     {
      "lesson": "1-10",
      "title": "while 迴圈",
-     "time": "3:14",
+     "time": "3:15",
      "chapter": "第①圈 記到打 q 為止、果凍兔停不下來（Control C）"
     }
    ],
@@ -180,13 +180,13 @@
     {
      "lesson": "1-11",
      "title": "for、range、enumerate 與兩層迴圈",
-     "time": "3:25",
+     "time": "3:24",
      "chapter": "第①圈 一週七天的花費：累加、計數、找最大值"
     },
     {
      "lesson": "1-9",
      "title": "if／elif／else：預算燈號與 BMI",
-     "time": "2:26",
+     "time": "2:27",
      "chapter": "第①圈 預算燈號：elif 從上往下看"
     }
    ],
@@ -199,7 +199,7 @@
     {
      "lesson": "1-9",
      "title": "if／elif／else：預算燈號與 BMI",
-     "time": "2:26",
+     "time": "2:27",
      "chapter": "第①圈 預算燈號：elif 從上往下看"
     }
    ],
@@ -212,7 +212,7 @@
     {
      "lesson": "1-4",
      "title": "數字與運算：分帳的零頭",
-     "time": "3:51",
+     "time": "3:53",
      "chapter": "第①圈 先算哪一個、寫分帳程式"
     }
    ],
