@@ -1,0 +1,28 @@
+# 2-2 第②圈：套件寫在哪裡？換一台電腦會怎樣？
+# 在「答：」後面寫 A、B 或 C，存檔。
+
+第 1 題：
+# 熊的 report.py 最上面兩行：
+#     from rich.console import Console
+#     from rich.table import Table
+# 下面是三份 pyproject.toml 的 dependencies（其他地方都一樣）。哪一份少了 report.py 要的套件？
+#   A. dependencies = ["rich>=15.0.0"]
+#   B. dependencies = ["rich>=15.0.0", "pygments>=2.21.0"]
+#   C. dependencies = ["markdown-it-py>=4.3.0", "pygments>=2.21.0"]
+答：
+
+第 2 題：
+# 同學拿到熊的帳本（有 pyproject.toml 和 uv.lock，沒有 .venv），打 uv sync。
+# 他裝到的 rich，版本跟熊的一樣嗎？
+#   A. 一樣：uv.lock 記了確切的版本（rich 15.0.0），uv sync 照它裝
+#   B. 不一定：pyproject.toml 只寫了 15.0.0 以上，會裝到最新的
+#   C. 一樣：因為 .venv 也在存檔點裡
+答：
+
+第 3 題：
+# Copilot 用 uv pip install prettytable 裝了一個套件，report.py 改成用它。
+# 在熊的電腦上跑得起來，pyproject.toml 沒有變。在乾淨複本上打 uv sync --locked，再跑 report.py，會怎樣？
+#   A. 一樣跑得起來：套件已經裝在熊的 .venv 裡了
+#   B. 跑不起來：找不到 prettytable，因為它沒寫進 pyproject.toml
+#   C. uv sync 會自動把 prettytable 補進 pyproject.toml
+答：

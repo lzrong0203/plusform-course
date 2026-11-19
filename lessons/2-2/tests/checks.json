@@ -1,0 +1,114 @@
+{
+ "note": "2-2 的檢查：第①圈 用 uv add 裝 rich（uv_deps：pyproject.toml 的 dependencies 和 uv.lock 都有 rich）；裝之前到 PyPI 查過（pypi.md，filled 自評）。第②圈 deps.txt（對答 3 題：哪一份 pyproject 少了依賴、同學 uv sync 裝到的版本、uv pip install 的套件在乾淨複本上會怎樣）。第③圈 乾淨複本（uv_locked：pyproject.toml、uv.lock、.python-version、report.py 複製到暫存資料夾，uv sync --locked --offline 建新的 .venv 再跑 report.py，表格每一列對齊，中文字算兩格；排在存檔點前面：收下之前先驗收）；交辦前先存檔、收下以後 pyproject.toml、uv.lock、report.py 都進存檔點（git_commits 的 saved_before＋committed）；decision.md（filled 五個標籤，自評）。grader 加的兩種（只對寫了它的題目生效）：uv_deps、uv_locked。",
+ "checks": [
+  {
+   "type": "uv_deps",
+   "id": "rich",
+   "group": "第一圈",
+   "packages": [
+    "rich"
+   ],
+   "desc": "用 uv add 裝了 rich（pyproject.toml、uv.lock 都記了）",
+   "ok_note": "pyproject.toml 和 uv.lock 都記了 rich"
+  },
+  {
+   "type": "filled",
+   "id": "pypi",
+   "file": "lessons/2-2/pypi.md",
+   "group": "第一圈",
+   "labels": [
+    "套件名稱，我對過拼法了：",
+    "維護者（Maintainers）：",
+    "最近一次發布（Release history 最上面那一個）的日期：",
+    "原始碼在哪裡（Verified details 的連結）："
+   ],
+   "count": 1,
+   "item": "",
+   "desc": "pypi.md：裝之前到 PyPI 查過 rich（自評）",
+   "hint": "打開 https://pypi.org/project/rich/，左邊（手機在下面）找 Verified details 和 Release history。",
+   "missing_hint": "pypi.md 應該在帳本的 lessons/2-2/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-2。"
+  },
+  {
+   "type": "answers",
+   "id": "deps",
+   "file": "lessons/2-2/deps.txt",
+   "key": "answers/deps.json",
+   "group": "第二圈"
+  },
+  {
+   "type": "uv_locked",
+   "id": "clean",
+   "group": "第三圈",
+   "files": [
+    "lessons/2-2/report.py"
+   ],
+   "run": "lessons/2-2/report.py",
+   "rows": [
+    [
+     "餐飲",
+     "1,250"
+    ],
+    [
+     "交通",
+     "320"
+    ],
+    [
+     "日用品",
+     "448"
+    ],
+    [
+     "娛樂",
+     "480"
+    ],
+    [
+     "其他",
+     "95"
+    ],
+    [
+     "合計",
+     "2,593"
+    ]
+   ],
+   "timeout": 20,
+   "desc": "乾淨複本：uv sync --locked 裝得起來，report.py 印出對齊的表格",
+   "ok_note": "乾淨複本上 uv sync --locked 裝得起來，表格每一列都對齊",
+   "hint": "把這一行貼回給 AI，請它用 rich 的 Table 改（rich 會算中文字的寬度）。",
+   "missing_hint": "report.py 應該在帳本的 lessons/2-2/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-2。"
+  },
+  {
+   "type": "git_commits",
+   "id": "saved",
+   "group": "第三圈",
+   "min": 2,
+   "saved_before": {
+    "file": "lessons/2-2/report.py",
+    "start": "start/report.py"
+   },
+   "committed": [
+    "pyproject.toml",
+    "uv.lock",
+    "lessons/2-2/report.py"
+   ],
+   "desc": "交辦前先存檔；收下後 pyproject.toml、uv.lock、report.py 都存了",
+   "ok_note": "交辦前存過檔，pyproject.toml、uv.lock、report.py 都存進存檔點了"
+  },
+  {
+   "type": "filled",
+   "id": "decision",
+   "file": "lessons/2-2/decision.md",
+   "group": "第三圈",
+   "labels": [
+    "它要執行的指令：",
+    "它有沒有裝套件、怎麼裝的：",
+    "pyproject.toml 和 uv.lock 有沒有變：",
+    "check 的結果（乾淨複本）：",
+    "收不收，為什麼："
+   ],
+   "count": 1,
+   "item": "",
+   "desc": "decision.md：它怎麼裝套件、收不收（自評，內容不改對錯）",
+   "hint": "照第③圈的順序寫：它要執行了哪些指令、有沒有裝套件、用什麼裝的、pyproject.toml 和 uv.lock 變了什麼、check 印了什麼、最後收不收。",
+   "missing_hint": "decision.md 應該在帳本的 lessons/2-2/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-2。"
+  }
+ ]
+}

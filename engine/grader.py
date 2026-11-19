@@ -9,6 +9,10 @@ check.py（學員端）和 tools/validate_lesson.py（老師端）共用這一�
   uv_project    帳本是 uv 專案（有 pyproject.toml）
   python_pin    帳本把 Python 釘在指定版本（.python-version）
   uv_python     帳本用的是自己 .venv 裡的 Python，不是系統 Python
+  uv_deps       帳本用 uv add 裝了這些套件：pyproject.toml 的 dependencies 有它，uv.lock 也記了它（2-2 起）
+  uv_locked     乾淨複本（2-2 起）：帳本的 pyproject.toml、uv.lock、.python-version 和指定的檔複製到暫存資料夾，
+                uv sync --locked --offline 建一個新的 .venv（不連網，只用 uv 的快取），再用它跑程式；rows＝印出來的表格每一列
+                （分類靠左、金額靠右對齊，中文字算兩格）。pip／uv pip install 裝進帳本 .venv、沒寫進 pyproject.toml 的套件，在這裡會找不到
   run           在帳本的環境裡跑學員的程式（stdin 由這裡餵），比對印出來的字；swap＝先把一行換掉再跑（1-C1 第三部分：
                 金額換了也要算得對）；當掉時 Result.data["error"] 記錯誤種類（1-C1 矯正包用）；runs＝同一題換幾組輸入各跑一次，
                 全部對才算對（1-C2 第三部分：邊界和區間中間的金額放同一題）
@@ -523,6 +527,8 @@ DEFAULT_GROUP = {
     "uv_project": "官方測試",
     "python_pin": "官方測試",
     "uv_python": "官方測試",
+    "uv_deps": "官方測試",
+    "uv_locked": "官方測試",
     "run": "官方測試",
     "call": "官方測試",
     "chaff": "第三圈",  # 終端機輸出不用圈號字元：③ 在 xterm.js、Terminal.app 會跟下一個字疊在一起
@@ -2813,6 +2819,168 @@ def _plain_text(text: str) -> list[str]:
     return lines
 
 
+# ====================================================================
+# 2-2：套件與乾淨複本
+# ====================================================================
+
+def _pkg_key(name: str) -> str:
+    """套件名稱照 PyPI 的規則比（大小寫、- _ . 都算一樣）。"""
+    return re.sub(r"[-_.]+", "-", name.strip()).lower()
+
+
+def _dep_names(deps) -> set[str]:
+    out = set()
+    for d in deps or []:
+        m = re.match(r"\s*([A-Za-z0-9][A-Za-z0-9._-]*)", d) if isinstance(d, str) else None
+        if m:
+            out.add(_pkg_key(m.group(1)))
+    return out
+
+
+class UvDepsCheck(Check):
+    """2-2：帳本用 uv add 裝了套件：pyproject.toml 的 [project] dependencies 有它，uv.lock 也記了它。
+    spec：packages（例如 ["rich"]）、desc、ok_note。"""
+
+    def run(self, results):
+        r = results[0]
+        pp = self.ctx.student("pyproject.toml")
+        if not pp.is_file():
+            r.detail = "帳本裡找不到 pyproject.toml，還不是 uv 專案（0-5）。"
+            return
+        try:
+            data = tomllib.loads(read_student_text(pp))
+        except tomllib.TOMLDecodeError as exc:
+            r.detail = (f"pyproject.toml 壞掉了，讀不懂：{exc}\n"
+                        "  手改壞的話，從存檔點還原（git restore pyproject.toml），再打一次 uv add。")
+            return
+        have = _dep_names((data.get("project") or {}).get("dependencies"))
+        names = self.spec["packages"]
+        for name in names:
+            if _pkg_key(name) not in have:
+                r.detail = (f"pyproject.toml 的 dependencies 裡還沒有 {name}。\n"
+                            f"  在帳本資料夾打：uv add {name}（不要用 pip install）")
+                return
+        lock = self.ctx.student("uv.lock")
+        if not lock.is_file():
+            r.detail = "帳本裡找不到 uv.lock。在帳本資料夾打：uv lock"
+            return
+        try:
+            ldata = tomllib.loads(read_student_text(lock))
+        except tomllib.TOMLDecodeError:
+            r.detail = "uv.lock 讀不懂（手改過嗎？它由 uv 管理）。\n  在帳本資料夾打：uv lock，重新產生。"
+            return
+        locked = {_pkg_key(str(x.get("name", ""))) for x in ldata.get("package", []) if isinstance(x, dict)}
+        for name in names:
+            if _pkg_key(name) not in locked:
+                r.detail = (f"pyproject.toml 寫了 {name}，uv.lock 卻沒有：是手改的嗎？\n"
+                            f"  在帳本資料夾打：uv lock（或再打一次 uv add {name}）")
+                return
+        r.ok = True
+        r.note = self.spec.get("ok_note") or ("pyproject.toml 和 uv.lock 都記了 " + "、".join(names))
+
+
+def _cols(text: str) -> int:
+    """終端機裡佔幾格：中文、全形字算兩格。"""
+    return sum(0 if unicodedata.combining(c) else 2 if unicodedata.east_asian_width(c) in "WF" else 1 for c in text)
+
+
+def table_problems(text: str, rows: list[list[str]]) -> list[str]:
+    """2-2 的表格：每一列的分類和金額要在同一行；分類的開頭對齊、金額的最後一個數字對齊（中文字算兩格）。"""
+    lines = [ln.rstrip() for ln in _text(text).splitlines()]
+    starts, ends = [], []
+    for label, num in rows:
+        pat = re.compile(rf"(?<![\d,]){re.escape(num)}(?![\d,])")
+        hit = [ln for ln in lines if label in ln and pat.search(ln.split(label, 1)[1])]
+        if not hit:
+            return [f"印出來的找不到「{label}」和 {num} 在同一行。"]
+        ln = hit[0]
+        i = ln.index(label)
+        m = pat.search(ln, i + len(label))
+        starts.append(_cols(ln[:i]))
+        ends.append(_cols(ln[:m.end()]))
+    out = []
+    for (label, _num), e in zip(rows, ends):
+        if e != ends[0]:
+            d = e - ends[0]
+            out.append(f"「{label}」那一行的金額沒對齊：比「{rows[0][0]}」那一行"
+                       f"{'右邊' if d > 0 else '左邊'} {abs(d)} 格（中文字佔兩格）。")
+    for (label, _num), st in zip(rows, starts):
+        if st != starts[0]:
+            out.append(f"「{label}」那一行的分類沒對齊：開頭跟「{rows[0][0]}」那一行差 {abs(st - starts[0])} 格。")
+    return out
+
+
+class UvLockedCheck(Check):
+    """2-2：乾淨複本。帳本的 pyproject.toml、uv.lock、.python-version 和 files 複製到系統的暫存資料夾（沒有 .venv＝換一台乾淨的電腦），
+    uv sync --locked --offline 建一個新的 .venv（--locked：uv.lock 跟 pyproject.toml 對不上就停，不偷偷更新；--offline：不連網，只用 uv 的快取），
+    再用那個 .venv 的 Python 跑 run 那個檔。用 pip 或 uv pip install 裝進帳本 .venv、沒寫進 pyproject.toml 的套件，在這裡會找不到。
+    spec：files、run、rows（[[分類, 金額], …]）、timeout、desc、ok_note。不碰帳本。"""
+
+    def run(self, results):
+        r = results[0]
+        uv = find_uv()
+        if not uv:
+            raise NotReady("找不到 uv 這個指令。先完成 0-5 的安裝，再開一個新的終端機視窗試試看。")
+        files = ["pyproject.toml", "uv.lock", ".python-version"] + list(self.spec.get("files", []))
+        tmp = Path(tempfile.mkdtemp(prefix="plusform-clean-"))
+        try:
+            for rel in files:
+                src = self.ctx.student(rel)
+                if not src.is_file():
+                    if rel == ".python-version":
+                        continue
+                    r.detail = ("帳本裡找不到 uv.lock。在帳本資料夾打：uv lock" if rel == "uv.lock"
+                                else self.ctx.missing(rel, self.spec.get("missing_hint")))
+                    return
+                dst = tmp / rel
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(src, dst)
+            env = child_env()
+            for k in ("UV_PROJECT_ENVIRONMENT", "UV_FROZEN", "UV_NO_SYNC"):
+                env.pop(k, None)
+            p = procs.run([uv, "sync", "--locked", "--offline", "--no-progress", "--color", "never"],
+                          cwd=tmp, env=env, timeout=WARMUP_TIMEOUT, cap=self.ctx.env.cap)
+            if p.returncode != 0:
+                err = _text(p.stderr)
+                if "needs to be updated" in err or "--locked" in err:
+                    r.detail = ("乾淨複本上 uv sync --locked 停下來了：uv.lock 跟 pyproject.toml 對不上。\n"
+                                "  pyproject.toml 是手改的嗎？在帳本資料夾打 uv lock，或用 uv add 裝。")
+                else:
+                    r.detail = ("乾淨複本上 uv sync 裝不起來（check.py 不讓 uv 連網）。\n"
+                                "  先在帳本資料夾打一次 uv sync，再回來跑檢查。uv 的訊息最後幾行：\n" + tail(err))
+                return
+            py = tmp / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+            target = self.spec["run"]
+            q = procs.run([str(py), "-B", target], cwd=tmp, env=env,
+                          timeout=float(self.spec.get("timeout", self.ctx.env.timeout)), cap=self.ctx.env.cap)
+            name = Path(target).name
+            if q.timed_out:
+                r.detail = f"乾淨複本上跑 {name}，跑了很久還沒結束（無窮迴圈？）。"
+                return
+            if q.returncode != 0:
+                err = _text(q.stderr)
+                m = re.search(r"ModuleNotFoundError: No module named '([^'.]+)", err)
+                if m:
+                    mod = m.group(1)
+                    r.detail = (f"乾淨複本上跑 {name}，找不到 {mod} 這個套件。\n"
+                                "  它沒寫進 pyproject.toml（pip 或 uv pip install 裝的？）。\n"
+                                f"  在帳本資料夾打：uv add {mod}")
+                else:
+                    r.detail = f"乾淨複本上跑 {name} 出錯了。錯誤訊息最後幾行：\n" + tail(err)
+                return
+            rows = self.spec.get("rows")
+            if rows:
+                problems = table_problems(q.stdout, rows)
+                if problems:
+                    r.detail = (f"乾淨複本上跑得起來，可是表格還沒對齊。\n  {first_problem(problems)}"
+                                + (f"\n  {self.spec['hint']}" if self.spec.get("hint") else ""))
+                    return
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+        r.ok = True
+        r.note = self.spec.get("ok_note") or "乾淨複本上 uv sync --locked 裝得起來，跑得出來"
+
+
 CHECKERS = {
     "tree": TreeCheck,
     "answers": AnswersCheck,
@@ -2828,6 +2996,8 @@ CHECKERS = {
     "filled": FilledCheck,
     "either": EitherCheck,
     "func_shape": FuncShapeCheck,
+    "uv_deps": UvDepsCheck,
+    "uv_locked": UvLockedCheck,
 }
 
 

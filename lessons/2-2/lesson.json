@@ -1,0 +1,7 @@
+{
+ "id": "2-2",
+ "title": "套件與虛擬環境：uv add、pyproject、uv.lock",
+ "minutes": 45,
+ "fast_minutes": 8,
+ "after_start": "接下來，照 README 一步一步做（影片裡熊也是這個順序）：\n  1. 第一圈：跑一次 report.py，看日用品那一行歪掉；到 PyPI 查 rich（寫 pypi.md）；uv add rich，看 pyproject.toml 和 uv.lock 多了什麼；刪掉 .venv，再用 uv sync 裝回來\n  2. 第二圈：問家教 uv.lock 為什麼要進存檔點；deps.txt 3 題\n  3. 第三圈：先按存檔點，再請 Copilot 的 agent 把報表改成表格（用 rich，套件一律用 uv add），它要執行的指令一個一個看懂再按同意；看它怎麼裝套件、跑檢查（乾淨複本），寫 decision.md，收了再按一個存檔點\n做完回到課程資料夾打：uv run check.py 2-2"
+}
