@@ -153,7 +153,8 @@
    "min": 2,
    "saved_before": {
     "file": "lessons/2-3/monthly.py",
-    "start": "start/monthly.py"
+    "start": "start/monthly.py",
+    "hint": "存檔點裡還沒有 lessons/2-3 的檔：交給 AI 寫測試之前，要先按一個存檔點。\n  到原始碼控制面板按存檔點（說明寫「交辦前」），再交給 AI。"
    },
    "committed": [
     "lessons/2-3/tests/test_monthly.py"

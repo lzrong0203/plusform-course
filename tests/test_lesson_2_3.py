@@ -315,7 +315,7 @@ class MonthlyTests(unittest.TestCase):
         self.assertTrue(rs["tmonthly-wheat"].ok, rs["tmonthly-wheat"].detail)
         self.assertEqual([rs[f"tmonthly-m{i}"].ok for i in (1, 2, 3, 4)], [False, False, False, True])
         self.assertEqual(rs["tmonthly-m4"].note, "被 test_empty 抓到")
-        self.assertIn("你的測試抓到 1 個壞版本，還有 3 個溜過去：", out.summaries)
+        self.assertIn("test_monthly.py 抓到 1 個壞版本，還有 3 個溜過去：", out.summaries)
         for s in out.summaries:
             self.assertLessEqual(grader._cols(s), 68, s)
 
@@ -324,7 +324,7 @@ class MonthlyTests(unittest.TestCase):
         out = ev(["tmonthly"])
         for k, r in by(out).items():
             self.assertTrue(r.ok, (k, r.detail))
-        self.assertIn("你的測試把 4 個壞版本全部抓到了。", out.summaries)
+        self.assertIn("test_monthly.py 把 4 個壞版本全部抓到了。", out.summaries)
 
 
 class Forms(unittest.TestCase):
@@ -343,6 +343,18 @@ class Forms(unittest.TestCase):
         r = by(ev(["edges"]))["edges"]
         self.assertFalse(r.ok)
         self.assertIn("第 2 條", r.detail)
+
+    def test_saved_hint_when_not_saved(self):
+        """還沒按交辦前的存檔點：提示照 2-3 的寫法（請 AI 寫測試，不是改 monthly.py）。"""
+        fresh_repo()
+        write(L / "README.md", "# 帳本\n")
+        git(L, "add", "README.md")
+        git(L, "commit", "-q", "-m", "第一個存檔點")
+        git(L, "commit", "-q", "--allow-empty", "-m", "帳本 v0")
+        r = by(ev(["saved"]))["saved"]
+        self.assertFalse(r.ok)
+        self.assertIn("交給 AI 寫測試之前", r.detail)
+        self.assertNotIn("Discard", r.detail)
 
     def test_saved_before_and_committed(self):
         fresh_repo()

@@ -2799,8 +2799,9 @@ class GitCheck(Check):
                     found = True
                     break
             if not found:
-                r.detail = (f"存檔點裡找不到 {Path(rel).name} 原本的樣子：交給 AI 改之前，要先按一個存檔點。\n"
-                            "  已經改了也沒關係：在原始碼控制面板放棄這個檔的改動（Discard Changes），按存檔點，再交給 AI 改一次。")
+                # 2-3（只對寫了 saved_before.hint 的題目）：交給 AI 的不是改這個檔（例如請它寫測試），換一句提示
+                r.detail = saved.get("hint") or (f"存檔點裡找不到 {Path(rel).name} 原本的樣子：交給 AI 改之前，要先按一個存檔點。\n"
+                                                 "  已經改了也沒關係：在原始碼控制面板放棄這個檔的改動（Discard Changes），按存檔點，再交給 AI 改一次。")
                 return
         for rel in self.spec.get("committed", []):
             p = procs.run([git, "status", "--porcelain", "--", rel], cwd=ledger, env=env, timeout=30)
@@ -3148,14 +3149,16 @@ class PytestChaffCheck(Check):
         caught = len(self.mutants) - len(slipped)
         if not tests:
             return
+        # 一課有好幾個測試檔：開頭寫檔名，才分得出是哪一個（只有一個壞版本、全部抓到的不印，那一題的 ✓ 就夠了）
         if not slipped:
-            self.ctx.summaries.append(f"你的測試把 {len(self.mutants)} 個壞版本全部抓到了。")
+            if len(self.mutants) > 1:
+                self.ctx.summaries.append(f"{name} 把 {len(self.mutants)} 個壞版本全部抓到了。")
         elif count_ok:
             # 每行壓在 68 欄內（VS Code 終端機、Terminal.app 預設 80 欄都不折行）：提示一條一行
-            self.ctx.summaries.append(f"你的測試抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去：")
+            self.ctx.summaries.append(f"{name} 抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去：")
             self.ctx.summaries.extend(f"  ・{h}" for h in slipped)
         else:
-            self.ctx.summaries.append(f"你的測試抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去。")
+            self.ctx.summaries.append(f"{name} 抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去。")
             self.ctx.summaries.append(f"  先寫滿 {self.min} 個測試，再告訴你是哪幾種。")
 
 
