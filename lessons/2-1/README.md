@@ -34,7 +34,7 @@ C. 在 VS Code 打開 AI 功能、登入 Copilot Free：
 
 1. 0-6 關掉的內建 AI 要打開：⌘ 逗號打開設定，搜尋 `disable ai`，把 **Chat: Disable AI Features** 的勾拿掉。
 2. 下面狀態列的 Copilot 圖示 → 登入（用 GitHub 帳號）。瀏覽器會跳出授權頁，確認是 GitHub 的網址再按同意。還沒有 Copilot 方案的帳號，登入時會開成 Copilot Free（VS Code 官方文件）；登入好以後，按狀態列的 Copilot 圖示，最上面會寫 **Copilot Free**。
-3. 打開右邊的 Chat（⌃⌘I），它就是 agent。輸入框下面寫 **Local**（在 VS Code 裡面跑的 agent；另一個 Cloud 要付費方案，不用選）；權限維持預設的 **Default permissions**（常見的唯讀指令可能直接跑，其他的指令會先停下來問你；Allow all、Autopilot 不會問你，先不要選）。
+3. 打開右邊的 Chat（Mac ⌃⌘I；Windows Ctrl+Alt+I），它就是 agent。輸入框下面寫 **Local**（在 VS Code 裡面跑的 agent；另一個 Cloud 要付費方案，不用選）；權限維持預設的 **Default permissions**（常見的唯讀指令可能直接跑，設定沒允許的，會先停下來問你；Allow all、Autopilot 不會一個一個問你，先不要選）。
 
 D. 先手寫預期輸出（`expected.txt`）。`report.py` 是熊的 11 月月報，跑起來數字沒有對齊：
 
