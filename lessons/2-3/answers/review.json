@@ -1,0 +1,24 @@
+{
+ "note": "2-3 第③圈：審 AI 寫的測試 2 題（對答，選擇題；看的是課程凍結的 ai_test_monthly.py）。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {
+   "id": "q1",
+   "title": "永遠會過",
+   "accept": ["A"],
+   "choices": {"A": "test_not_negative", "B": "test_same_as_sum", "C": "test_empty"},
+   "hint": "哪一個測試沒有寫出「應該是多少」？金額都是正的，加起來會是負數嗎？",
+   "explain": "test_not_negative 只檢查「不是負數」。帳裡的金額都是正的，不管它挑錯哪個月、全部加起來，都不會是負數，所以四個壞版本都過得了。"
+  },
+  {
+   "id": "q2",
+   "title": "照程式算期望值",
+   "accept": ["B"],
+   "choices": {"A": "test_not_negative", "B": "test_same_as_sum", "C": "test_empty"},
+   "hint": "哪一個測試的 expected 是用迴圈算出來的？那個迴圈跟 monthly.py 裡的長得一樣嗎？",
+   "explain": "test_same_as_sum 的期望值，是把 monthly.py 的迴圈抄一遍算出來的。程式怎麼算，它就怎麼算：程式的想法錯了，它也跟著錯。期望值要自己手算（120 加 15 是 135）。它的帳也只有 11 月，挑錯月份的版本一樣過得了。"
+  }
+ ]
+}

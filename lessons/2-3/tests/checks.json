@@ -1,0 +1,183 @@
+{
+ "note": "2-3 的檢查：第一圈 uv add --dev pytest（uv_deps 的 dev）；split.py 修好零頭（call）；tests/test_split.py 至少 6 個測試、正確版全過、抓到三個零頭寫錯的壞版本（pytest_chaff）；tests/test_dates.py 用 monkeypatch 換掉今天、抓到三個壞版本（pytest_chaff，must_use monkeypatch）。第二圈 edges.md（filled 自評三條）；split(100, 0) 丟 ValueError（call）；test_split.py 抓到人數 0 除以 0 的版本（pytest_chaff，只有壞版本那一題）。第三圈 review.txt 對答 2 題（審課程凍結的 AI 測試 ai_test_monthly.py）；tests/test_monthly.py 至少 3 個測試、正確版全過、四個壞版本都抓到（總企劃：AI 的測試只抓到 1 個）；交辦前先存檔＋test_monthly.py 存進存檔點；decision.md（filled）。grader 加的：pytest_chaff（每個版本各一個暫存資料夾，用帳本 .venv 的 Python 跑 python -m pytest，讀 junitxml）、uv_deps 的 dev（[dependency-groups] dev），都只對寫了它的題目生效。",
+ "checks": [
+  {
+   "type": "uv_deps",
+   "id": "pytest",
+   "group": "第一圈",
+   "packages": [
+    "pytest"
+   ],
+   "dev": true,
+   "desc": "用 uv add --dev 裝了 pytest（pyproject.toml、uv.lock 都記了）",
+   "ok_note": "pyproject.toml 和 uv.lock 都記了 pytest"
+  },
+  {
+   "type": "call",
+   "id": "split-1",
+   "group": "第一圈",
+   "file": "lessons/2-3/split.py",
+   "module": "split",
+   "func": "split",
+   "args": [
+    100,
+    3
+   ],
+   "expect": [
+    34,
+    33,
+    33
+   ],
+   "desc": "split(100, 3) 交回 [34, 33, 33]（零頭從第一個人開始，一人多 1 元）",
+   "hint": "先放好每個人的 each，再用 for i in range(total % people): 讓前面幾個人各加 1 元。",
+   "missing_hint": "split.py 應該在帳本的 lessons/2-3/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-3。"
+  },
+  {
+   "type": "call",
+   "id": "split-2",
+   "group": "第一圈",
+   "file": "lessons/2-3/split.py",
+   "module": "split",
+   "func": "split",
+   "args": [
+    10,
+    4
+   ],
+   "expect": [
+    3,
+    3,
+    2,
+    2
+   ],
+   "desc": "split(10, 4) 交回 [3, 3, 2, 2]（零頭 2 元，前兩個人各多 1 元）",
+   "missing_hint": "split.py 應該在帳本的 lessons/2-3/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-3。"
+  },
+  {
+   "type": "pytest_chaff",
+   "id": "tsplit",
+   "group": "第一圈",
+   "file": "lessons/2-3/tests/test_split.py",
+   "module": "split",
+   "reference": "reference/split.py",
+   "mutants": "mutants/split.json",
+   "teacher_file": "answers/test_split.py",
+   "min_tests": 6,
+   "mutant_desc": "你的分帳測試抓到第 {i} 個壞版本",
+   "missing_hint": "tests/test_split.py 應該在帳本的 lessons/2-3/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-3。"
+  },
+  {
+   "type": "pytest_chaff",
+   "id": "tdates",
+   "group": "第一圈",
+   "file": "lessons/2-3/tests/test_dates.py",
+   "module": "dates",
+   "reference": "reference/dates.py",
+   "mutants": "mutants/dates.json",
+   "teacher_file": "answers/test_dates.py",
+   "wheat_desc": "test_dates.py 用 monkeypatch 換掉今天，正確版全部通過",
+   "mutant_desc": "你的日期測試抓到第 {i} 個壞版本",
+   "must_use": [
+    "monkeypatch"
+   ],
+   "must_use_hint": "test_dates.py 裡還沒有用 monkeypatch：fill_date(\"\") 用的是今天，不換掉「今天」，明天這個測試就不過了。\n  寫一個 def test_…(monkeypatch):，第一行 monkeypatch.setattr(dates, \"today\", lambda: date(2026, 11, 3))。",
+   "missing_hint": "tests/test_dates.py 應該在帳本的 lessons/2-3/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-3。"
+  },
+  {
+   "type": "filled",
+   "id": "edges",
+   "group": "第二圈",
+   "file": "lessons/2-3/edges.md",
+   "labels": [
+    "邊界情況：",
+    "我的決定和理由："
+   ],
+   "count": 3,
+   "item": "第 {n} 條",
+   "desc": "edges.md：家教提的邊界情況，三條各自決定加不加（自評）",
+   "hint": "照第②圈：家教問了哪些邊界情況（例如人數是 0、金額是 0、金額比人數少），每一條寫你決定加、不加、還是先問需求，為什麼。",
+   "missing_hint": "edges.md 應該在帳本的 lessons/2-3/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-3。"
+  },
+  {
+   "type": "call",
+   "id": "split-0",
+   "group": "第二圈",
+   "file": "lessons/2-3/split.py",
+   "module": "split",
+   "func": "split",
+   "args": [
+    100,
+    0
+   ],
+   "raises": "ValueError",
+   "desc": "split(100, 0) 丟出 ValueError（人數至少 1 個人）",
+   "hint": "在 split 的第一行加：if people < 1: 再空四格寫 raise ValueError(f\"人數至少要 1 個人：{people}\")。",
+   "missing_hint": "split.py 應該在帳本的 lessons/2-3/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-3。"
+  },
+  {
+   "type": "pytest_chaff",
+   "id": "tzero",
+   "group": "第二圈",
+   "file": "lessons/2-3/tests/test_split.py",
+   "module": "split",
+   "reference": "reference/split.py",
+   "mutants": "mutants/split_zero.json",
+   "teacher_file": "answers/test_split.py",
+   "wheat": false,
+   "mutant_desc": "你的測試抓到「人數是 0 卻沒丟 ValueError」的版本",
+   "missing_hint": "tests/test_split.py 應該在帳本的 lessons/2-3/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-3。"
+  },
+  {
+   "type": "answers",
+   "id": "review",
+   "group": "第三圈",
+   "file": "lessons/2-3/review.txt",
+   "key": "answers/review.json"
+  },
+  {
+   "type": "pytest_chaff",
+   "id": "tmonthly",
+   "group": "第三圈",
+   "file": "lessons/2-3/tests/test_monthly.py",
+   "module": "monthly",
+   "reference": "reference/monthly.py",
+   "mutants": "mutants/monthly.json",
+   "teacher_file": "answers/test_monthly.py",
+   "min_tests": 3,
+   "mutant_desc": "你的 monthly_total 測試抓到第 {i} 個壞版本",
+   "missing_hint": "tests/test_monthly.py 是第③圈請 AI 寫的測試。沒開 GitHub 帳號的話，在帳本資料夾打：cp lessons/2-3/ai_test_monthly.py lessons/2-3/tests/test_monthly.py"
+  },
+  {
+   "type": "git_commits",
+   "id": "saved",
+   "group": "第三圈",
+   "min": 2,
+   "saved_before": {
+    "file": "lessons/2-3/monthly.py",
+    "start": "start/monthly.py"
+   },
+   "committed": [
+    "lessons/2-3/tests/test_monthly.py"
+   ],
+   "desc": "交給 AI 寫測試之前先存檔；改好的 test_monthly.py 也存進存檔點",
+   "ok_note": "交辦前存過檔，改好的測試也存進存檔點了"
+  },
+  {
+   "type": "filled",
+   "id": "decision",
+   "group": "第三圈",
+   "file": "lessons/2-3/decision.md",
+   "labels": [
+    "它寫了幾個測試、跑了什麼指令：",
+    "永遠會過的測試：",
+    "照程式的算法算期望值的測試：",
+    "壞版本抓到幾個（改之前、改之後）：",
+    "收不收，為什麼："
+   ],
+   "count": 1,
+   "item": "",
+   "desc": "decision.md：AI 寫的測試收不收（自評，內容不改對錯）",
+   "hint": "照第③圈的順序寫：它寫了幾個測試、跑了 uv run pytest 嗎、哪個永遠會過、哪個照程式算期望值、check 說抓到幾個壞版本、改完抓到幾個、最後收不收。",
+   "missing_hint": "decision.md 應該在帳本的 lessons/2-3/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-3。"
+  }
+ ]
+}

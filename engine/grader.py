@@ -68,6 +68,7 @@ import tomllib
 import unicodedata
 from dataclasses import dataclass, field
 from pathlib import Path
+from xml.etree import ElementTree
 
 from . import proc as procs
 from . import vshell
@@ -2855,11 +2856,26 @@ class UvDepsCheck(Check):
             return
         have = _dep_names((data.get("project") or {}).get("dependencies"))
         names = self.spec["packages"]
-        for name in names:
-            if _pkg_key(name) not in have:
-                r.detail = (f"pyproject.toml 的 dependencies 裡還沒有 {name}。\n"
-                            f"  在帳本資料夾打：uv add {name}（不要用 pip install）")
+        dev_note = ""
+        if self.spec.get("dev"):   # 2-3（只對寫了 dev 的題目生效）：寫程式時才用的工具（pytest），uv add --dev 寫進 [dependency-groups] 的 dev
+            groups = data.get("dependency-groups") or {}
+            dev = _dep_names(groups.get("dev") if isinstance(groups, dict) else None)
+            dev |= _dep_names(((data.get("tool") or {}).get("uv") or {}).get("dev-dependencies"))   # 舊版 uv 的寫法
+            for name in names:
+                if _pkg_key(name) in dev:
+                    continue
+                if _pkg_key(name) in have:   # 沒加 --dev 也能用，提醒一句就好
+                    dev_note = f"（{name} 寫在 dependencies 裡也能用；寫程式時才用的工具，習慣用 uv add --dev 裝）"
+                    continue
+                r.detail = (f"pyproject.toml 裡還沒有 {name}。\n"
+                            f"  在帳本資料夾打：uv add --dev {name}（不要用 pip install）")
                 return
+        else:
+            for name in names:
+                if _pkg_key(name) not in have:
+                    r.detail = (f"pyproject.toml 的 dependencies 裡還沒有 {name}。\n"
+                                f"  在帳本資料夾打：uv add {name}（不要用 pip install）")
+                    return
         lock = self.ctx.student("uv.lock")
         if not lock.is_file():
             r.detail = "帳本裡找不到 uv.lock。在帳本資料夾打：uv lock"
@@ -2876,7 +2892,7 @@ class UvDepsCheck(Check):
                             f"  在帳本資料夾打：uv lock（或再打一次 uv add {name}）")
                 return
         r.ok = True
-        r.note = self.spec.get("ok_note") or ("pyproject.toml 和 uv.lock 都記了 " + "、".join(names))
+        r.note = (self.spec.get("ok_note") or ("pyproject.toml 和 uv.lock 都記了 " + "、".join(names))) + dev_note
 
 
 def _cols(text: str) -> int:
@@ -2981,6 +2997,168 @@ class UvLockedCheck(Check):
         r.note = self.spec.get("ok_note") or "乾淨複本上 uv sync --locked 裝得起來，跑得出來"
 
 
+class PytestChaffCheck(Check):
+    """2-3：學員用 pytest 寫的測試檔，在正確版上要全部通過，在每個壞版本上至少一個測試變紅（chaff 的 pytest 版；只對寫了 type pytest_chaff 的題目生效）。
+    每個版本各一個系統暫存資料夾：<module>.py（那個版本）、conftest.py（空的）、tests/<學員的測試檔>，
+    用帳本 .venv 的 Python 跑 python -m pytest（帳本要先 uv add --dev pytest；check.py 不讓 uv 連網），結果讀 --junitxml：
+    一個測試一筆，parametrize 的每一組各算一個。不碰帳本、不寫課程資料夾。
+    spec：file（帳本裡的測試檔）、module（被測的模組名）、reference、mutants（json：mutants[].file、hint）、
+          min_tests（有寫才多一題「至少 N 個測試」）、wheat（預設 true：多一題「正確版全部通過」）、
+          must_use（測試檔裡一定要出現的字，例如 ["monkeypatch"]）、must_use_hint、mutant_desc（"抓到第 {i} 個壞版本"）、timeout、hint、missing_hint。"""
+
+    def __init__(self, spec, ctx):
+        super().__init__(spec, ctx)
+        info = json.loads(ctx.course(spec["mutants"]).read_text(encoding="utf-8"))
+        self.mutants = info["mutants"]
+        self.mutant_dir = ctx.course(spec["mutants"]).parent
+        self.min = int(spec.get("min_tests", 0))
+        self.wheat = spec.get("wheat", True)
+
+    def plan(self):
+        out = []
+        if self.min:
+            out.append(self.stub("count", f"至少寫 {self.min} 個測試（parametrize 的每一組各算一個）"))
+        if self.wheat:
+            out.append(self.stub("wheat", self.spec.get("wheat_desc", "你的測試在正確版上全部通過")))
+        fmt = self.spec.get("mutant_desc", "抓到第 {i} 個壞版本")
+        for i, m in enumerate(self.mutants, start=1):
+            out.append(self.stub(f"m{i}", fmt.format(i=i, what=m.get("what", ""))))
+        return out
+
+    def run_version(self, impl: Path, source: bytes) -> dict:
+        """跑一個版本：回傳 {"tests": {測試名稱: (狀態, 訊息)}, "collect": 收集時的錯誤或 None, "stuck": 原因或 None}。"""
+        key = ("pytest_chaff", str(impl), self.spec["module"], Path(self.spec["file"]).name, hash(source))
+        if key in self.ctx._call_cache:
+            return self.ctx._call_cache[key]
+        tmp = Path(tempfile.mkdtemp(prefix="plusform-pytest-"))
+        try:
+            (tmp / f"{self.spec['module']}.py").write_bytes(impl.read_bytes())
+            (tmp / "conftest.py").write_bytes(b"")
+            (tmp / "tests").mkdir()
+            (tmp / "tests" / Path(self.spec["file"]).name).write_bytes(source)
+            xmlp = tmp / "result.xml"
+            cmd = self.ctx.env.python_cmd() + ["-B", "-m", "pytest", "-q", "-p", "no:cacheprovider", "--no-header",
+                                               f"--junitxml={xmlp}", "-o", "junit_family=xunit2", "tests"]
+            timeout = min(self.ctx.env.timeout, float(self.spec.get("timeout", 20)))
+            p = procs.run(cmd, cwd=tmp, env=child_env(), timeout=timeout, cap=self.ctx.env.cap)
+            err = _text(p.stderr) + _text(p.stdout)
+            if "No module named pytest" in err:
+                raise NotReady("你的帳本還沒裝 pytest。在帳本資料夾打：uv add --dev pytest")
+            out: dict = {"tests": {}, "collect": None, "stuck": None}
+            if p.stopped and not xmlp.is_file():
+                out["stuck"] = (f"跑了 {timeout:.0f} 秒還沒結束（可能卡在無窮迴圈）" if p.timed_out
+                                else "印了太多東西被停下來（可能是迴圈沒停下來）")
+            elif xmlp.is_file():
+                root = ElementTree.parse(xmlp).getroot()
+                for tc in root.iter("testcase"):
+                    status, msg = "pass", ""
+                    for child in tc:
+                        if child.tag in ("failure", "error"):
+                            status = "fail" if child.tag == "failure" else "error"
+                            msg = (child.get("message") or "").strip()
+                        elif child.tag == "skipped":
+                            status, msg = "skip", (child.get("message") or "").strip()
+                    if status == "error" and "collection failure" in msg:
+                        lines = [ln[4:] if ln.startswith("E   ") else ln for ln in err.splitlines() if ln.startswith("E   ")]
+                        out["collect"] = "\n".join("    " + ln for ln in lines[-4:]) or tail(err)
+                        continue
+                    out["tests"][tc.get("name", "?")] = (status, msg)
+            else:
+                out["collect"] = tail(err)
+            self.ctx._call_cache[key] = out
+            return out
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    def run(self, results):
+        by_id = {r.id.rsplit("-", 1)[-1]: r for r in results}
+        mutant_rs = [by_id[f"m{i}"] for i in range(1, len(self.mutants) + 1)]
+        rel = self.spec["file"]
+        name = Path(rel).name
+        path = self.ctx.student(rel)
+
+        def fail_all(text: str) -> None:
+            for r in results:
+                r.detail = text
+
+        if not path.is_file():
+            fail_all(self.ctx.missing(rel, self.spec.get("missing_hint")))
+            return
+        source = path.read_bytes()
+        text = read_student_text(path)
+        try:
+            ast.parse(text)
+        except SyntaxError as exc:
+            fail_all(f"你的 {name} 第 {exc.lineno} 行有語法錯誤（{exc.msg}），先修好它。")
+            return
+        try:   # 註解裡寫到不算（起點檔的說明就提到 monkeypatch）
+            code = "".join(tok.string + " " for tok in tokenize.generate_tokens(io.StringIO(text).readline)
+                           if tok.type not in (tokenize.COMMENT, tokenize.STRING))
+        except (tokenize.TokenError, SyntaxError):
+            code = text
+        for word in self.spec.get("must_use", []):
+            if word not in code:
+                fail_all(self.spec.get("must_use_hint") or f"{name} 裡還沒有用到 {word}。")
+                return
+        ref = self.run_version(self.ctx.course(self.spec["reference"]), source)
+        if ref["collect"]:
+            fail_all(f"pytest 讀不進你的 {name}（收集測試的時候就出錯了）：\n{ref['collect']}\n"
+                     "  看看 import 那一行、函式名稱有沒有打錯。")
+            return
+        if ref["stuck"]:
+            fail_all(f"你的 {name} 在正確版上{ref['stuck']}。")
+            return
+        tests = ref["tests"]
+        n = len(tests)
+        count_ok = n >= self.min
+        if "count" in by_id:
+            by_id["count"].ok = count_ok
+            if not count_ok:
+                by_id["count"].detail = (f"pytest 在你的 {name} 找到 {n} 個測試，這課要至少 {self.min} 個。\n"
+                                         "  測試函式的名字要用 test_ 開頭；parametrize 的每一組各算一個。")
+        bad = [(t, s) for t, s in tests.items() if s[0] != "pass"]
+        if "wheat" in by_id:
+            by_id["wheat"].ok = bool(tests) and not bad
+            if not tests:
+                by_id["wheat"].detail = f"pytest 在你的 {name} 裡一個測試都沒找到：函式的名字要用 test_ 開頭。"
+            elif bad:
+                t, (st, msg) = bad[0]
+                short = msg.splitlines()[0][:120] if msg else ""
+                by_id["wheat"].detail = (f"{t} 在正確版上就沒過" + (f"（{short}）" if short else "") + "。\n"
+                                         "  正確版不會錯，所以是這個測試的期望值要再算一次。"
+                                         + (f"\n  （一共有 {len(bad)} 個測試在正確版上沒過）" if len(bad) > 1 else ""))
+        valid = [t for t, s in tests.items() if s[0] == "pass"]
+        slipped = []
+        for k, (m, r) in enumerate(zip(self.mutants, mutant_rs), start=1):
+            res = self.run_version(self.mutant_dir / m["file"], source)
+            if res["collect"] or res["stuck"]:
+                catchers = list(valid)   # 壞版本一載入就壞掉、或卡住：學員的測試都變紅，算抓到
+            else:
+                catchers = [t for t in valid if res["tests"].get(t, ("missing", ""))[0] != "pass"]
+            r.ok = bool(catchers)
+            if r.ok:
+                r.note = f"被 {catchers[0]} 抓到" + ("（這個壞版本卡住了、跑不完）" if res["stuck"] else "")
+            elif not valid:
+                r.detail = "你的測試在正確版上還沒有一個通過，先修好正確版那一題。"
+                slipped.append(m["hint"])
+            else:
+                r.detail = (f"溜過去了：{m['hint']}" if count_ok
+                            else f"溜過去了。（先寫滿 {self.min} 個測試，再告訴你溜過去的是哪一種錯）")
+                slipped.append(m["hint"])
+        caught = len(self.mutants) - len(slipped)
+        if not tests:
+            return
+        if not slipped:
+            self.ctx.summaries.append(f"你的測試把 {len(self.mutants)} 個壞版本全部抓到了。")
+        elif count_ok:
+            # 每行壓在 68 欄內（VS Code 終端機、Terminal.app 預設 80 欄都不折行）：提示一條一行
+            self.ctx.summaries.append(f"你的測試抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去：")
+            self.ctx.summaries.extend(f"  ・{h}" for h in slipped)
+        else:
+            self.ctx.summaries.append(f"你的測試抓到 {caught} 個壞版本，還有 {len(slipped)} 個溜過去。")
+            self.ctx.summaries.append(f"  先寫滿 {self.min} 個測試，再告訴你是哪幾種。")
+
+
 CHECKERS = {
     "tree": TreeCheck,
     "answers": AnswersCheck,
@@ -2998,6 +3176,7 @@ CHECKERS = {
     "func_shape": FuncShapeCheck,
     "uv_deps": UvDepsCheck,
     "uv_locked": UvLockedCheck,
+    "pytest_chaff": PytestChaffCheck,
 }
 
 

@@ -1,0 +1,7 @@
+{
+ "id": "2-3",
+ "title": "測試先行：pytest",
+ "minutes": 50,
+ "fast_minutes": 10,
+ "after_start": "接下來，照 README 一步一步做（影片裡熊也是這個順序）：\n  1. 第一圈：uv add --dev pytest；把 checks_split.py 的 assert 搬進 tests/test_split.py，uv run pytest 先紅後綠（修好 split.py 的零頭）；改成 parametrize 寫 6 個案例；tests/test_dates.py 用 monkeypatch 換掉今天\n  2. 第二圈：問家教「我漏了哪些邊界情況」，一條一條決定（寫 edges.md）；人數是 0 先寫測試（pytest.raises），再改 split.py\n  3. 第三圈：先按存檔點，再請 Copilot 的 agent 幫 monthly_total 寫測試；審它的測試（review.txt），用 check 跑壞版本，改到四個都抓到，寫 decision.md，收了再按一個存檔點\n做完回到課程資料夾打：uv run check.py 2-3"
+}

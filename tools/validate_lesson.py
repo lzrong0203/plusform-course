@@ -254,6 +254,104 @@ def flat_checks(checks: list[dict]) -> list[dict]:
     return out
 
 
+def pytest_ledger(temp: dict) -> Path:
+    """2-3 起（pytest_chaff）：臨時帳本裡 uv add --dev --offline pytest（只用 uv 的快取，不連網），整次驗證共用一個。"""
+    if "pytest_ledger" not in temp:
+        top = Path(tempfile.mkdtemp(prefix="plusform-validate-pytest-"))
+        temp.setdefault("tops", []).append(top)
+        ledger = top / "ledger"
+        ledger.mkdir()
+        uv = grader.find_uv()
+        if not uv:
+            raise RuntimeError("找不到 uv")
+        env = grader.child_env()
+        subprocess.run([uv, "init", "--no-package", "--vcs", "none", "--python", "3.13", "--name", "ledger", "--quiet"],
+                       cwd=ledger, check=True, env=env, capture_output=True)
+        subprocess.run([uv, "add", "--dev", "--offline", "--quiet", "pytest"], cwd=ledger, check=True, env=env, capture_output=True)
+        temp["pytest_ledger"] = ledger
+    return temp["pytest_ledger"]
+
+
+def validate_pytest_chaff(rep: Report, lesson: grader.Lesson, spec: dict, use_env: bool, temp: dict) -> None:
+    """2-3 起：pytest_chaff（學員用 pytest 寫的測試抓壞版本）。老師的標準測試在正確版上全部通過、每個壞版本至少讓一個測試變紅，
+    壞版本不能一載入就壞（語法錯誤、import 就當掉）、也不能讓老師的測試全部變紅（藏不住）；起點的測試檔在正確版上要全部通過、不能一開始就抓到全部壞版本。"""
+    d = lesson.dir
+    info = json.loads((d / spec["mutants"]).read_text(encoding="utf-8"))
+    mutants = info["mutants"]
+    mdir = (d / spec["mutants"]).parent
+    ref_path = d / spec["reference"]
+    for m in mutants:
+        mp = mdir / m["file"]
+        if not mp.is_file():
+            rep.bad(f"找不到壞版本 {m['file']}")
+            return
+        text = mp.read_text(encoding="utf-8")
+        if strip_comments(text) == strip_comments(ref_path.read_text(encoding="utf-8")):
+            rep.bad(f"壞版本 {m['file']} 跟正確版一模一樣")
+        try:
+            ast.parse(text)
+        except SyntaxError as exc:
+            rep.bad(f"壞版本 {m['file']} 第 {exc.lineno} 行有語法錯誤：一載入就壞，任何測試都抓得到它")
+    if not spec.get("teacher_file"):
+        rep.bad(f"{spec['id']} 沒有 teacher_file（老師的標準測試）")
+        return
+    if not use_env:
+        rep.skip(f"{spec['id']}（pytest）要臨時帳本，這次用 --no-env 跳過")
+        return
+    try:
+        ledger = pytest_ledger(temp)
+    except (RuntimeError, subprocess.CalledProcessError) as exc:
+        rep.bad(f"建不起裝了 pytest 的臨時帳本（uv 的快取裡要有 pytest），沒辦法驗證 {spec['id']}：{exc}")
+        return
+    env = grader.Env(ledger)
+    _ctx, checkers = grader.build(lesson, ledger, env=env, overrides={spec["file"]: d / spec["teacher_file"]}, only=[spec])
+    ch = checkers[0]
+    src = (d / spec["teacher_file"]).read_bytes()
+    ref = ch.run_version(ref_path, src)
+    if ref["collect"] or ref["stuck"]:
+        rep.bad(f"老師的標準測試 {spec['teacher_file']} 在正確版上跑不起來：{ref['collect'] or ref['stuck']}")
+        return
+    tests = ref["tests"]
+    bad = [t for t, s in tests.items() if s[0] != "pass"]
+    if not tests:
+        rep.bad(f"老師的標準測試 {spec['teacher_file']} 裡 pytest 一個測試都沒找到")
+        return
+    if bad:
+        rep.bad(f"正確版沒通過老師的標準測試：{bad[0]}（{tests[bad[0]][1][:100]}）")
+    else:
+        rep.ok(f"正確版通過老師的標準測試（{spec['teacher_file']}，{len(tests)} 個測試）")
+    if len(tests) < ch.min:
+        rep.bad(f"老師的標準測試只有 {len(tests)} 個，這課要至少 {ch.min} 個")
+    for m in mutants:
+        res = ch.run_version(mdir / m["file"], src)
+        if res["collect"]:
+            rep.bad(f"壞版本 {m['file']} 一載入就壞（{res['collect'].strip()[:80]}）：任何測試都抓得到它")
+            continue
+        red = [t for t in tests if res["tests"].get(t, ("missing", ""))[0] != "pass"]
+        if not red:
+            rep.bad(f"壞版本 {m['file']} 沒有讓老師的任何一個測試變紅，學員不可能抓到它")
+        elif len(red) == len(tests) and len(tests) > 1:
+            rep.bad(f"壞版本 {m['file']} 讓老師的 {len(tests)} 個測試全部變紅：太明顯了，藏不住")
+        else:
+            rep.ok(f"壞版本 {m['file']} 讓老師的 {len(red)} 個測試變紅、{len(tests) - len(red)} 個還是綠的（藏得住）（{m.get('what', m['hint'])}）")
+    start = d / "start" / Path(spec["file"]).relative_to(f"lessons/{lesson.id}")
+    if start.is_file():
+        s_src = start.read_bytes()
+        s_ref = ch.run_version(ref_path, s_src)
+        s_bad = [t for t, s in s_ref["tests"].items() if s[0] != "pass"]
+        if s_ref["collect"] or s_bad:
+            rep.bad(f"起點檔 {start.relative_to(d).as_posix()} 的範例測試在正確版上沒過：{s_ref['collect'] or s_bad[0]}")
+        else:
+            caught = 0
+            for m in mutants:
+                res = ch.run_version(mdir / m["file"], s_src)
+                caught += any(res["tests"].get(t, ("missing", ""))[0] != "pass" for t in s_ref["tests"])
+            if caught == len(mutants) and len(mutants) > 1:
+                rep.bad(f"起點檔 {start.relative_to(d).as_posix()} 一開始就抓到全部 {len(mutants)} 個壞版本：學員什麼都不用寫")
+            else:
+                rep.ok(f"起點檔 {start.relative_to(d).as_posix()} 的 {len(s_ref['tests'])} 個範例測試在正確版上都過（一開始抓到 {caught}/{len(mutants)} 個壞版本）")
+
+
 def validate_lesson(lid: str, root: Path, use_env: bool, temp: dict) -> Report:
     rep = Report(lid)
     try:
@@ -336,6 +434,9 @@ def validate_lesson(lid: str, root: Path, use_env: bool, temp: dict) -> Report:
 
     # ---- 1、2. 壞版本 ----
     for spec in lesson.checks:
+        if spec["type"] == "pytest_chaff":   # 2-3 起
+            validate_pytest_chaff(rep, lesson, spec, use_env, temp)
+            continue
         if spec["type"] != "chaff":
             continue
         info = json.loads((d / spec["mutants"]).read_text(encoding="utf-8"))
@@ -530,6 +631,8 @@ def main(argv: list[str] | None = None) -> int:
     finally:
         if "top" in temp:
             shutil.rmtree(temp["top"], ignore_errors=True)
+        for top in temp.get("tops", []):   # 2-3 起：裝了 pytest 的臨時帳本
+            shutil.rmtree(top, ignore_errors=True)
     print()
     print(f"驗證了 {len(ids)} 課：{'全部沒問題' if not failed else f'{failed} 課有問題'}")
     return 1 if failed else 0

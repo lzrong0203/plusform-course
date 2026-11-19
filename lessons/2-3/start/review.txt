@@ -1,0 +1,16 @@
+# 2-3 第③圈：審 AI 寫的測試（打開 ai_test_monthly.py，課程凍結的版本）
+# 在「答：」後面寫 A、B 或 C，存檔。
+
+第 1 題：
+# 哪一個測試，不管 monthly_total 寫錯成什麼樣子，幾乎都會過？
+#   A. test_not_negative
+#   B. test_same_as_sum
+#   C. test_empty
+答：
+
+第 2 題：
+# 哪一個測試的期望值，是照 monthly.py 的算法算出來的（沒有自己手算）？
+#   A. test_not_negative
+#   B. test_same_as_sum
+#   C. test_empty
+答：

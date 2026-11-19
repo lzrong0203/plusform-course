@@ -1,0 +1,9 @@
+{
+  "target": "dates.py",
+  "note": "2-3 第①圈：fill_date 的三個壞版本。學員的 tests/test_dates.py 要用 monkeypatch 把 today 換成固定的一天。",
+  "mutants": [
+    {"id": "m1", "file": "dates_m1.py", "hint": "月和日寫反了：11/03 變成 03/11（挑一個月和日不一樣的日子測）", "what": "月日寫反"},
+    {"id": "m2", "file": "dates_m2.py", "hint": "沒打日期（空的字串）的時候，沒有換成今天", "what": "空字串沒換成今天"},
+    {"id": "m3", "file": "dates_m3.py", "hint": "沒有補零：11/03 變成 11/3（挑一個日期是個位數的日子測）", "what": "沒補零"}
+  ]
+}

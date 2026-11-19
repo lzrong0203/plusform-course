@@ -1,0 +1,26 @@
+{
+ "note": "回顧題：學員通過這課以後，往後第 2 課和第 5 課的 check 會各帶一題。",
+ "questions": [
+  {
+   "id": "r1",
+   "q": "AI 幫你寫的測試全部通過了。下面哪一個測試，最可能是「永遠會過」的？\nA. assert monthly_total(帳, 11) == 135\nB. assert monthly_total(帳, 11) >= 0\nC. assert monthly_total([], 11) == 0\n（寫 A、B 或 C）",
+   "accept": ["B"],
+   "explain": "金額都是正的，加起來不可能是負數：>= 0 這一條，程式挑錯月份、全部加起來都會過。期望值要寫出「應該是多少」（135 是自己手算的）。",
+   "choices": {"A": "assert monthly_total(帳, 11) == 135", "B": "assert monthly_total(帳, 11) >= 0", "C": "assert monthly_total([], 11) == 0"}
+  },
+  {
+   "id": "r2",
+   "q": "測試先行的順序是哪一個？\nA. 先寫程式，跑得起來再補測試\nB. 先寫測試、跑一次看它紅（沒過），再寫程式讓它變綠\nC. 程式和測試請 AI 一起寫好\n（寫 A、B 或 C）",
+   "accept": ["B"],
+   "explain": "先紅後綠：先把需求寫成測試，跑一次確定它真的會紅（程式還沒做到），再寫程式讓它變綠。沒紅過的測試，你不知道它抓不抓得到錯。",
+   "choices": {"A": "先寫程式，跑得起來再補測試", "B": "先寫測試、跑一次看它紅（沒過），再寫程式讓它變綠", "C": "程式和測試請 AI 一起寫好"}
+  },
+  {
+   "id": "r3",
+   "q": "fill_date(\"\") 會用今天的日期。要測它，最好的做法是哪一個？\nA. 每天手動改測試裡的日期\nB. 用 monkeypatch 把「今天」換成固定的一天，測完 pytest 自動換回來\nC. 不測，日期本來就會變\n（寫 A、B 或 C）",
+   "accept": ["B"],
+   "explain": "monkeypatch.setattr 可以在測試裡暫時換掉一個函式（例如 today），測完 pytest 自動換回來（官方文件：All modifications will be undone after the requesting test function or fixture has finished）。",
+   "choices": {"A": "每天手動改測試裡的日期", "B": "用 monkeypatch 把「今天」換成固定的一天，測完 pytest 自動換回來", "C": "不測，日期本來就會變"}
+  }
+ ]
+}

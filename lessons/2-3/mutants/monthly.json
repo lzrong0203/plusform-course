@@ -1,0 +1,10 @@
+{
+  "target": "monthly.py",
+  "note": "2-3 第③圈：monthly_total 的四個壞版本（總企劃：用 4 個壞版本跑 AI 寫的測試，只抓到 1 個）。課程凍結的 AI 測試（start/ai_test_monthly.py）只抓得到 m4；學員改好的 tests/test_monthly.py 要四個都抓到、正確版全部通過。",
+  "mutants": [
+    {"id": "m1", "file": "monthly_m1.py", "hint": "用 1 月測測看：10、11、12 月的帳，有沒有被算成 1 月？", "what": "startswith 比月份"},
+    {"id": "m2", "file": "monthly_m2.py", "hint": "沒有挑月份，每個月的帳全部加起來了（測試的帳要有別的月份）", "what": "沒挑月份"},
+    {"id": "m3", "file": "monthly_m3.py", "hint": "比較後面的月份也算進去了：12 月的帳，被算進 11 月", "what": "大於等於"},
+    {"id": "m4", "file": "monthly_m4.py", "hint": "一筆都沒有的時候，交回 None，不是 0", "what": "空的交回 None"}
+  ]
+}

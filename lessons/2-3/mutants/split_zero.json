@@ -1,0 +1,7 @@
+{
+  "target": "split.py",
+  "note": "2-3 第②圈：人數是 0 的邊界情況。學員用 pytest.raises(ValueError) 寫的測試要抓到這個版本（它丟的是 ZeroDivisionError）。",
+  "mutants": [
+    {"id": "z1", "file": "split_z1.py", "hint": "人數是 0 的時候，它丟的是 ZeroDivisionError，不是 ValueError：用 pytest.raises(ValueError) 測 split(100, 0)", "what": "人數 0 除以 0"}
+  ]
+}
