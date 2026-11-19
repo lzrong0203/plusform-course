@@ -18,7 +18,7 @@ A. 開 GitHub 帳號，開兩步驟驗證（照 GitHub 官方文件，影片裡�
 
 B. 把 git 的信箱換成 GitHub 給的 noreply 信箱：
 
-1. GitHub 右上角頭像 → Settings → 左邊 Emails，勾 **Keep my email addresses private**。下面會寫出一個 `一串數字+你的帳號@users.noreply.github.com` 的信箱，複製它。
+1. GitHub 右上角頭像 → Settings → 左邊 Emails，確認 **Keep my email addresses private** 是 **On**（2026-11 的畫面是一個開關，沒開就按一下）。那一段會寫出一個 `一串數字+你的帳號@users.noreply.github.com` 的信箱，複製它。
 2. 在 VS Code 的終端機打（換成你自己的那一個）：
 
 ```bash
