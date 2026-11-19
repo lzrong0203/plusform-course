@@ -33,8 +33,8 @@ git config --global user.email
 C. 在 VS Code 打開 AI 功能、登入 Copilot Free：
 
 1. 0-6 關掉的內建 AI 要打開：⌘ 逗號打開設定，搜尋 `disable ai`，把 **Chat: Disable AI Features** 的勾拿掉。
-2. 下面狀態列的 Copilot 圖示 → 登入（用 GitHub 帳號）。瀏覽器會跳出授權頁，確認是 GitHub 的網址再按同意。還沒有 Copilot 方案的帳號，登入時會開成 Copilot Free（VS Code 官方文件）。
-3. 打開右邊的 Chat，下面的選單選 **Agent**；權限維持預設（常見的唯讀指令可能直接跑，其他的指令會先停下來問你）。
+2. 下面狀態列的 Copilot 圖示 → 登入（用 GitHub 帳號）。瀏覽器會跳出授權頁，確認是 GitHub 的網址再按同意。還沒有 Copilot 方案的帳號，登入時會開成 Copilot Free（VS Code 官方文件）；登入好以後，按狀態列的 Copilot 圖示，最上面會寫 **Copilot Free**。
+3. 打開右邊的 Chat（⌃⌘I），它就是 agent。輸入框下面寫 **Local**（在 VS Code 裡面跑的 agent；另一個 Cloud 要付費方案，不用選）；權限維持預設的 **Default permissions**（常見的唯讀指令可能直接跑，其他的指令會先停下來問你；Allow all、Autopilot 不會問你，先不要選）。
 
 D. 先手寫預期輸出（`expected.txt`）。`report.py` 是熊的 11 月月報，跑起來數字沒有對齊：
 
@@ -54,11 +54,11 @@ D. 先手寫預期輸出（`expected.txt`）。`report.py` 是熊的 11 月月�
 **第③圈：存檔，交給 agent，再驗收。**
 
 1. 先按存檔點（原始碼控制面板，說明寫「交辦前」）。
-2. 在 Chat 選 Agent，交辦：
+2. 在右邊的 Chat（Local、Default permissions）貼上交辦的話，看一遍沒貼錯再送出：
 
 > 照 lessons/2-1/expected.txt 的樣子，把 lessons/2-1/report.py 印出來的報表改成每一行對齊：金額加千分位逗號、靠右對齊。不要裝任何套件，只改 report.py。改完用 uv run 跑一次給我看。
 
-3. 它要執行指令時會先問你。**一個一個看懂再按同意**；看不懂、或跟交辦的事無關（裝套件、刪檔、丟掉改動），就按拒絕，問它為什麼。
+3. 它要執行指令時會先問你（2026-11 的畫面：Run zsh command? 下面是那一行指令，按鈕是 **Allow**（同意）和 **Skip**（拒絕））。**一個一個看懂再按同意**；看不懂、或跟交辦的事無關（裝套件、刪檔、丟掉改動），就按 Skip，問它為什麼。
 4. 看 diff：它改了哪幾行？只改了 report.py 嗎？
 5. 跑檢查（`uv run check.py 2-1`），印出來要跟 expected.txt 一模一樣。
 6. 決定收不收，寫在 `decision.md`。收了，按 Keep，再按一個存檔點（說明寫「報表對齊」）。不收，按 Undo，或回到交辦前的存檔點，改需求再交一次。
@@ -130,7 +130,7 @@ $ git config --global user.email
 | 存檔點裡找不到 report.py 原本的樣子 | 交給 AI 之前沒有先存檔 | 在原始碼控制面板放棄 report.py 的改動（Discard Changes）、按存檔點，再交辦一次 |
 | `lessons/2-1/report.py 改過之後還沒按存檔點` | 收下了，可是還沒存 | 按 Keep 以後，再按一個存檔點 |
 | report.py「第 6 行應該是『合計  2,145 元』」 | 合計那一行沒對齊 | 把 check 說的那一行貼回給 AI，請它照 expected.txt 改 |
-| Chat 裡沒有 Agent 可以選 | 還沒登入，或 AI 功能還是關著 | 照第 1 節 C 再做一次 |
+| Chat 打不開、或要你先 Use AI Features | 還沒登入，或 AI 功能還是關著 | 照第 1 節 C 再做一次 |
 | `error: Failed to spawn: check.py` | 你不在課程資料夾裡 | 先打 `cd ~/code/plusform-course` |
 
 ## 6. 怎麼交
