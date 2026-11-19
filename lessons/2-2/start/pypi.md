@@ -4,8 +4,8 @@
 
 套件名稱，我對過拼法了：
 
-維護者（Maintainers）：
+維護者（maintainer）：
 
-最近一次發布（Release history 最上面那一個）的日期：
+最近一次發布（Key dates 的 Released）：
 
-原始碼在哪裡（Verified details 的連結）：
+原始碼在哪裡（Project links 的連結）：

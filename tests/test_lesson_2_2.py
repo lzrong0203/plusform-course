@@ -387,8 +387,8 @@ class Forms(unittest.TestCase):
         self.assertFalse(ev(["decision"]).results[0].ok)
 
     def test_filled_forms_pass(self):
-        fill("pypi.md", {"套件名稱，我對過拼法了：": "rich", "維護者（Maintainers）：": "willmcgugan",
-                         "最近一次發布（Release history 最上面那一個）的日期：": "2026 年 4 月", "原始碼在哪裡（Verified details 的連結）：": "GitHub 上的 Textualize/rich"})
+        fill("pypi.md", {"套件名稱，我對過拼法了：": "rich", "維護者（maintainer）：": "willmcgugan",
+                         "最近一次發布（Key dates 的 Released）：": "2026 年 4 月", "原始碼在哪裡（Project links 的連結）：": "GitHub 上的 Textualize/rich"})
         fill("decision.md", {"它要執行的指令：": "uv run lessons/2-2/report.py", "它有沒有裝套件、怎麼裝的：": "沒有裝，用已經裝好的 rich",
                              "pyproject.toml 和 uv.lock 有沒有變：": "沒有變", "check 的結果（乾淨複本）：": "全過", "收不收，為什麼：": "收，乾淨複本跑得起來"})
         self.assertTrue(ev(["pypi"]).results[0].ok, ev(["pypi"]).results[0].detail)
@@ -402,8 +402,8 @@ class Whole(unittest.TestCase):
         add_rich()
         fresh_repo()
         answer("deps.txt", RIGHT)
-        fill("pypi.md", {"套件名稱，我對過拼法了：": "rich", "維護者（Maintainers）：": "willmcgugan",
-                         "最近一次發布（Release history 最上面那一個）的日期：": "2026-04-12", "原始碼在哪裡（Verified details 的連結）：": "github.com/Textualize/rich"})
+        fill("pypi.md", {"套件名稱，我對過拼法了：": "rich", "維護者（maintainer）：": "willmcgugan",
+                         "最近一次發布（Key dates 的 Released）：": "2026-04-12", "原始碼在哪裡（Project links 的連結）：": "github.com/Textualize/rich"})
         fill("decision.md", {"它要執行的指令：": "uv run", "它有沒有裝套件、怎麼裝的：": "沒有", "pyproject.toml 和 uv.lock 有沒有變：": "沒變",
                              "check 的結果（乾淨複本）：": "全過", "收不收，為什麼：": "收下"})
         save("交辦前")

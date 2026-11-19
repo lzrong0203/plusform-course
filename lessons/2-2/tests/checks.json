@@ -18,14 +18,14 @@
    "group": "第一圈",
    "labels": [
     "套件名稱，我對過拼法了：",
-    "維護者（Maintainers）：",
-    "最近一次發布（Release history 最上面那一個）的日期：",
-    "原始碼在哪裡（Verified details 的連結）："
+    "維護者（maintainer）：",
+    "最近一次發布（Key dates 的 Released）：",
+    "原始碼在哪裡（Project links 的連結）："
    ],
    "count": 1,
    "item": "",
    "desc": "pypi.md：裝之前到 PyPI 查過 rich（自評）",
-   "hint": "打開 https://pypi.org/project/rich/，左邊（手機在下面）找 Verified details 和 Release history。",
+   "hint": "打開 https://pypi.org/project/rich/，右邊（手機在下面）找 maintainer、Key dates、Project links。",
    "missing_hint": "pypi.md 應該在帳本的 lessons/2-2/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-2。"
   },
   {

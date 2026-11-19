@@ -20,11 +20,13 @@ uv run lessons/2-2/report.py
 
 B. 裝之前，先到 PyPI 查它（寫 `pypi.md`）。
 
-PyPI（Python Package Index，官方說念 pie pea eye，PI 一個字母一個字母念）是 Python 官方的套件倉庫，`uv add` 預設從這裡下載。打開 https://pypi.org/project/rich/ ，看三件事：
+PyPI（Python Package Index，官方說念 pie pea eye，PI 一個字母一個字母念）是 Python 官方的套件倉庫，`uv add` 預設從這裡下載。打開 https://pypi.org/project/rich/ ，看三件事（頁面上寫的 `pip install rich` 不要照打，這門課一律用 `uv add`）：
 
-1. **維護者**：左邊（手機在下面）的 Maintainers。
-2. **最近一次發布**：Release history 最上面那一個的日期。很久沒有更新的套件，出了問題可能沒人修。
-3. **原始碼在哪裡**：Verified details 底下的連結（PyPI 驗證過：上傳套件的人，當時管得到這個連結，例如它的 GitHub 頁面）。
+1. **維護者**：右邊（手機在下面）的 maintainer，寫著誰在管這個套件。
+2. **最近一次發布**：Key dates 的 Released（Release history 分頁有每一次的日期）。很久沒有更新的套件，出了問題可能沒人修。
+3. **原始碼在哪裡**：Project links 的連結（rich 的 Homepage 連到 GitHub）。
+
+維護者和發布日期旁邊標著 **PyPI data**，是 PyPI 自己的紀錄；Project links 是作者自己填的，沒有標 Verified 的就是 PyPI 沒驗證過，點進去看看是不是真的有在維護（PyPI 官方文件：沒標 PyPI data 或 Verified 的，都當成沒驗證過）。
 
 **名字要一個字母一個字母對**：PyPI 上誰都可以放套件，PyPI 不先審查；有人會故意放名字很像的套件，等你拼錯（PyPI 官方文件稱 typosquatting）。AI 給你的套件名，一樣要查過（AI 可能編出一個不存在的名字，有人就搶先用那個名字放壞套件）。
 
