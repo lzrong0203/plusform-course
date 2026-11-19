@@ -4,7 +4,10 @@ grader 加的兩種（只對寫了它的題目生效）：
   uv_deps    pyproject.toml 的 dependencies 和 uv.lock 都有這個套件（用 uv add 裝的）
   uv_locked  乾淨複本：pyproject.toml、uv.lock、.python-version、report.py 複製到暫存資料夾，uv sync --locked --offline 建新的 .venv 再跑，
              表格每一列對齊（中文字算兩格）；pip／uv pip install 裝進帳本 .venv、沒寫進 pyproject.toml 的套件在這裡會找不到
-rich 用 uv add --offline 從 uv 的快取裝（不連網；沒有快取時這幾條測試會失敗，先在任何地方 uv add rich 一次）。
+不依賴網路和 uv 的快取（2026-11-19 改：快取會被暫存清理或別課清掉，原本的 uv add rich --offline 找不到 markdown-it-py 就整批壞）：
+  uv_deps、git_commits 只讀 pyproject.toml、uv.lock、存檔點，用 fake_add_rich 照 uv add rich 寫進去的樣子改這兩個檔；
+  乾淨複本大多用沒有第三方套件的帳本（uv sync --locked --offline 不用快取），「手改 pyproject.toml」用 requires-python 那一行（離線也看得出 uv.lock 對不上）；
+  只有真的要跑 rich 的幾條（CleanRich、Whole）用 real_add_rich：uv 的快取裡沒有 rich 和它要的套件就跳過，印出原因（要跑：在任何 uv 專案連網打一次 uv add rich）。
 全部寫在 PLUSFORM_TEST_WS 底下，不寫課程資料夾、不寫真的家目錄。需要 uv 和 git。
 """
 
@@ -14,6 +17,7 @@ import json
 import re
 import shutil
 import subprocess
+import sys
 import unittest
 from pathlib import Path
 
@@ -106,15 +110,43 @@ def pyproject_deps(deps: list[str]) -> None:
     p.write_text(text, encoding="utf-8")
 
 
-def add_rich() -> None:
+_BASELINE: dict[str, bytes] = {}   # 剛 uv init 的 pyproject.toml、uv.lock（setUpModule 存）
+_RICH_SKIP: list[str] = []
+
+
+def reset_deps() -> None:
+    """pyproject.toml、uv.lock 回到剛 uv init 的樣子（沒有第三方套件）。不用 uv remove：重新鎖定要網路或快取。"""
+    for name, data in _BASELINE.items():
+        (L / name).write_bytes(data)
+
+
+def fake_add_rich() -> None:
+    """照 uv add rich（uv 0.13.8，2026-11-19 實跑）寫進 pyproject.toml、uv.lock 的樣子改這兩個檔，不裝套件、不連網、不用快取。
+    uv_deps 只讀這兩個檔、git_commits 只看存檔點，用這個就夠；乾淨複本要真的跑 rich 的用 real_add_rich。"""
+    reset_deps()
+    pyproject_deps(["rich>=15.0.0"])
+    lock = L / "uv.lock"
+    text = lock.read_text(encoding="utf-8").rstrip()
+    assert text.endswith('source = { virtual = "." }'), text[-200:]   # 剛 uv init：帳本自己那一段在最後
+    text += ('\ndependencies = [\n    { name = "rich" },\n]\n\n[package.metadata]\nrequires-dist = [{ name = "rich", specifier = ">=15.0.0" }]\n\n'
+             '[[package]]\nname = "rich"\nversion = "15.0.0"\nsource = { registry = "https://pypi.org/simple" }\n')
+    lock.write_text(text, encoding="utf-8")
+
+
+def real_add_rich() -> None:
+    """真的 uv add rich（--offline：只用 uv 的快取，不連網）。快取裡沒有 rich 和它要的套件（markdown-it-py、mdurl、pygments）就跳過，印出原因。"""
+    if _RICH_SKIP:
+        raise unittest.SkipTest(_RICH_SKIP[0])
+    reset_deps()
     r = uv("add", "rich", "--offline", "--quiet")
     if r.returncode != 0:
-        raise AssertionError("uv add rich --offline 失敗（uv 的快取裡沒有 rich？）：" + r.stderr[-400:])
-
-
-def remove_rich() -> None:
-    if "rich" in (L / "pyproject.toml").read_text(encoding="utf-8"):
-        uv("remove", "rich", "--offline", "--quiet")
+        reset_deps()
+        lines = [ln.strip(" ×╰─▶") for ln in r.stderr.splitlines() if ln.strip()]
+        last = next((ln for ln in lines if "Failed to" in ln or "not found" in ln), lines[0] if lines else "")   # 例：Failed to download `markdown-it-py==4.3.0`
+        _RICH_SKIP.append("uv 的快取裡沒有 rich 和它要的套件，要真的裝 rich 的測試跳過（測試不連網）。"
+                          "要跑這幾條：在任何 uv 專案連網打一次 uv add rich。uv 的訊息：" + last[-200:])
+        print("\n[test_lesson_2_2] SKIP " + _RICH_SKIP[0], file=sys.stderr)
+        raise unittest.SkipTest(_RICH_SKIP[0])
 
 
 def save(msg: str) -> None:
@@ -133,6 +165,8 @@ def setUpModule():
         raise unittest.SkipTest("需要 uv 和 git")
     BASE.mkdir(parents=True, exist_ok=True)
     uv_ledger(L)
+    for name in ("pyproject.toml", "uv.lock"):
+        _BASELINE[name] = (L / name).read_bytes()
 
 
 class Basics(unittest.TestCase):
@@ -206,7 +240,7 @@ class TableShape(unittest.TestCase):
 class Deps(unittest.TestCase):
     def setUp(self):
         start()
-        remove_rich()
+        reset_deps()
 
     def test_not_added(self):
         r = ev(["rich"]).results[0]
@@ -214,7 +248,7 @@ class Deps(unittest.TestCase):
         self.assertIn("uv add rich", r.detail)
 
     def test_uv_add_passes(self):
-        add_rich()
+        fake_add_rich()
         r = ev(["rich"]).results[0]
         self.assertTrue(r.ok, r.detail)
         self.assertIn("rich", r.note)
@@ -238,16 +272,11 @@ class Deps(unittest.TestCase):
 
 
 class Clean(unittest.TestCase):
-    """乾淨複本：不碰帳本，在暫存資料夾裡 uv sync --locked 再跑。"""
-
-    @classmethod
-    def setUpClass(cls):
-        start()
-        remove_rich()
-        add_rich()
+    """乾淨複本：不碰帳本，在暫存資料夾裡 uv sync --locked 再跑。這一組的帳本沒有第三方套件（離線、不用 uv 的快取）。"""
 
     def setUp(self):
         start()
+        reset_deps()
 
     def test_start_runs_but_crooked(self):
         r = ev(["clean"]).results[0]
@@ -255,13 +284,7 @@ class Clean(unittest.TestCase):
         self.assertIn("表格還沒對齊", r.detail)
         self.assertIn("日用品", r.detail)
 
-    def test_reference_passes(self):
-        write(mine("report.py"), ref("report.py"))
-        r = ev(["clean"]).results[0]
-        self.assertTrue(r.ok, r.detail)
-
     def test_ledger_untouched(self):
-        write(mine("report.py"), ref("report.py"))
         before = snapshot(L)
         ev(["clean"])
         self.assertEqual(snapshot(L), before)
@@ -274,19 +297,66 @@ class Clean(unittest.TestCase):
         self.assertIn("找不到 prettytable 這個套件", r.detail)
         self.assertIn("uv add prettytable", r.detail)
 
-    def test_rich_removed_from_pyproject(self):
+    def test_rich_not_in_pyproject(self):
         """report.py 用 rich，可是 pyproject.toml（和 uv.lock）沒有 rich：乾淨複本上 import rich 失敗。"""
         write(mine("report.py"), ref("report.py"))
-        remove_rich()
-        try:
-            r = ev(["clean"]).results[0]
-            self.assertFalse(r.ok)
-            self.assertIn("找不到 rich 這個套件", r.detail)
-        finally:
-            add_rich()
+        r = ev(["clean"]).results[0]
+        self.assertFalse(r.ok)
+        self.assertIn("找不到 rich 這個套件", r.detail)
 
     def test_lock_out_of_date(self):
-        """手改 pyproject.toml（多寫一個套件、沒有 uv lock）：--locked 停下來，不偷偷更新 uv.lock。"""
+        """手改 pyproject.toml、沒有 uv lock：--locked 停下來，不偷偷更新 uv.lock（改 requires-python，離線也看得出對不上）。"""
+        p = L / "pyproject.toml"
+        p.write_text(p.read_text(encoding="utf-8").replace('requires-python = ">=3.13"', 'requires-python = ">=3.12"'), encoding="utf-8")
+        r = ev(["clean"]).results[0]
+        self.assertFalse(r.ok)
+        self.assertIn("uv.lock 跟 pyproject.toml 對不上", r.detail)
+
+    def test_no_lock(self):
+        (L / "uv.lock").unlink()
+        r = ev(["clean"]).results[0]
+        self.assertFalse(r.ok)
+        self.assertIn("找不到 uv.lock", r.detail)
+
+    def test_crash_shows_tail(self):
+        write(mine("report.py"), (D / "start" / "report.py").read_text(encoding="utf-8") + "print(1 / 0)\n")
+        r = ev(["clean"]).results[0]
+        self.assertFalse(r.ok)
+        self.assertIn("ZeroDivisionError", r.detail)
+
+
+class CleanRich(unittest.TestCase):
+    """真的 uv add rich 以後的乾淨複本（要 uv 的快取裡有 rich；沒有就整組跳過，見 real_add_rich）。"""
+
+    @classmethod
+    def setUpClass(cls):
+        start()
+        real_add_rich()
+
+    @classmethod
+    def tearDownClass(cls):
+        reset_deps()
+
+    def setUp(self):
+        start()
+
+    def test_real_uv_add_passes_deps(self):
+        r = ev(["rich"]).results[0]
+        self.assertTrue(r.ok, r.detail)
+
+    def test_reference_passes(self):
+        write(mine("report.py"), ref("report.py"))
+        r = ev(["clean"]).results[0]
+        self.assertTrue(r.ok, r.detail)
+
+    def test_reference_ledger_untouched(self):
+        write(mine("report.py"), ref("report.py"))
+        before = snapshot(L)
+        ev(["clean"])
+        self.assertEqual(snapshot(L), before)
+
+    def test_added_package_not_locked(self):
+        """手改 pyproject.toml 多寫一個套件、沒有 uv lock：--locked 停下來（pygments 是 rich 要的，快取裡一定有）。"""
         write(mine("report.py"), ref("report.py"))
         p = L / "pyproject.toml"
         old = p.read_text(encoding="utf-8")
@@ -297,24 +367,6 @@ class Clean(unittest.TestCase):
             self.assertIn("uv.lock 跟 pyproject.toml 對不上", r.detail)
         finally:
             p.write_text(old, encoding="utf-8")
-
-    def test_no_lock(self):
-        write(mine("report.py"), ref("report.py"))
-        lock = L / "uv.lock"
-        keep = lock.read_bytes()
-        lock.unlink()
-        try:
-            r = ev(["clean"]).results[0]
-            self.assertFalse(r.ok)
-            self.assertIn("找不到 uv.lock", r.detail)
-        finally:
-            lock.write_bytes(keep)
-
-    def test_crash_shows_tail(self):
-        write(mine("report.py"), ref("report.py") + "print(1 / 0)\n")
-        r = ev(["clean"]).results[0]
-        self.assertFalse(r.ok)
-        self.assertIn("ZeroDivisionError", r.detail)
 
 
 class Answers(unittest.TestCase):
@@ -340,8 +392,11 @@ class Saved(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         start()
-        remove_rich()
-        add_rich()
+        fake_add_rich()
+
+    @classmethod
+    def tearDownClass(cls):
+        reset_deps()
 
     def setUp(self):
         start()
@@ -398,8 +453,8 @@ class Forms(unittest.TestCase):
 class Whole(unittest.TestCase):
     def test_all_right(self):
         start()
-        remove_rich()
-        add_rich()
+        real_add_rich()
+        self.addCleanup(reset_deps)
         fresh_repo()
         answer("deps.txt", RIGHT)
         fill("pypi.md", {"套件名稱，我對過拼法了：": "rich", "維護者（maintainer）：": "willmcgugan",
