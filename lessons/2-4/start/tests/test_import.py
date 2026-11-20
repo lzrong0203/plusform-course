@@ -14,4 +14,4 @@ def test_count():
 
 
 # 換你寫：test_totals。匯入 bank_a.csv 以後，各分類的合計應該是多少？
-#   自己照 bank_a.csv 手算（退款是負的，要扣掉），寫成 assert category_totals(entries) == {"餐飲": …, …}
+#   自己照 bank_a.csv 手算（退款是負的，要扣掉），寫成 assert totals == {"餐飲": …, …}

@@ -79,10 +79,11 @@ m = re.fullmatch(r"(\d{2,3})/(\d{1,2})/(\d{1,2})", text.strip())
 ```python
 def test_totals():
     entries = import_statement(FOLDER / "bank_a.csv", KEYWORDS)
-    assert category_totals(entries) == {"餐飲": 185, …}   # 其他幾類自己算
+    totals = category_totals(entries)
+    assert totals == {"餐飲": 185, …}   # 其他幾類自己算
 ```
 
-現在跑 `uv run pytest` 會紅：import_bank.py 還沒寫。這是對的，先紅後綠（2-3）。
+在帳本資料夾打 `uv run pytest lessons/2-4`（只跑這一課的測試）。現在會紅：import_bank.py 還沒寫。這是對的，先紅後綠（2-3）。
 
 2. 先按存檔點（原始碼控制面板，說明寫「交辦前」）。
 3. 在 Chat 選 Agent，交辦四欄：
@@ -90,10 +91,10 @@ def test_totals():
 > 目標：寫 lessons/2-4/import_bank.py，有 import_statement(path, keywords) 和 category_totals(entries)。import_statement 讀一份對帳單（CSV），交回一串 (日期, 項目, 分類, 金額)。
 > 背景：bank_a.csv、bank_b.csv 是兩家銀行的樣本（假資料），欄位名稱不一樣（交易日期／消費日、摘要／說明、金額／交易金額）；檔案開頭可能有 BOM；日期是民國年（115/11/03 要變成 2026/11/03）；金額有千分位；退款是負的；有空白列。分類照 keywords（項目裡有哪個關鍵字就是哪一類，都沒有是「其他」）。
 > 限制：只用 Python 內建的 csv、json、re，不要裝任何套件；不要改 tests 資料夾。
-> 怎樣算做完：uv run pytest 全部通過，把輸出貼給我。
+> 怎樣算做完：uv run pytest lessons/2-4 全部通過，把輸出貼給我。
 
 4. 它要執行指令時會先問你，一個一個看懂再按同意。它沒附 pytest 的輸出，就不算做完。
-5. 自己再跑一次 `uv run pytest`。沒過就看是哪一類的合計不對，打開 import_bank.py 找原因，改好再跑。
+5. 自己再跑一次 `uv run pytest lessons/2-4`。沒過就看是哪一類的合計不對，打開 import_bank.py 找原因，改好再跑。
 6. 跑檢查：`uv run check.py 2-4` 還會拿幾份**你沒看過的對帳單**（另一家銀行的欄位、Windows 的換行、更多空白列）試你的 import_bank.py。
 7. 決定收不收，寫在 `decision.md`。收了，再按一個存檔點（說明寫「匯入對帳單」）。
 
@@ -109,7 +110,7 @@ def test_totals():
 - **BOM：** 檔案最前面三個看不見的位元組，用來表示「這是 UTF-8」。用 `encoding="utf-8-sig"` 打開：有 BOM 就讀掉，沒有也照常讀。
 - **千分位與負號：** `"1,250".replace(",", "")` 是 `"1250"`。不要用 `re.sub(r"\D", "", …)` 拿掉「不是數字的字」：負號也不是數字，退款會變成支出。
 - **對不到的日期：** `re.fullmatch` 對不到交回 None，`roc_date` 會丟出 `ValueError: 看不懂的日期`。看到它，先看那一列的日期長什麼樣子。
-- **為什麼不用 pandas：** pandas 很好用，但它是一個很大的套件（還會帶著裝 numpy 等好幾個套件），我們還沒學。這一課的檔案只有幾十行，Python 內建的 csv 就做得到。
+- **為什麼不用 pandas：** pandas 很好用，但它是一個很大的套件：uv add pandas 會連 numpy、python-dateutil、tzdata 一起裝，.venv 多了大約 70 MB（2026-11 沙盒實測），我們也還沒學。這一課的檔案只有幾十行，Python 內建的 csv 就做得到。
 - **第 2 級交辦給 agent 的三條規矩：** 它不能改 `tests/`、不能用 pip 裝套件、沒附測試的輸出不算做完。
 
 ## 3. 開始前要打的指令
@@ -130,7 +131,7 @@ uv run lessons/2-4/read_csv.py
 uv run lessons/2-4/save_settings.py
 uv run lessons/2-4/peek.py
 uv run lessons/2-4/read_bank.py
-uv run pytest
+uv run pytest lessons/2-4
 ```
 
 檢查的時候**回到課程資料夾**：

@@ -20,4 +20,5 @@ def test_first_entry():
 
 def test_totals():
     entries = import_statement(FOLDER / "bank_a.csv", KEYWORDS)
-    assert category_totals(entries) == {"餐飲": 185, "交通": 500, "日用品": 900, "娛樂": 320}
+    totals = category_totals(entries)
+    assert totals == {"餐飲": 185, "交通": 500, "日用品": 900, "娛樂": 320}
