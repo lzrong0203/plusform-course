@@ -1,4 +1,4 @@
-# 2-4　CSV 與 JSON：匯入台灣銀行對帳單（假資料）
+# 2-4　CSV 與 JSON：匯入台灣的銀行對帳單（假資料）
 
 這課大約 55 分鐘。三圈比例 45／30／25。Windows 同學：指令在 Git Bash 照打，⌘ 換成 Ctrl（安裝見 0-W）。
 要會的：dict（1-15）、for 與 continue（1-11）、def 與 return（1-18）、import（1-21）、raise（1-22）、with open 與 encoding（1-23）、pytest（2-3）、2-1 的交辦與核准（先存檔、指令看懂才按同意）。
@@ -48,7 +48,7 @@ with open(p, encoding="utf-8", newline="") as f:
 D. 設定存成 JSON（`save_settings.py`）。先跑一次，打開 `settings.json`：中文變成 `\u6bcf\u6708…` 這種代碼。在 `json.dump` 加上 `ensure_ascii=False`，再跑一次，中文就照原樣存了（官方文件：If ensure_ascii is false, all characters will be output as-is）。`json.load` 讀回來就是原本的 dict。
 
 E. 讀練習用的對帳單（`peek.py`）。`bank_a.csv` 是課程準備的假資料（練習用的信用卡對帳單：金額是正的、退款是負的）。跑 peek.py，會跳出 `KeyError: '交易日期'`：明明有這一欄！
-原因是檔案最前面有一個看不見的字 **BOM**（很多銀行、試算表匯出的 CSV 都有；VS Code 右下角寫 `UTF-8 with BOM`），第一欄的名字變成 `\ufeff交易日期`。encoding 改成 `"utf-8-sig"`，Python 會把它讀掉（官方文件：On decoding utf-8-sig will skip those three bytes）。
+原因是檔案最前面有一個看不見的字 **BOM**（有些網路銀行、試算表匯出的 CSV 會有；VS Code 右下角寫 `UTF-8 with BOM`），第一欄的名字變成 `\ufeff交易日期`。encoding 改成 `"utf-8-sig"`，Python 會把它讀掉（官方文件：On decoding utf-8-sig will skip those three bytes）。
 
 F. 民國年、千分位、空白列（`clean.py`、`read_bank.py`）。
 

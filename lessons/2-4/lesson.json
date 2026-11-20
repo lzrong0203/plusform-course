@@ -1,6 +1,6 @@
 {
  "id": "2-4",
- "title": "CSV 與 JSON：匯入台灣銀行對帳單（假資料）",
+ "title": "CSV 與 JSON：匯入台灣的銀行對帳單（假資料）",
  "minutes": 55,
  "fast_minutes": 10,
  "after_start": "接下來，照 README 一步一步做（影片裡熊也是這個順序）：\n  1. 第一圈：save_csv.py 用 csv.DictWriter 存成 ledger.csv、read_csv.py 用 DictReader 讀回來（備註有逗號也不怕）；save_settings.py 加上 ensure_ascii=False；peek.py 改用 utf-8-sig；clean.py 的 to_int 拿掉千分位的逗號、read_bank.py 跳過空白列；re.txt 3 題\n  2. 第二圈：問家教有沒有更省事的做法，它建議 pandas 的話，自己決定用不用（寫 pandas.md）\n  3. 第三圈：先在 tests/test_import.py 手算各分類的合計，按存檔點，再請 Copilot 的 agent 寫 import_bank.py；uv run pytest 驗收，改到全過，寫 decision.md，收了再按一個存檔點\n做完回到課程資料夾打：uv run check.py 2-4\n練習一律用課程的假資料，不要拿你真的對帳單來練。"

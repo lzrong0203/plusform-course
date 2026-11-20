@@ -57,7 +57,7 @@
     {"id": "2-1", "title": "開 GitHub 帳號，第一次讓 AI 碰你的專案"},
     {"id": "2-2", "title": "套件與虛擬環境：uv add、pyproject、uv.lock"},
     {"id": "2-3", "title": "測試先行：pytest"},
-    {"id": "2-4", "title": "CSV 與 JSON：匯入台灣銀行對帳單（假資料）"},
+    {"id": "2-4", "title": "CSV 與 JSON：匯入台灣的銀行對帳單（假資料）"},
     {"id": "2-5", "title": "SQLite 與 SQL 基礎"},
     {"id": "2-C1", "title": "檢核站 5（關掉 AI，30 分鐘）"},
     {"id": "2-6", "title": "呼叫網路 API：狀態碼、逾時、假回應"},
