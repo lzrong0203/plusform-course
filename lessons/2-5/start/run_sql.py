@@ -1,6 +1,6 @@
 # 課程準備的小工具（不用改）：把一個 .sql 檔交給 practice.db 跑，印出查到的每一列
 #   用法（在帳本資料夾）：uv run lessons/2-5/run_sql.py q1.sql
-#   SQL 檔裡有 CREATE TABLE 的話（例如 tiny.sql），改在一個用完就丟的空資料庫跑，不動 practice.db
+#   SQL 檔裡有 CREATE TABLE 的話（例如 tiny.sql），改在用完就丟的空資料庫跑
 import sqlite3
 import sys
 from pathlib import Path

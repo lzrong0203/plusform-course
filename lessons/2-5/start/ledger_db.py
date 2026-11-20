@@ -1,4 +1,5 @@
-# 課程準備（不用改）：把 entries.csv 放進資料表 entries。第①圈 import_csv.py 的寫法，包成函式給測試用
+# 課程準備（不用改）：把 entries.csv 放進資料表 entries
+#   第①圈 import_csv.py 的寫法，包成函式給測試用
 import csv
 
 

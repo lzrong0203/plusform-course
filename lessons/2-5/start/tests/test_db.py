@@ -19,5 +19,5 @@ def test_count():
     assert con.execute("SELECT COUNT(*) FROM entries").fetchone()[0] == 11
 
 
-# 換你寫：test_totals。11 月各分類的合計應該是多少？要跟 CSV 版（csv_totals.py）算出來的一樣
-#   自己照 entries.csv 手算（退票是負的，要扣掉；金額空白的不算），寫成 assert totals == {"餐飲": …, …}
+# 換你寫：test_totals。11 月各分類的合計，要跟 CSV 版一樣
+#   自己照 entries.csv 手算（退票要扣掉、金額空白的不算）

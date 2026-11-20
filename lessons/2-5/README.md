@@ -72,7 +72,8 @@ GROUP BY category;
 **第②圈：跟 AI 學（`tiny.sql`、`null.txt`、`verify.md`）。** 請家教解釋這一條 SQL 在做什麼：
 
 ```sql
-SELECT category, COUNT(*), COUNT(amount), AVG(amount) FROM t GROUP BY category;
+SELECT category, COUNT(*), COUNT(amount), AVG(amount)
+FROM t GROUP BY category;
 ```
 
 不要只聽它說：用 **5 筆小資料**自己跑一次（`tiny.sql`：故意放一筆金額空白的，先自己算答案再跑），對照它的解釋。`uv run lessons/2-5/run_sql.py tiny.sql`（這個檔自己建一張小表，跑在用完就丟的空資料庫，不動 practice.db）。再答 `null.txt` 3 題，寫 `verify.md`（五個標籤都寫了就算交了）。
