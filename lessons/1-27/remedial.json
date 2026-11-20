@@ -71,7 +71,7 @@
     {
      "lesson": "1-22",
      "title": "錯誤處理：try／except／else／finally 與 raise",
-     "time": "1:32",
+     "time": "1:31",
      "chapter": "第①圈 讀 Traceback、try 和 except"
     },
     {
@@ -103,7 +103,7 @@
     {
      "lesson": "1-20",
      "title": "看懂 AI 常用的寫法（下）：型別提示、lambda、sorted 的 key",
-     "time": "4:57",
+     "time": "4:56",
      "chapter": "第①圈 穩定排序、any／all、*args"
     }
    ],
@@ -116,7 +116,7 @@
     {
      "lesson": "1-23",
      "title": "檔案讀寫：關掉程式，帳還在",
-     "time": "1:43",
+     "time": "1:42",
      "chapter": "第①圈 寫進檔案、讀回來"
     }
    ],
@@ -142,7 +142,7 @@
     {
      "lesson": "1-22",
      "title": "錯誤處理：try／except／else／finally 與 raise",
-     "time": "1:32",
+     "time": "1:31",
      "chapter": "第①圈 讀 Traceback、try 和 except"
     }
    ],
@@ -155,7 +155,7 @@
     {
      "lesson": "1-5",
      "title": "字串：索引、切片、方法、f-string",
-     "time": "3:28",
+     "time": "3:27",
      "chapter": "第①圈 strip、split、f-string，中文字對齊"
     }
    ],
@@ -194,7 +194,7 @@
     {
      "lesson": "1-5",
      "title": "字串：索引、切片、方法、f-string",
-     "time": "3:28",
+     "time": "3:27",
      "chapter": "第①圈 strip、split、f-string，中文字對齊"
     },
     {
@@ -226,13 +226,13 @@
     {
      "lesson": "1-23",
      "title": "檔案讀寫：關掉程式，帳還在",
-     "time": "1:43",
+     "time": "1:42",
      "chapter": "第①圈 寫進檔案、讀回來"
     },
     {
      "lesson": "1-23",
      "title": "檔案讀寫：關掉程式，帳還在",
-     "time": "3:49",
+     "time": "3:47",
      "chapter": "第①圈 w 和 a、Windows 的預設編碼"
     }
    ],
