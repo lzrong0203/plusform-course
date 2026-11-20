@@ -1,0 +1,7 @@
+{
+ "id": "2-5",
+ "title": "SQLite 與 SQL 基礎",
+ "minutes": 50,
+ "fast_minutes": 10,
+ "after_start": "接下來，照 README 一步一步做（影片裡熊也是這個順序）：\n  1. 第一圈：import_csv.py 先寫 CREATE TABLE，跑一次看「熊's 生日蛋糕」那一筆怎麼弄壞 f-string 拼出來的 SQL，改成問號；q1.sql 用 WHERE 挑出餐飲、q2.sql 用 GROUP BY 查本月各分類合計（要跟 csv_totals.py 一樣）；sql.txt 3 題\n  2. 第二圈：請家教解釋一條 SQL，用 tiny.sql 的 5 筆小資料自己跑一次驗證；null.txt 3 題、寫 verify.md\n  3. 第三圈：先在 tests/test_db.py 手算 11 月各分類的合計，按存檔點，再請 Copilot 的 agent 寫 db_report.py；uv run pytest 驗收，改到全過，寫 decision.md，收了再按一個存檔點\n做完回到課程資料夾打：uv run check.py 2-5"
+}

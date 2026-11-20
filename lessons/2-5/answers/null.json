@@ -1,0 +1,32 @@
+{
+ "note": "2-5 第②圈：NULL 在 COUNT、SUM 裡怎麼算（對答，選擇題；用 tiny.sql 的 5 筆小資料驗證過再答）。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {
+   "id": "q1",
+   "title": "COUNT(*)",
+   "accept": ["B"],
+   "choices": {"A": "2", "B": "3", "C": "0"},
+   "hint": "COUNT(*) 數的是這一組有幾列，不看金額有沒有值。跑 tiny.sql 看看。",
+   "explain": "COUNT(*) 數這一組一共幾列，金額空白的那一列也算，所以是 3（SQLite 官方文件：count(*) … returns the total number of rows in the group）。"
+  },
+  {
+   "id": "q2",
+   "title": "COUNT(amount)",
+   "accept": ["A"],
+   "choices": {"A": "2", "B": "3", "C": "90"},
+   "hint": "COUNT(amount) 只數 amount 有值的列。",
+   "explain": "COUNT(amount) 只數 amount 不是 NULL 的列，50 和 40 兩列，所以是 2（SQLite 官方文件：count(X) … the number of times that X is not NULL in a group）。"
+  },
+  {
+   "id": "q3",
+   "title": "整組都是 NULL 的 SUM",
+   "accept": ["C"],
+   "choices": {"A": "0", "B": "1", "C": "NULL（Python 讀出來是 None）"},
+   "hint": "SUM 只加有值的；一個有值的都沒有，加出來是什麼？",
+   "explain": "SUM 只加不是 NULL 的值；整組都是 NULL，SUM 交回 NULL，Python 讀出來是 None（SQLite 官方文件：If there are no non-NULL input rows then sum() returns NULL）。所以 q2.sql 要寫 amount IS NOT NULL，醫療才不會跑出一列 None。"
+  }
+ ]
+}

@@ -1,0 +1,9 @@
+{
+  "target": "db_report.py",
+  "note": "2-5 第③圈：db_report.py 的三個壞版本（總企劃：抓到 GROUP BY 漏掉退款、或把 NULL 當 0 的版本）。學員的驗收測試（11 月各分類合計，要跟 CSV 版一樣、自己手算）要三個都抓到、正確版全部通過。課程凍結的 AI 版本（start/ai_db_report.py）就是 m1 的寫法。",
+  "mutants": [
+    {"id": "m1", "file": "db_report_m1.py", "hint": "退票被跳過了：amount > 0 把負的也擋掉，交通多了 420", "what": "漏掉退款"},
+    {"id": "m2", "file": "db_report_m2.py", "hint": "把 NULL 當成 0：金額空白的醫療多出一列 0（CSV 版沒有這一類）", "what": "NULL 當 0"},
+    {"id": "m3", "file": "db_report_m3.py", "hint": "沒有篩月份：10 月的早餐店、捷運加值也加進去了", "what": "沒篩月份"}
+  ]
+}

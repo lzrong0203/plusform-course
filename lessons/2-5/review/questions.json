@@ -1,0 +1,44 @@
+{
+ "note": "回顧題：學員通過這課以後，往後第 2 課和第 5 課的 check 會各帶一題。",
+ "questions": [
+  {
+   "id": "r1",
+   "q": "要查「各分類的合計」，SQL 要加哪一段？\nA. GROUP BY category\nB. WHERE category\nC. ORDER BY category\n（寫 A、B 或 C）",
+   "accept": [
+    "A"
+   ],
+   "explain": "GROUP BY category 把分類一樣的帳分成一組，SUM(amount) 再把每一組加起來，有幾類就印幾列。WHERE 是挑出某幾筆。",
+   "choices": {
+    "A": "GROUP BY category",
+    "B": "WHERE category",
+    "C": "ORDER BY category"
+   }
+  },
+  {
+   "id": "r2",
+   "q": "備註是「熊's 生日蛋糕」。用 f-string 把它拼進 INSERT 的 SQL，會怎樣？\nA. 照樣存進去\nB. 單引號提早把字串收掉，SQL 壞掉（sqlite3.OperationalError）\nC. 單引號自動被刪掉\n（寫 A、B 或 C）",
+   "accept": [
+    "B"
+   ],
+   "explain": "f-string 拼出來的是 '熊's 生日蛋糕'：第二個單引號把字串收掉，後面的 s 被當成 SQL 的一部分，就壞了。值用問號另外交給 execute，才會原樣存成資料。",
+   "choices": {
+    "A": "照樣存進去",
+    "B": "單引號提早把字串收掉，SQL 壞掉（sqlite3.OperationalError）",
+    "C": "單引號自動被刪掉"
+   }
+  },
+  {
+   "id": "r3",
+   "q": "要跳過金額空白（NULL）的帳，WHERE 該寫哪一個？\nA. amount > 0\nB. amount = NULL\nC. amount IS NOT NULL\n（寫 A、B 或 C）",
+   "accept": [
+    "C"
+   ],
+   "explain": "amount IS NOT NULL 只跳過空白的。amount > 0 會連退款（負的）一起跳過；amount = NULL 什麼都對不到（NULL 要用 IS 比）。",
+   "choices": {
+    "A": "amount > 0",
+    "B": "amount = NULL",
+    "C": "amount IS NOT NULL"
+   }
+  }
+ ]
+}

@@ -1,0 +1,23 @@
+# 2-5 第①圈：SQL 的四個字（SELECT、FROM、WHERE、GROUP BY）與問號
+# 在「答：」後面寫 A、B 或 C，存檔。
+
+第 1 題：
+# 只要「交通」這一類的帳，條件要寫在哪一段？
+#   A. WHERE
+#   B. GROUP BY
+#   C. SELECT
+答：
+
+第 2 題：
+# SELECT category, SUM(amount) FROM entries GROUP BY category; 會印出幾列？
+#   A. 每一筆帳一列
+#   B. 不管幾類，只有一列
+#   C. 每一類一列
+答：
+
+第 3 題：
+# 為什麼要用問號把值交給 execute，不要用 f-string 拼進 SQL？
+#   A. 跑得比較快
+#   B. 值不會被當成 SQL 的一部分：備註有單引號、寫了奇怪的字，都改不了指令
+#   C. 不用問號，中文就存不進去
+答：

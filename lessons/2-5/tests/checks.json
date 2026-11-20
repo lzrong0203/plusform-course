@@ -1,0 +1,249 @@
+{
+ "note": "2-5 的檢查：第一圈 import_csv.py（CREATE TABLE、INSERT 用問號；sandbox 跑完用 probe 看 practice.db：五欄、11 筆、熊's 生日蛋糕照原樣、牙醫 None）、q1.sql（WHERE）、q2.sql（GROUP BY、本月、amount IS NOT NULL，要跟 CSV 版一樣；probe 在記憶體資料庫跑學員的 SQL、列排序後比）、sql.txt 對答 3 題。第二圈 tiny.sql（自己放 5 筆、一筆 NULL）、null.txt 對答 3 題（COUNT(*)、COUNT(amount)、整組 NULL 的 SUM）、verify.md（filled）。第三圈 tests/test_db.py（pytest_chaff：自己手算的 11 月各分類合計，正確版全過、抓到 amount > 0 漏掉退票、IFNULL 把 NULL 當 0、沒篩月份三個壞版本；extra_files 放 entries.csv、ledger_db.py）、db_report.py 的隱藏帳（run sandbox＋probe）、交辦前先存檔、decision.md。沒有新加 grader 欄位。",
+ "checks": [
+  {
+   "type": "run",
+   "id": "import",
+   "file": "lessons/2-5/import_csv.py",
+   "group": "第一圈",
+   "desc": "import_csv.py：建好資料表 entries（五欄），11 筆帳都放進 practice.db（熊's 生日蛋糕那一筆的備註照原樣、金額空白的存成 NULL）",
+   "timeout": 10,
+   "sandbox": {
+    "copy": [
+     "import_csv.py"
+    ],
+    "probe": {
+     "entries.csv": "start/entries.csv",
+     "db_probe.py": "probe/db_probe.py"
+    },
+    "steps": [
+     {
+      "run": "import_csv.py",
+      "cwd": "."
+     },
+     {
+      "run": "db_probe.py",
+      "cwd": "."
+     }
+    ]
+   },
+   "expect_contains": [
+    "欄位 date item category amount note",
+    "一共 11 筆",
+    "麵包店 450 熊's 生日蛋糕",
+    "牙醫 None 等收據"
+   ],
+   "hint": "先寫 con.execute(\"CREATE TABLE entries (date TEXT, item TEXT, category TEXT, amount INTEGER, note TEXT)\")；INSERT 不要用 f-string 拼字串，改成 con.execute(\"INSERT INTO entries VALUES (?, ?, ?, ?, ?)\", (d, item, cat, amount, note))。",
+   "missing_hint": "import_csv.py 應該在帳本的 lessons/2-5/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-5。"
+  },
+  {
+   "type": "run",
+   "id": "q1",
+   "file": "lessons/2-5/q1.sql",
+   "group": "第一圈",
+   "desc": "q1.sql：列出餐飲這一類的每一筆（日期、項目、金額、備註）",
+   "timeout": 10,
+   "sandbox": {
+    "copy": [
+     "q1.sql"
+    ],
+    "probe": {
+     "entries.csv": "start/entries.csv",
+     "ledger_db.py": "start/ledger_db.py",
+     "sqlprobe.py": "probe/sqlprobe.py",
+     "q1_probe.py": "probe/q1_probe.py"
+    },
+    "steps": [
+     {
+      "run": "q1_probe.py",
+      "cwd": "lesson"
+     }
+    ]
+   },
+   "expect_exact": [
+    "2026-10-28 | 早餐店 | 65 |",
+    "2026-11-01 | 早餐店 | 65 |",
+    "2026-11-08 | 便當店 | 120 | 跟同事",
+    "2026-11-15 | 麵包店 | 450 | 熊's 生日蛋糕"
+   ],
+   "hint": "SELECT date, item, amount, note FROM entries WHERE category = '餐飲';（SQL 裡的字用單引號包起來，最後一個分號）",
+   "missing_hint": "q1.sql 應該在帳本的 lessons/2-5/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-5。"
+  },
+  {
+   "type": "run",
+   "id": "q2",
+   "file": "lessons/2-5/q2.sql",
+   "group": "第一圈",
+   "desc": "q2.sql：本月（2026 年 11 月）各分類的合計，金額空白的不算（要跟 CSV 版 csv_totals.py 一樣）",
+   "timeout": 10,
+   "sandbox": {
+    "copy": [
+     "q2.sql"
+    ],
+    "probe": {
+     "entries.csv": "start/entries.csv",
+     "ledger_db.py": "start/ledger_db.py",
+     "sqlprobe.py": "probe/sqlprobe.py",
+     "q2_probe.py": "probe/q2_probe.py"
+    },
+    "steps": [
+     {
+      "run": "q2_probe.py",
+      "cwd": "lesson"
+     }
+    ]
+   },
+   "expect_exact": [
+    "交通 | 500",
+    "娛樂 | 320",
+    "日用品 | 680",
+    "餐飲 | 635"
+   ],
+   "hint": "SELECT category, SUM(amount) FROM entries WHERE date LIKE '2026-11%' AND amount IS NOT NULL GROUP BY category;（醫療那一筆金額空白：沒寫 amount IS NOT NULL，會多一列 醫療 | None）",
+   "missing_hint": "q2.sql 應該在帳本的 lessons/2-5/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-5。"
+  },
+  {
+   "type": "answers",
+   "id": "sql",
+   "group": "第一圈",
+   "file": "lessons/2-5/sql.txt",
+   "key": "answers/sql.json"
+  },
+  {
+   "type": "run",
+   "id": "tiny",
+   "file": "lessons/2-5/tiny.sql",
+   "group": "第二圈",
+   "desc": "tiny.sql：自己放 5 筆小資料（其中一筆金額空白），用來驗證 AI 的解釋",
+   "timeout": 10,
+   "sandbox": {
+    "copy": [
+     "tiny.sql"
+    ],
+    "probe": {
+     "tiny_probe.py": "probe/tiny_probe.py"
+    },
+    "steps": [
+     {
+      "run": "tiny_probe.py",
+      "cwd": "lesson"
+     }
+    ]
+   },
+   "expect_contains": [
+    "一共 5 筆"
+   ],
+   "expect_not_contains": [
+    "金額空白的 0 筆"
+   ],
+   "hint": "INSERT INTO t VALUES 後面放 5 組括號，其中一組的金額寫 NULL，例如 ('交通', NULL)；表的名字 t 不要改。",
+   "missing_hint": "tiny.sql 應該在帳本的 lessons/2-5/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-5。"
+  },
+  {
+   "type": "answers",
+   "id": "null",
+   "group": "第二圈",
+   "file": "lessons/2-5/null.txt",
+   "key": "answers/null.json"
+  },
+  {
+   "type": "filled",
+   "id": "verify",
+   "group": "第二圈",
+   "file": "lessons/2-5/verify.md",
+   "labels": [
+    "我問 AI 的 SQL：",
+    "AI 的解釋：",
+    "我的 5 筆小資料：",
+    "跑出來的結果：",
+    "AI 說的對不對、哪裡不一樣："
+   ],
+   "count": 1,
+   "item": "",
+   "desc": "verify.md：AI 對一條 SQL 的解釋，你用 5 筆小資料驗證的紀錄（自評，內容不改對錯）",
+   "hint": "照第②圈：問 AI 的那一條 SQL、它怎麼解釋、你放的 5 筆、跑出來的結果、它說的對不對。",
+   "missing_hint": "verify.md 應該在帳本的 lessons/2-5/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-5。"
+  },
+  {
+   "type": "pytest_chaff",
+   "id": "accept",
+   "group": "第三圈",
+   "file": "lessons/2-5/tests/test_db.py",
+   "module": "db_report",
+   "reference": "reference/db_report.py",
+   "mutants": "mutants/db_report.json",
+   "teacher_file": "answers/test_db.py",
+   "extra_files": {
+    "entries.csv": "start/entries.csv",
+    "ledger_db.py": "start/ledger_db.py"
+   },
+   "wheat_desc": "test_db.py 在正確版上全部通過（11 月各分類的合計是自己手算的）",
+   "mutant_desc": "你的驗收測試抓到第 {i} 個壞版本",
+   "missing_hint": "tests/test_db.py 應該在帳本的 lessons/2-5/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-5。"
+  },
+  {
+   "type": "run",
+   "id": "hidden",
+   "file": "lessons/2-5/db_report.py",
+   "group": "第三圈",
+   "desc": "db_report.py：另一份沒看過的帳（12 月、退款在另一類、整類金額空白、備註有單引號）合計正確",
+   "timeout": 10,
+   "sandbox": {
+    "copy": [
+     "db_report.py"
+    ],
+    "probe": {
+     "hidden_probe.py": "probe/hidden_probe.py"
+    },
+    "steps": [
+     {
+      "run": "hidden_probe.py",
+      "cwd": "lesson"
+     }
+    ]
+   },
+   "expect_exact": [
+    "娛樂 280",
+    "日用品 900",
+    "餐飲 60"
+   ],
+   "hint": "照需求卡：只算那個月（date LIKE ?，值是 month + \"%\"）；金額空白的不算（amount IS NOT NULL，不是 amount > 0：退款是負的，要扣掉）；用問號交值。",
+   "missing_hint": "db_report.py 是第③圈交給 AI 寫的。沒開 GitHub 帳號的話，在帳本資料夾打：cp lessons/2-5/ai_db_report.py lessons/2-5/db_report.py，再照影片改好"
+  },
+  {
+   "type": "git_commits",
+   "id": "saved",
+   "group": "第三圈",
+   "min": 2,
+   "saved_before": {
+    "file": "lessons/2-5/ai_db_report.py",
+    "start": "start/ai_db_report.py",
+    "hint": "存檔點裡還沒有 lessons/2-5 的檔：交給 AI 寫程式之前，要先按一個存檔點。\n  到原始碼控制面板按存檔點（說明寫「交辦前」），再交給 AI。"
+   },
+   "committed": [
+    "lessons/2-5/db_report.py",
+    "lessons/2-5/tests/test_db.py"
+   ],
+   "desc": "交給 AI 寫程式之前先存檔；改好的 db_report.py、test_db.py 也存進存檔點",
+   "ok_note": "交辦前存過檔，改好的程式和驗收測試也存進存檔點了"
+  },
+  {
+   "type": "filled",
+   "id": "decision",
+   "group": "第三圈",
+   "file": "lessons/2-5/decision.md",
+   "labels": [
+    "它跑了什麼指令：",
+    "uv run pytest 的結果：",
+    "哪一類的合計不對、為什麼：",
+    "我改了哪一行：",
+    "收不收，為什麼："
+   ],
+   "count": 1,
+   "item": "",
+   "desc": "decision.md：AI 寫的 db_report.py 收不收（自評，內容不改對錯）",
+   "hint": "照第③圈的順序寫：它要執行什麼指令、pytest 的結果、哪一類的合計不對（為什麼）、你改了哪一行、最後收不收。",
+   "missing_hint": "decision.md 應該在帳本的 lessons/2-5/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-5。"
+  }
+ ]
+}

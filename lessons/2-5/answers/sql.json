@@ -1,0 +1,32 @@
+{
+ "note": "2-5 第①圈：SQL 的四個字與參數化查詢（對答，選擇題）。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {
+   "id": "q1",
+   "title": "挑出某幾筆",
+   "accept": ["A"],
+   "choices": {"A": "WHERE", "B": "GROUP BY", "C": "SELECT"},
+   "hint": "SELECT 決定拿哪幾欄、FROM 是哪一張表；要挑出某幾筆，寫的是條件。",
+   "explain": "WHERE 寫條件，只留符合的那幾筆（WHERE category = '交通'）；GROUP BY 是照什麼分組，SELECT 是拿哪幾欄。"
+  },
+  {
+   "id": "q2",
+   "title": "GROUP BY 印幾列",
+   "accept": ["C"],
+   "choices": {"A": "每一筆帳一列", "B": "不管幾類，只有一列", "C": "每一類一列"},
+   "hint": "GROUP BY category：分類一樣的帳放在同一組，SUM 再把每一組加起來。",
+   "explain": "GROUP BY category 把分類一樣的帳分成一組，每一組印一列：有幾類就幾列。沒寫 GROUP BY 的 SUM(amount) 才是全部加成一列。"
+  },
+  {
+   "id": "q3",
+   "title": "為什麼用問號",
+   "accept": ["B"],
+   "choices": {"A": "跑得比較快", "B": "值不會被當成 SQL 的一部分：備註有單引號、寫了奇怪的字，都改不了指令", "C": "不用問號，中文就存不進去"},
+   "hint": "回想「熊's 生日蛋糕」那一筆：f-string 拼起來的 SQL，單引號在哪裡結束？",
+   "explain": "f-string 把備註直接拼進 SQL，備註裡的單引號提早把字串收掉，資料變成了指令的一部分（SQL 注入）。用問號，值另外交給 sqlite3，原樣存成資料（Python 官方文件：use the DB-API's parameter substitution）。"
+  }
+ ]
+}
