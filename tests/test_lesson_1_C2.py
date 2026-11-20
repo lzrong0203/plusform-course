@@ -270,7 +270,7 @@ class Flow(unittest.TestCase):
         pack = (L / "lessons/1-C2/矯正包.md").read_text(encoding="utf-8")
         self.assertIn("正確答案：B（5025 和 75）", pack)
         self.assertIn("1-8〈比較、邏輯與 assert〉1:17 起", pack)
-        self.assertIn("1-9〈if／elif／else：預算燈號與 BMI〉10:51 起", pack)
+        self.assertIn("1-9〈if／elif／else：預算燈號與 BMI〉10:49 起", pack)   # 1-9 v6（台灣讀音）章節 10:51→10:49
         self.assertIn("11/19 起", pack)
         self.assertEqual(pack.count("### 剛好等於的那一種"), 1)   # 兩題都錯在剛好等於：同一個主題只列一次
         self.assertEqual(sorted(p.name for p in (L / "lessons/1-C2/practice").iterdir()), ["p_edge.py", "p_input.py"])

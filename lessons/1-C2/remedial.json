@@ -7,7 +7,7 @@
     {
      "lesson": "1-5",
      "title": "字串：索引、切片、方法、f-string",
-     "time": "1:15",
+     "time": "1:14",
      "chapter": "第①圈 索引、切片，先猜 d[::-1]"
     }
    ],
@@ -20,7 +20,7 @@
     {
      "lesson": "1-5",
      "title": "字串：索引、切片、方法、f-string",
-     "time": "3:28",
+     "time": "3:27",
      "chapter": "第①圈 strip、split、f-string，中文字對齊"
     }
    ],
@@ -148,7 +148,7 @@
     {
      "lesson": "1-9",
      "title": "if／elif／else：預算燈號與 BMI",
-     "time": "10:51",
+     "time": "10:49",
      "chapter": "第③圈 用 assert 驗收 BMI 分級（邊界 24）"
     }
    ],
