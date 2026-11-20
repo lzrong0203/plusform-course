@@ -124,7 +124,7 @@ def test_no_people():
 - **`__pycache__`、`.pytest_cache`：** 跑過 pytest 以後自動多出來的暫存資料夾，不用管，也不用存（`.pytest_cache` 自己帶了 .gitignore，git 本來就不收）。
 - **conftest.py：** 課程準備的空檔，有它 pytest 才找得到同一個資料夾的 `split.py`。不用改，也不要刪。
 - **tmp_path（延伸）：** 要測寫檔案的函式，測試函式的參數寫 `tmp_path`，pytest 會在測試開始前給你一個這個測試專用的暫存資料夾（官方文件：a temporary directory unique to each test function），例如 `path = tmp_path / "ledger.txt"`。這課的 check 不考，1-23 的 save／load 可以拿來練。
-- **期望值要自己手算：** 測試的期望值抄程式的算法，程式的想法錯了，測試也跟着錯。帳裡只有 11 月，挑錯月份的程式也測不出來。
+- **期望值要自己手算：** 測試的期望值抄程式的算法，程式的想法錯了，測試也跟著錯。帳裡只有 11 月，挑錯月份的程式也測不出來。
 - **第 2 級交辦給 agent 的三條規矩：** 它不能改 `tests/`（除非你請它寫測試）、不能用 pip 裝套件、沒附測試的輸出不算做完。
 
 ## 3. 開始前要打的指令
