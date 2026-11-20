@@ -1,0 +1,18 @@
+{
+  "target": "import_bank.py",
+  "note": "2-4 第③圈：import_bank.py 的兩個壞版本（總企劃：抓到把退款（負數）當成支出加進去的版本）。學員的驗收測試（各分類合計，自己手算）要兩個都抓到、正確版全部通過。課程凍結的 AI 版本（start/ai_import_bank.py）就是 m1 的寫法。",
+  "mutants": [
+    {
+      "id": "m1",
+      "file": "import_bank_m1.py",
+      "hint": "退款被當成支出加進去了：-350 的負號被拿掉，日用品多了 700",
+      "what": "退款當支出"
+    },
+    {
+      "id": "m2",
+      "file": "import_bank_m2.py",
+      "hint": "退款整筆不見了：日用品沒有扣掉 350",
+      "what": "退款整筆跳過"
+    }
+  ]
+}

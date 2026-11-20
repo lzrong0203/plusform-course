@@ -1,0 +1,50 @@
+{
+ "note": "2-4 第①圈：看得懂解析民國年的 re（對答，選擇題）。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {
+   "id": "q1",
+   "title": "第一組括號",
+   "accept": [
+    "A"
+   ],
+   "choices": {
+    "A": "115",
+    "B": "11",
+    "C": "03"
+   },
+   "hint": "\\d 是一個數字，{2,3} 是兩到三個。括號把對到的那一段抓出來，第一組在最前面、第一條斜線之前。",
+   "explain": "(\\d{2,3}) 是兩到三個數字，放在第一條斜線之前，所以抓到 115（民國年）；m.group(1) 就是它，加 1911 是 2026。"
+  },
+  {
+   "id": "q2",
+   "title": "對不到的時候",
+   "accept": [
+    "B"
+   ],
+   "choices": {
+    "A": "交回 2026/11/03",
+    "B": "re.fullmatch 對不到、交回 None，roc_date 丟出 ValueError",
+    "C": "交回 3937/11/03"
+   },
+   "hint": "fullmatch 要整串字都照規則才對得到。規則裡寫的是斜線，2026-11-03 用的是減號。",
+   "explain": "re.fullmatch 要整串都符合才交回對到的結果，不然交回 None（官方文件：Return None if the string does not match the pattern）。roc_date 看到 None，就丟出 ValueError（看不懂的日期）。"
+  },
+  {
+   "id": "q3",
+   "title": "\\D 拿掉什麼",
+   "accept": [
+    "C"
+   ],
+   "choices": {
+    "A": "\"-1250\"",
+    "B": "\"-1,250\"",
+    "C": "\"1250\""
+   },
+   "hint": "\\D 是「不是數字的字」：逗號不是數字，負號是不是數字？",
+   "explain": "re.sub(r\"\\D\", \"\", …) 會拿掉所有不是數字的字（官方文件：Matches any character which is not a decimal digit）。逗號拿掉了，負號也被拿掉：-1,250 變成 1250，退款就被當成支出。"
+  }
+ ]
+}

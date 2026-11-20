@@ -1548,7 +1548,8 @@ class CallCheck(Check):
         data = self._batch()
         name = Path(s["file"]).name
         if data.get("missing"):
-            r.detail = self.ctx.missing(s["file"])
+            # 2-4 missing_call_hint（只對寫了它的題目）：檔案不是起點檔、要學員自己做出來的時候（例如請 AI 寫的 import_bank.py）；舊課 call 題寫的 missing_hint 照舊不用
+            r.detail = self.ctx.missing(s["file"], s.get("missing_call_hint"))
             return
         reply = data["reply"]
         err = reply.get("load_error")
@@ -3005,7 +3006,8 @@ class PytestChaffCheck(Check):
     一個測試一筆，parametrize 的每一組各算一個。不碰帳本、不寫課程資料夾。
     spec：file（帳本裡的測試檔）、module（被測的模組名）、reference、mutants（json：mutants[].file、hint）、
           min_tests（有寫才多一題「至少 N 個測試」）、wheat（預設 true：多一題「正確版全部通過」）、
-          must_use（測試檔裡一定要出現的字，例如 ["monkeypatch"]）、must_use_hint、mutant_desc（"抓到第 {i} 個壞版本"）、timeout、hint、missing_hint。"""
+          must_use（測試檔裡一定要出現的字，例如 ["monkeypatch"]）、must_use_hint、mutant_desc（"抓到第 {i} 個壞版本"）、timeout、hint、missing_hint、
+          extra_files（2-4：{檔名: 課程裡的路徑}，跟被測的模組放在同一個暫存資料夾，例如測試要讀的樣本對帳單）。"""
 
     def __init__(self, spec, ctx):
         super().__init__(spec, ctx)
@@ -3035,6 +3037,9 @@ class PytestChaffCheck(Check):
         try:
             (tmp / f"{self.spec['module']}.py").write_bytes(impl.read_bytes())
             (tmp / "conftest.py").write_bytes(b"")
+            # 2-4 extra_files（只對寫了它的題目）：測試要讀的資料檔，{暫存資料夾裡的檔名: 課程這一課資料夾裡的路徑}，照 bytes 複製（BOM、換行照原樣）
+            for name, rel in (self.spec.get("extra_files") or {}).items():
+                (tmp / name).write_bytes(self.ctx.course(rel).read_bytes())
             (tmp / "tests").mkdir()
             (tmp / "tests" / Path(self.spec["file"]).name).write_bytes(source)
             xmlp = tmp / "result.xml"

@@ -1,0 +1,465 @@
+{
+ "note": "2-4 的檢查：第一圈 save_csv.py（DictWriter，ledger.csv 備註的逗號用雙引號包起來）、read_csv.py（DictReader 讀回來、合計 735）、save_settings.py（settings.json，ensure_ascii=False）、peek.py（utf-8-sig 讀掉 BOM）、clean.py 的 to_int（千分位、負號留著）、read_bank.py（六筆、空白列跳過）、re.txt 對答 3 題（看得懂解析民國年的 re）。第二圈 pandas.md（filled 自評）。第三圈 tests/test_import.py（pytest_chaff：自己手算的各分類合計，正確版全過、抓到退款當支出、退款整筆跳過兩個壞版本；extra_files 放樣本對帳單和設定）、import_bank.py 的隱藏髒資料測試（call 的 files：BOM＋Windows 換行＋空白列＋負的千分位、另一家銀行的欄位名稱＋一位數月日、只有標題列）、category_totals、交辦前先存檔、decision.md。grader 加的：pytest_chaff 的 extra_files、call 的 missing_call_hint（都只對寫了它的題目生效）。",
+ "checks": [
+  {
+   "type": "run",
+   "id": "csv-save",
+   "file": "lessons/2-4/save_csv.py",
+   "group": "第一圈",
+   "desc": "save_csv.py：用 csv.DictWriter 存成 ledger.csv（標題列＋三筆，備註有逗號的那一格用雙引號包起來）",
+   "timeout": 5,
+   "sandbox": {
+    "copy": [
+     "save_csv.py"
+    ],
+    "steps": [
+     {
+      "run": "save_csv.py",
+      "cwd": "."
+     }
+    ],
+    "files": {
+     "ledger.csv": [
+      "日期,項目,金額,備註",
+      "11/03,午餐,120,跟同事",
+      "11/04,公車,15,",
+      "11/05,聚餐,600,\"跟小明, 小華\""
+     ]
+    },
+    "files_hint": "with open(p, \"w\", encoding=\"utf-8\", newline=\"\") as f: 下面 w = csv.DictWriter(f, fieldnames=FIELDS)、w.writeheader()、w.writerows(entries)。",
+    "absent_top": [
+     "ledger.csv"
+    ],
+    "absent_hint": "p 要跟著這個檔走：p = Path(__file__).parent / \"ledger.csv\"（起點檔已經寫好，不要改）。"
+   },
+   "expect_contains": [
+    "存好了"
+   ],
+   "ast_require": [
+    {
+     "name": "open",
+     "kind": "with_open"
+    },
+    {
+     "name": "open",
+     "kind": "open_utf8"
+    }
+   ],
+   "hint": "用 csv.DictWriter，不要自己用逗號接字串：備註裡的逗號，csv 會自動用雙引號包起來。",
+   "missing_hint": "save_csv.py 應該在帳本的 lessons/2-4/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-4。"
+  },
+  {
+   "type": "run",
+   "id": "csv-read",
+   "file": "lessons/2-4/read_csv.py",
+   "group": "第一圈",
+   "desc": "read_csv.py：先跑 save_csv.py，再用 csv.DictReader 讀回來，印出三筆和合計 735 元（備註的逗號照原樣）",
+   "timeout": 5,
+   "sandbox": {
+    "copy": [
+     "save_csv.py",
+     "read_csv.py"
+    ],
+    "steps": [
+     {
+      "run": "save_csv.py",
+      "cwd": "."
+     },
+     {
+      "run": "read_csv.py",
+      "cwd": "."
+     }
+    ]
+   },
+   "expect_exact": [
+    "11/03 午餐 120 跟同事",
+    "11/04 公車 15",
+    "11/05 聚餐 600 跟小明, 小華",
+    "合計 735 元"
+   ],
+   "ast_require": [
+    {
+     "name": "open",
+     "kind": "with_open"
+    },
+    {
+     "name": "open",
+     "kind": "open_utf8"
+    }
+   ],
+   "hint": "for row in csv.DictReader(f): 每一列是一個 dict：print(row[\"日期\"], row[\"項目\"], row[\"金額\"], row[\"備註\"])；讀回來的都是文字，total += int(row[\"金額\"])。",
+   "missing_hint": "read_csv.py 應該在帳本的 lessons/2-4/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-4。"
+  },
+  {
+   "type": "run",
+   "id": "json",
+   "file": "lessons/2-4/save_settings.py",
+   "group": "第一圈",
+   "desc": "save_settings.py：設定存成 settings.json，中文照原樣存（ensure_ascii=False），再用 json.load 讀回來",
+   "timeout": 5,
+   "sandbox": {
+    "copy": [
+     "save_settings.py"
+    ],
+    "steps": [
+     {
+      "run": "save_settings.py",
+      "cwd": "."
+     }
+    ],
+    "files": {
+     "settings.json": [
+      "{",
+      "  \"每月預算\": 12000,",
+      "  \"分類關鍵字\": {",
+      "    \"早餐店\": \"餐飲\",",
+      "    \"便當店\": \"餐飲\",",
+      "    \"捷運\": \"交通\",",
+      "    \"超市\": \"日用品\",",
+      "    \"電影院\": \"娛樂\"",
+      "  }",
+      "}"
+     ]
+    },
+    "files_hint": "json.dump(settings, f, ensure_ascii=False, indent=2)：沒寫 ensure_ascii=False，中文會存成 \\u6bcf 這種代碼。"
+   },
+   "expect_contains": [
+    "讀回來的每月預算： 12000"
+   ],
+   "hint": "settings 的內容不要改；json.dump 加上 ensure_ascii=False。",
+   "missing_hint": "save_settings.py 應該在帳本的 lessons/2-4/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-4。"
+  },
+  {
+   "type": "run",
+   "id": "bom",
+   "file": "lessons/2-4/peek.py",
+   "group": "第一圈",
+   "desc": "peek.py：讀得到「交易日期」這一欄（用 utf-8-sig 讀掉檔案開頭看不見的 BOM）",
+   "timeout": 5,
+   "sandbox": {
+    "copy": [
+     "peek.py"
+    ],
+    "probe": {
+     "bank_a.csv": "start/bank_a.csv"
+    },
+    "steps": [
+     {
+      "run": "peek.py",
+      "cwd": "."
+     }
+    ]
+   },
+   "expect_contains": [
+    "115/11/01 早餐店 65"
+   ],
+   "hint": "bank_a.csv 開頭有一個看不見的 BOM，第一欄的名字變成 \\ufeff交易日期，所以 KeyError: '交易日期'。open 的 encoding 改成 \"utf-8-sig\"。",
+   "missing_hint": "peek.py 應該在帳本的 lessons/2-4/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-4。"
+  },
+  {
+   "type": "call",
+   "id": "to-int-1",
+   "group": "第一圈",
+   "file": "lessons/2-4/clean.py",
+   "module": "clean",
+   "func": "to_int",
+   "args": [
+    "1,250"
+   ],
+   "expect": 1250,
+   "strict_type": true,
+   "desc": "to_int(\"1,250\") 交回 1250（拿掉千分位的逗號）",
+   "hint": "return int(text.replace(\",\", \"\"))：先把逗號換成空的，再 int(...)。",
+   "missing_hint": "clean.py 應該在帳本的 lessons/2-4/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-4。"
+  },
+  {
+   "type": "call",
+   "id": "to-int-2",
+   "group": "第一圈",
+   "file": "lessons/2-4/clean.py",
+   "module": "clean",
+   "func": "to_int",
+   "args": [
+    "-1,200"
+   ],
+   "expect": -1200,
+   "strict_type": true,
+   "desc": "to_int(\"-1,200\") 交回 -1200（退款的負號要留著）",
+   "hint": "只拿掉逗號，負號要留著。",
+   "missing_hint": "clean.py 應該在帳本的 lessons/2-4/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-4。"
+  },
+  {
+   "type": "run",
+   "id": "bank-read",
+   "file": "lessons/2-4/read_bank.py",
+   "group": "第一圈",
+   "desc": "read_bank.py：對帳單六筆都整理好（西元年、整數金額、退款是負的、空白列跳過）",
+   "timeout": 5,
+   "sandbox": {
+    "copy": [
+     "read_bank.py",
+     "clean.py"
+    ],
+    "probe": {
+     "bank_a.csv": "start/bank_a.csv"
+    },
+    "steps": [
+     {
+      "run": "read_bank.py",
+      "cwd": "."
+     }
+    ]
+   },
+   "expect_exact": [
+    "2026/11/01 早餐店 65",
+    "2026/11/02 捷運加值 500",
+    "2026/11/03 超市 1250",
+    "2026/11/05 電影院 320",
+    "2026/11/06 超市退款 -350",
+    "2026/11/08 便當店 120"
+   ],
+   "hint": "空白列的日期是空的：在 print 上面加 if not row[\"交易日期\"]: 再空四格寫 continue；clean.py 的 to_int 要先拿掉逗號。",
+   "missing_hint": "read_bank.py 應該在帳本的 lessons/2-4/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-4。"
+  },
+  {
+   "type": "answers",
+   "id": "re",
+   "group": "第一圈",
+   "file": "lessons/2-4/re.txt",
+   "key": "answers/re.json"
+  },
+  {
+   "type": "filled",
+   "id": "pandas",
+   "group": "第二圈",
+   "file": "lessons/2-4/pandas.md",
+   "labels": [
+    "家教的建議：",
+    "要不要用 pandas：",
+    "理由："
+   ],
+   "count": 1,
+   "item": "",
+   "desc": "pandas.md：家教建議改用 pandas，你決定用不用、寫下理由（自評，內容不改對錯）",
+   "hint": "照第②圈：家教建議了什麼、你決定用不用、為什麼（例如要多裝幾個套件、還沒學過、csv 模組幾行就做得到）。",
+   "missing_hint": "pandas.md 應該在帳本的 lessons/2-4/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-4。"
+  },
+  {
+   "type": "pytest_chaff",
+   "id": "accept",
+   "group": "第三圈",
+   "file": "lessons/2-4/tests/test_import.py",
+   "module": "import_bank",
+   "reference": "reference/import_bank.py",
+   "mutants": "mutants/import_bank.json",
+   "teacher_file": "answers/test_import.py",
+   "extra_files": {
+    "bank_a.csv": "start/bank_a.csv",
+    "settings.json": "reference/settings.json"
+   },
+   "wheat_desc": "test_import.py 在正確版上全部通過（各分類的合計是自己手算的）",
+   "mutant_desc": "你的驗收測試抓到第 {i} 個壞版本",
+   "missing_hint": "tests/test_import.py 應該在帳本的 lessons/2-4/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-4。"
+  },
+  {
+   "type": "call",
+   "id": "hidden-1",
+   "group": "第三圈",
+   "file": "lessons/2-4/import_bank.py",
+   "module": "import_bank",
+   "func": "import_statement",
+   "args": [
+    {
+     "tmp_file": "bank_c.csv"
+    },
+    {
+     "早餐店": "餐飲",
+     "便當店": "餐飲",
+     "捷運": "交通",
+     "超市": "日用品",
+     "電影院": "娛樂"
+    }
+   ],
+   "files": {
+    "bank_c.csv": "﻿交易日期,摘要,金額,備註\r\n115/12/01,便當店,95,\r\n115/12/02,超市,\"2,340\",\r\n,,,\r\n\r\n115/12/05,超市退款,\"-1,200\",退貨\r\n115/12/09,書店,450,\r\n"
+   },
+   "seq_as_list": true,
+   "expect": [
+    [
+     "2026/12/01",
+     "便當店",
+     "餐飲",
+     95
+    ],
+    [
+     "2026/12/02",
+     "超市",
+     "日用品",
+     2340
+    ],
+    [
+     "2026/12/05",
+     "超市退款",
+     "日用品",
+     -1200
+    ],
+    [
+     "2026/12/09",
+     "書店",
+     "其他",
+     450
+    ]
+   ],
+   "desc": "另一份對帳單（BOM、Windows 換行、兩種空白列、退款也有千分位）匯入正確",
+   "hint": "照需求卡：欄位名稱兩家不一樣（交易日期／消費日、摘要／說明、金額／交易金額）；encoding=\"utf-8-sig\" 讀掉 BOM；民國年加 1911；千分位的逗號拿掉，負號要留著（退款）；日期是空的那一列跳過。",
+   "missing_call_hint": "import_bank.py 是第③圈交給 AI 寫的。沒開 GitHub 帳號的話，在帳本資料夾打：cp lessons/2-4/ai_import_bank.py lessons/2-4/import_bank.py"
+  },
+  {
+   "type": "call",
+   "id": "hidden-2",
+   "group": "第三圈",
+   "file": "lessons/2-4/import_bank.py",
+   "module": "import_bank",
+   "func": "import_statement",
+   "args": [
+    {
+     "tmp_file": "bank_d.csv"
+    },
+    {
+     "早餐店": "餐飲",
+     "便當店": "餐飲",
+     "捷運": "交通",
+     "超市": "日用品",
+     "電影院": "娛樂"
+    }
+   ],
+   "files": {
+    "bank_d.csv": "消費日,說明,交易金額\n114/1/5,捷運加值,\"1,000\"\n114/01/18,電影院,280\n114/01/20,電影院退票,-280\n"
+   },
+   "seq_as_list": true,
+   "expect": [
+    [
+     "2025/01/05",
+     "捷運加值",
+     "交通",
+     1000
+    ],
+    [
+     "2025/01/18",
+     "電影院",
+     "娛樂",
+     280
+    ],
+    [
+     "2025/01/20",
+     "電影院退票",
+     "娛樂",
+     -280
+    ]
+   ],
+   "desc": "另一家銀行的對帳單（欄位叫消費日、說明、交易金額；月日只寫一位數）匯入正確",
+   "hint": "照需求卡：欄位名稱兩家不一樣（交易日期／消費日、摘要／說明、金額／交易金額）；encoding=\"utf-8-sig\" 讀掉 BOM；民國年加 1911；千分位的逗號拿掉，負號要留著（退款）；日期是空的那一列跳過。",
+   "missing_call_hint": "import_bank.py 是第③圈交給 AI 寫的。沒開 GitHub 帳號的話，在帳本資料夾打：cp lessons/2-4/ai_import_bank.py lessons/2-4/import_bank.py"
+  },
+  {
+   "type": "call",
+   "id": "hidden-3",
+   "group": "第三圈",
+   "file": "lessons/2-4/import_bank.py",
+   "module": "import_bank",
+   "func": "import_statement",
+   "args": [
+    {
+     "tmp_file": "bank_e.csv"
+    },
+    {
+     "早餐店": "餐飲",
+     "便當店": "餐飲",
+     "捷運": "交通",
+     "超市": "日用品",
+     "電影院": "娛樂"
+    }
+   ],
+   "files": {
+    "bank_e.csv": "﻿交易日期,摘要,金額,備註\n"
+   },
+   "seq_as_list": true,
+   "expect": [],
+   "desc": "只有標題列、一筆帳都沒有的對帳單，交回空的 list",
+   "hint": "照需求卡：欄位名稱兩家不一樣（交易日期／消費日、摘要／說明、金額／交易金額）；encoding=\"utf-8-sig\" 讀掉 BOM；民國年加 1911；千分位的逗號拿掉，負號要留著（退款）；日期是空的那一列跳過。",
+   "missing_call_hint": "import_bank.py 是第③圈交給 AI 寫的。沒開 GitHub 帳號的話，在帳本資料夾打：cp lessons/2-4/ai_import_bank.py lessons/2-4/import_bank.py"
+  },
+  {
+   "type": "call",
+   "id": "totals",
+   "group": "第三圈",
+   "file": "lessons/2-4/import_bank.py",
+   "module": "import_bank",
+   "func": "category_totals",
+   "args": [
+    [
+     [
+      "2026/12/01",
+      "便當店",
+      "餐飲",
+      95
+     ],
+     [
+      "2026/12/02",
+      "超市",
+      "日用品",
+      2340
+     ],
+     [
+      "2026/12/05",
+      "超市退款",
+      "日用品",
+      -1200
+     ]
+    ]
+   ],
+   "expect": {
+    "餐飲": 95,
+    "日用品": 1140
+   },
+   "desc": "category_totals：各分類的合計，退款會扣掉",
+   "hint": "totals[category] = totals.get(category, 0) + amount：退款是負的，加上去就是扣掉。",
+   "missing_call_hint": "import_bank.py 是第③圈交給 AI 寫的。沒開 GitHub 帳號的話，在帳本資料夾打：cp lessons/2-4/ai_import_bank.py lessons/2-4/import_bank.py"
+  },
+  {
+   "type": "git_commits",
+   "id": "saved",
+   "group": "第三圈",
+   "min": 2,
+   "saved_before": {
+    "file": "lessons/2-4/ai_import_bank.py",
+    "start": "start/ai_import_bank.py",
+    "hint": "存檔點裡還沒有 lessons/2-4 的檔：交給 AI 寫程式之前，要先按一個存檔點。\n  到原始碼控制面板按存檔點（說明寫「交辦前」），再交給 AI。"
+   },
+   "committed": [
+    "lessons/2-4/import_bank.py",
+    "lessons/2-4/tests/test_import.py"
+   ],
+   "desc": "交給 AI 寫程式之前先存檔；改好的 import_bank.py、test_import.py 也存進存檔點",
+   "ok_note": "交辦前存過檔，改好的程式和驗收測試也存進存檔點了"
+  },
+  {
+   "type": "filled",
+   "id": "decision",
+   "group": "第三圈",
+   "file": "lessons/2-4/decision.md",
+   "labels": [
+    "它跑了什麼指令：",
+    "uv run pytest 的結果：",
+    "哪一類的合計不對、為什麼：",
+    "我改了哪一行：",
+    "收不收，為什麼："
+   ],
+   "count": 1,
+   "item": "",
+   "desc": "decision.md：AI 寫的 import_bank.py 收不收（自評，內容不改對錯）",
+   "hint": "照第③圈的順序寫：它要執行什麼指令、pytest 的結果、哪一類的合計不對（為什麼）、你改了哪一行、最後收不收。",
+   "missing_hint": "decision.md 應該在帳本的 lessons/2-4/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-4。"
+  }
+ ]
+}

@@ -1,0 +1,26 @@
+{
+ "note": "回顧題：學員通過這課以後，往後第 2 課和第 5 課的 check 會各帶一題。",
+ "questions": [
+  {
+   "id": "r1",
+   "q": "一筆帳的備註是「跟小明, 小華」。用 csv.DictWriter 存成 CSV，那一格會怎麼存？\nA. 逗號被刪掉\nB. 整格用雙引號包起來\nC. 照樣用逗號切成兩格\n（寫 A、B 或 C）",
+   "accept": ["B"],
+   "explain": "csv 模組存的時候，一格裡有逗號就用雙引號包起來（\"跟小明, 小華\"），讀回來再拿掉。自己用逗號接字串、用 split(\",\") 切，才會像 1-23 一樣壞掉。",
+   "choices": {"A": "逗號被刪掉", "B": "整格用雙引號包起來", "C": "照樣用逗號切成兩格"}
+  },
+  {
+   "id": "r2",
+   "q": "json.dump 存設定檔時加上 ensure_ascii=False，差別是什麼？\nA. 中文照原樣存，人打開看得懂\nB. 檔案變小一半\nC. 讀回來的時候才不會壞\n（寫 A、B 或 C）",
+   "accept": ["A"],
+   "explain": "預設 ensure_ascii 是 True，中文會存成 \\u9910 這種代碼（讀回來一樣是對的，只是人看不懂）。寫 ensure_ascii=False，中文照原樣存（官方文件：all characters will be output as-is），open 也要寫 encoding=\"utf-8\"。",
+   "choices": {"A": "中文照原樣存，人打開看得懂", "B": "檔案變小一半", "C": "讀回來的時候才不會壞"}
+  },
+  {
+   "id": "r3",
+   "q": "對帳單的金額是 \"-1,250\"（退款）。哪一種寫法換成整數才是對的？\nA. int(re.sub(r\"\\D\", \"\", text))\nB. int(text)\nC. int(text.replace(\",\", \"\"))\n（寫 A、B 或 C）",
+   "accept": ["C"],
+   "explain": "只拿掉千分位的逗號：\"-1,250\" → \"-1250\" → -1250。\\D 是「不是數字的字」，負號也會被拿掉，退款就變成支出；int(\"-1,250\") 有逗號會當掉。",
+   "choices": {"A": "int(re.sub(r\"\\D\", \"\", text))", "B": "int(text)", "C": "int(text.replace(\",\", \"\"))"}
+  }
+ ]
+}
