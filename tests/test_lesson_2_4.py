@@ -1,4 +1,4 @@
-"""2-4〈CSV 與 JSON：匯入台灣銀行對帳單（假資料）〉：作業與 check 的回歸測試（每課自己一個測試檔，不改 test_regressions.py）。
+"""2-4〈CSV 與 JSON：匯入台灣的銀行對帳單（假資料）〉：作業與 check 的回歸測試（每課自己一個測試檔，不改 test_regressions.py）。
 
 grader 加的（只對寫了它的題目生效）：
   call 的 missing_call_hint  要學員自己做出來的檔（請 AI 寫的 import_bank.py）還沒有時，提示怎麼補（舊課 call 題的 missing_hint 照舊不用）。
