@@ -34,7 +34,7 @@ C. 在 VS Code 打開 AI 功能、登入 Copilot Free：
 
 1. 0-6 關掉的內建 AI 要打開：⌘ 逗號打開設定，搜尋 `disable ai`，把 **Chat: Disable AI Features** 的勾拿掉。
 2. 下面狀態列的 Copilot 圖示 → 登入（用 GitHub 帳號）。瀏覽器會跳出授權頁，確認是 GitHub 的網址再按同意。還沒有 Copilot 方案的帳號，登入時會開成 Copilot Free（VS Code 官方文件）；登入好以後，按狀態列的 Copilot 圖示，最上面會寫 **Copilot Free**。
-3. 打開右邊的 Chat（Mac ⌃⌘I；Windows Ctrl+Alt+I），它就是 agent。輸入框下面寫 **Local**（在 VS Code 裡面跑的 agent；另一個 Cloud 要付費方案，不用選）；權限維持預設的 **Default permissions**（常見的唯讀指令可能直接跑，設定沒允許的，會先停下來問你；Allow all、Autopilot 不會一個一個問你，先不要選）。
+3. 打開右邊的 Chat（Mac ⌃⌘I；Windows Ctrl+Alt+I）。輸入框下面寫 **Local**（在 VS Code 裡面跑的 agent；另一個 Cloud 要付費方案，不用選）；權限維持預設的 **Default permissions**（常見的唯讀指令可能直接跑，設定沒允許的，會先停下來問你；Allow all、Autopilot 不會一個一個問你，先不要選）。
 
 D. 先手寫預期輸出（`expected.txt`）。`report.py` 是熊的 11 月月報，跑起來數字沒有對齊：
 
@@ -71,7 +71,7 @@ D. 先手寫預期輸出（`expected.txt`）。`report.py` 是熊的 11 月月�
 - **Copilot Free：** 官方方案頁寫 Copilot Free 的 agent 模式是 Included，每個月有一定的額度（AI credits），頁面沒有寫數字；用完了要等下個月，或改用聊天版。
 - **它要執行的指令：** VS Code 會把 agent 要跑的那一行秀出來，旁邊有同意和拒絕。常見的唯讀指令可能直接跑；`rm` 這種有風險的指令一定會先問（VS Code 官方文件）。看懂了再按，看不懂就拒絕、問它。
 - **Keep 不是存檔點：** VS Code 官方文件寫，agent 改的檔案已經存到磁碟上，Keep 只是「我看過了，留著」，不會幫你按存檔點。Undo、Restore Checkpoint 只還原它改的檔，**收不回終端機裡跑過的指令**。所以交辦前、收下後，都自己按存檔點。
-- **一直按同意會麻木：** VS Code 官方文件也提醒，同意按多了，會越來越不仔細看。這一級「逐一按同意」是新手階段，第 5 級會改成事先寫好的規則。
+- **同意按多了，可能看漏：** VS Code 官方文件也提醒，同意按多了，可能越看越不仔細。這一級「逐一按同意」是新手階段，第 5 級會改成事先寫好的規則。
 - **`{amount:>5,}` 是什麼：** AI 交回來的寫法：`>5` 靠右、佔五格，`,` 加千分位逗號。讀得懂就好。
 
 ## 3. 開始前要打的指令
