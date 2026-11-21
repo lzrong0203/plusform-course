@@ -290,7 +290,7 @@ class Flow(unittest.TestCase):
         write(work / "write.py", (work / "write.py").read_text(encoding="utf-8") + WRITE_A)
         r = self.run_(["1-C2", "--predict", "9", "--no-review"], "2026-11-18T19:20:00+08:00")
         self.assertIn("結果：過了 9／12 題", r.stdout)
-        self.assertIn("  修好：跑不起來（ValueError） → 1-6 影片 6:43 起", r.stdout)
+        self.assertIn("  修好：跑不起來（ValueError） → 1-6 影片 6:47 起", r.stdout)
         pack = (L / "lessons/1-C2/矯正包.md").read_text(encoding="utf-8")
         self.assertIn("ValueError：int() 看不懂的字", pack)
         self.assertTrue((work / "practice" / "p_value_error.py").is_file())
