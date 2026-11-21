@@ -1,0 +1,209 @@
+{
+ "note": "2-6 的檢查：第一圈 用 uv add 裝 httpx（uv_deps）、rate.py（run sandbox＋probe：把 httpx 真的連線換成假回應跑兩次，200 印出匯率、404 要是 HTTPStatusError、timeout 改回 ≥1 秒）、tests/test_rates.py（pytest_chaff：學員補的 test_429 抓到沒看狀態碼、悄悄交回 None 兩個壞版本；extra_files 放 conftest.py＝擋真網路）、api.txt 對答 3 題。第二圈 jpy.py（假的 Frankfurter：參數名字不認得回 422；改成 quotes 才印得出）、codes.txt 對答 3 題、docs.md（filled）。第三圈 tests/test_cache.py（pytest_chaff：起點的 test_cache_one_hour＋學員補的兩行 assert，抓到只接 HTTPStatusError、掛掉交回 None、沒有提示、快取太短四個壞版本；extra_files 放 conftest.py、rates.py）、rate_cache.py 的隱藏情況（run sandbox＋probe：日圓、半小時、一小時又一分、503、429、連不上）、交辦前先存檔、decision.md。測試與 check 全部不打真網路。沒有新加 grader 欄位。",
+ "checks": [
+  {
+   "type": "uv_deps",
+   "id": "httpx",
+   "group": "第一圈",
+   "packages": [
+    "httpx"
+   ],
+   "desc": "用 uv add 裝了 httpx（pyproject.toml、uv.lock 都記了）",
+   "ok_note": "pyproject.toml 和 uv.lock 都記了 httpx"
+  },
+  {
+   "type": "run",
+   "id": "rate",
+   "file": "lessons/2-6/rate.py",
+   "group": "第一圈",
+   "desc": "rate.py：印出「1 美元 = ○○ 台幣」；狀態碼不是 2 開頭時當場報錯（r.raise_for_status()）；timeout 改回 5 秒（check 用假回應跑，不打真網路）",
+   "timeout": 15,
+   "sandbox": {
+    "copy": [
+     "rate.py"
+    ],
+    "probe": {
+     "rate_probe.py": "probe/rate_probe.py"
+    },
+    "steps": [
+     {
+      "run": "rate_probe.py",
+      "cwd": "lesson"
+     }
+    ]
+   },
+   "expect_contains": [
+    "1 美元 = 31.234 台幣",
+    "ok → 跑完",
+    "404 → HTTPStatusError",
+    "timeout 夠長"
+   ],
+   "hint": "最後一行寫 print(\"1 美元 =\", data[0][\"rate\"], \"台幣\")；httpx.get 那一行下面加 r.raise_for_status()（404 才不會跑到讀資料那一行變成 KeyError）；第①圈試過的 timeout=0.001 要改回 timeout=5。",
+   "missing_hint": "rate.py 應該在帳本的 lessons/2-6/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-6。"
+  },
+  {
+   "type": "pytest_chaff",
+   "id": "fake",
+   "group": "第一圈",
+   "file": "lessons/2-6/tests/test_rates.py",
+   "module": "rates",
+   "reference": "reference/rates.py",
+   "mutants": "mutants/rates.json",
+   "teacher_file": "answers/test_rates.py",
+   "extra_files": {
+    "conftest.py": "start/conftest.py"
+   },
+   "must_use": [
+    "429"
+   ],
+   "must_use_hint": "test_rates.py 裡還沒有 test_429：假回應回 429，用 pytest.raises(httpx.HTTPStatusError) 包住 fetch_rate。",
+   "wheat_desc": "test_rates.py 在正確版上全部通過（用假回應，沒打真網路）",
+   "mutant_desc": "你的 test_429 抓到第 {i} 個壞版本",
+   "missing_hint": "tests/test_rates.py 應該在帳本的 lessons/2-6/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-6。"
+  },
+  {
+   "type": "answers",
+   "id": "api",
+   "group": "第一圈",
+   "file": "lessons/2-6/api.txt",
+   "key": "answers/api.json"
+  },
+  {
+   "type": "run",
+   "id": "jpy",
+   "file": "lessons/2-6/jpy.py",
+   "group": "第二圈",
+   "desc": "jpy.py：照官方文件改對參數名字，印出「1 日圓 = ○○ 台幣」（check 用假回應跑，不打真網路）",
+   "timeout": 15,
+   "sandbox": {
+    "copy": [
+     "jpy.py"
+    ],
+    "probe": {
+     "jpy_probe.py": "probe/jpy_probe.py"
+    },
+    "steps": [
+     {
+      "run": "jpy_probe.py",
+      "cwd": "lesson"
+     }
+    ]
+   },
+   "expect_contains": [
+    "1 日圓 = 0.2071 台幣"
+   ],
+   "hint": "Frankfurter 官方文件：Filter target currencies with quotes。要哪幾種貨幣，參數叫 quotes，不是 symbols：params={\"base\": \"JPY\", \"quotes\": \"TWD\"}。",
+   "missing_hint": "jpy.py 應該在帳本的 lessons/2-6/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-6。"
+  },
+  {
+   "type": "answers",
+   "id": "codes",
+   "group": "第二圈",
+   "file": "lessons/2-6/codes.txt",
+   "key": "answers/codes.json"
+  },
+  {
+   "type": "filled",
+   "id": "docs",
+   "group": "第二圈",
+   "file": "lessons/2-6/docs.md",
+   "labels": [
+    "我想查的：",
+    "拿到的狀態碼和錯誤訊息：",
+    "我查的官方文件（網址）：",
+    "文件寫的參數名字：",
+    "家教怎麼帶我查的："
+   ],
+   "count": 1,
+   "item": "",
+   "desc": "docs.md：參數名字查官方文件的紀錄（自評，內容不改對錯）",
+   "hint": "照第②圈：你想查什麼、拿到的狀態碼和錯誤訊息、查了哪一份官方文件、文件寫的參數名字、家教怎麼帶你查。",
+   "missing_hint": "docs.md 應該在帳本的 lessons/2-6/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-6。"
+  },
+  {
+   "type": "pytest_chaff",
+   "id": "accept",
+   "group": "第三圈",
+   "file": "lessons/2-6/tests/test_cache.py",
+   "module": "rate_cache",
+   "reference": "reference/rate_cache.py",
+   "mutants": "mutants/rate_cache.json",
+   "teacher_file": "answers/test_cache.py",
+   "extra_files": {
+    "conftest.py": "start/conftest.py",
+    "rates.py": "start/rates.py"
+   },
+   "wheat_desc": "test_cache.py 在正確版上全部通過（全部用假回應，沒打真網路）",
+   "mutant_desc": "你的驗收測試抓到第 {i} 個壞版本",
+   "missing_hint": "tests/test_cache.py 應該在帳本的 lessons/2-6/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-6。"
+  },
+  {
+   "type": "run",
+   "id": "hidden",
+   "file": "lessons/2-6/rate_cache.py",
+   "group": "第三圈",
+   "desc": "rate_cache.py：另一組沒看過的情況（日圓、半小時後、一小時又一分後、503、429、連不上）都對（全部是假回應）",
+   "timeout": 15,
+   "sandbox": {
+    "copy": [
+     "rate_cache.py"
+    ],
+    "probe": {
+     "rates.py": "start/rates.py",
+     "cache_probe.py": "probe/cache_probe.py"
+    },
+    "steps": [
+     {
+      "run": "cache_probe.py",
+      "cwd": "lesson"
+     }
+    ]
+   },
+   "expect_exact": [
+    "第一次 0.21",
+    "半小時後 0.21 （問了 1 次）",
+    "一小時又一分後 0.22 （問了 2 次）",
+    "503 0.22 有提示",
+    "429 0.22 有提示",
+    "連不上 0.22 有提示"
+   ],
+   "hint": "照需求卡：一小時內用快取（不再問 API）；API 掛掉（狀態碼不對、沒回應、連不上）都要用上一次的值，提示裡寫「上一次」。只接 httpx.HTTPStatusError 不夠：沒回應、連不上是 RequestError，兩種都接要寫 except httpx.HTTPError。",
+   "missing_hint": "rate_cache.py 是第③圈交給 AI 寫的。沒開 GitHub 帳號的話，在帳本資料夾打：cp lessons/2-6/ai_rate_cache.py lessons/2-6/rate_cache.py，再照影片改好"
+  },
+  {
+   "type": "git_commits",
+   "id": "saved",
+   "group": "第三圈",
+   "min": 2,
+   "saved_before": {
+    "file": "lessons/2-6/ai_rate_cache.py",
+    "start": "start/ai_rate_cache.py",
+    "hint": "存檔點裡還沒有 lessons/2-6 的檔：交給 AI 寫程式之前，要先按一個存檔點。\n  到原始碼控制面板按存檔點（說明寫「交辦前」），再交給 AI。"
+   },
+   "committed": [
+    "lessons/2-6/rate_cache.py",
+    "lessons/2-6/tests/test_cache.py"
+   ],
+   "desc": "交給 AI 寫程式之前先存檔；改好的 rate_cache.py、test_cache.py 也存進存檔點",
+   "ok_note": "交辦前存過檔，改好的程式和驗收測試也存進存檔點了"
+  },
+  {
+   "type": "filled",
+   "id": "decision",
+   "group": "第三圈",
+   "file": "lessons/2-6/decision.md",
+   "labels": [
+    "它跑了什麼指令：",
+    "uv run pytest 的結果：",
+    "哪個測試沒過、為什麼：",
+    "我改了哪一行：",
+    "收不收，為什麼："
+   ],
+   "count": 1,
+   "item": "",
+   "desc": "decision.md：AI 寫的 rate_cache.py 收不收（自評，內容不改對錯）",
+   "hint": "照第③圈的順序寫：它要執行什麼指令、pytest 的結果、哪個測試沒過（為什麼）、你改了哪一行、最後收不收。",
+   "missing_hint": "decision.md 應該在帳本的 lessons/2-6/ 裡。還沒有的話，在課程資料夾打 uv run check.py start 2-6。"
+  }
+ ]
+}

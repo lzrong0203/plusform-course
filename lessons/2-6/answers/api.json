@@ -1,0 +1,32 @@
+{
+ "note": "2-6 第①圈：狀態碼、逾時、假回應（對答，選擇題）。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {
+   "id": "q1",
+   "title": "沒寫 raise_for_status",
+   "accept": ["B"],
+   "choices": {"A": "httpx.get 那一行就報錯", "B": "照樣往下跑，到讀資料那一行才出錯", "C": "httpx 會自己重試，直到拿到 200"},
+   "hint": "回想第①圈網址少打一個 s：第七行印出 404 以後，程式停在哪一行？",
+   "explain": "httpx 拿到 404 不會自己報錯（狀態碼印得出來），程式照樣往下跑，到讀 data[0] 那一行才出 KeyError，看不出是網址錯了。在 get 後面寫 r.raise_for_status()，不是 2 開頭的狀態碼就當場丟出 HTTPStatusError（httpx 官方文件：raise an exception for any responses which are not a 2xx success code）。"
+  },
+  {
+   "id": "q2",
+   "title": "429",
+   "accept": ["A"],
+   "choices": {"A": "一段時間內查太多次，要等一下再查", "B": "網址找不到", "C": "伺服器那邊壞了"},
+   "hint": "429 的英文是 Too Many Requests。",
+   "explain": "429 Too Many Requests：一段時間內送了太多次請求，被限流了，要等一下再查。404 是找不到；5 開頭是伺服器那邊的問題。Frankfurter 的說明也寫了會限流（rate-limited to prevent abuse），還建議把查到的結果存起來用（第③圈的快取）。"
+  },
+  {
+   "id": "q3",
+   "title": "為什麼用假回應",
+   "accept": ["C"],
+   "choices": {"A": "假回應的匯率比較準", "B": "只是為了跑得比較快", "C": "不靠網路、不靠今天的匯率，也做得出 429、沒回應這些情況"},
+   "hint": "真的 API 什麼時候會回 429、什麼時候會沒回應，你控制得了嗎？",
+   "explain": "真的 API 每天匯率不一樣、網路會斷，也不能為了測 429 一直狂查別人的服務。MockTransport 讓 client 不連網路、改問你寫的 handler 要回應（httpx 官方文件：return pre-determined responses, rather than making actual network requests），想要 200、429、沒回應都做得出來，每次結果都一樣。"
+  }
+ ]
+}

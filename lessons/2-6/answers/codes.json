@@ -1,0 +1,32 @@
+{
+ "note": "2-6 第②圈：狀態碼與官方文件（對答，選擇題）。",
+ "normalize": "text",
+ "how": "A、B 或 C",
+ "strict_choice": true,
+ "questions": [
+  {
+   "id": "q1",
+   "title": "422",
+   "accept": ["A"],
+   "choices": {"A": "看得懂你的請求，但沒辦法處理（例如參數名字它不認得）", "B": "伺服器那邊壞了", "C": "查太多次了"},
+   "hint": "到 Frankfurter 官方文件找錯誤那一段：400、404、422 各寫了什麼？",
+   "explain": "Frankfurter 官方文件：422 是 Request understood but cannot be processed（看得懂請求，但沒辦法處理）。第②圈熊把 quotes 寫成 symbols，它回 422、說 unknown parameter: symbols。"
+  },
+  {
+   "id": "q2",
+   "title": "參數名字查哪裡",
+   "accept": ["C"],
+   "choices": {"A": "憑印象", "B": "別的 API 怎麼寫，這個就怎麼寫", "C": "這個 API 自己的官方文件"},
+   "hint": "熊憑印象寫了 symbols，結果呢？",
+   "explain": "每個 API 的參數名字都是它自己定的。Frankfurter 的官方文件寫 Filter target currencies with quotes：要哪幾種貨幣，參數叫 quotes。憑印象或照別的 API 寫，對方不認得就回 422。"
+  },
+  {
+   "id": "q3",
+   "title": "4 開頭和 5 開頭",
+   "accept": ["B"],
+   "choices": {"A": "一樣，都是網路斷了", "B": "4 開頭多半是我們送過去的有問題（網址、參數、查太多次），5 開頭是伺服器那邊的問題", "C": "5 開頭代表成功"},
+   "hint": "httpx 的錯誤訊息：404 寫 Client error，503 寫 Server error。",
+   "explain": "2 開頭是成功；4 開頭是 client error（我們送過去的有問題：404 找不到、422 參數不對、429 查太多次）；5 開頭是 server error（伺服器那邊出問題）。網路斷了根本拿不到狀態碼，是另一種錯（連不上、逾時）。"
+  }
+ ]
+}

@@ -1,0 +1,30 @@
+{
+  "target": "rate_cache.py",
+  "note": "2-6 第③圈：rate_cache.py 的四個壞版本。學員的驗收測試（test_cache.py：起點已經有 test_cache_one_hour，學員補上 test_api_down 的兩行 assert）要四個都抓到、正確版全部通過。課程凍結的 AI 版本（start/ai_rate_cache.py）就是 m1 的寫法。",
+  "mutants": [
+    {
+      "id": "m1",
+      "file": "rate_cache_m1.py",
+      "hint": "只接住 HTTPStatusError：API 沒回應（ConnectTimeout）就整個當掉",
+      "what": "沒回應就當掉"
+    },
+    {
+      "id": "m2",
+      "file": "rate_cache_m2.py",
+      "hint": "API 掛掉時交回 None，沒有用上一次的值",
+      "what": "沒用上一次的值"
+    },
+    {
+      "id": "m3",
+      "file": "rate_cache_m3.py",
+      "hint": "用了上一次的值，但沒有提示（note 是空的）",
+      "what": "沒有提示"
+    },
+    {
+      "id": "m4",
+      "file": "rate_cache_m4.py",
+      "hint": "快取只留一分鐘（hours 寫成 minutes）：半小時後又去問 API",
+      "what": "快取太短"
+    }
+  ]
+}

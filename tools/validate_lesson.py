@@ -254,8 +254,21 @@ def flat_checks(checks: list[dict]) -> list[dict]:
     return out
 
 
-def pytest_ledger(temp: dict) -> Path:
-    """2-3 起（pytest_chaff）：臨時帳本裡 uv add --dev --offline pytest（只用 uv 的快取，不連網），整次驗證共用一個。"""
+def pytest_ledger(temp: dict, packages: list[str] | None = None) -> Path:
+    """2-3 起（pytest_chaff）：臨時帳本裡 uv add --dev --offline pytest（只用 uv 的快取，不連網），整次驗證共用一個。
+    2-6 起：lesson.json 寫了 validate_packages（例如 ["httpx"]）的課，同一個臨時帳本再 uv add --offline 這些套件（沒寫的課照舊）。"""
+    if packages:
+        key = "pytest_ledger:" + ",".join(packages)
+        if key not in temp:
+            ledger = pytest_ledger(temp) if "pytest_ledger" not in temp else temp["pytest_ledger"]
+            top = Path(tempfile.mkdtemp(prefix="plusform-validate-pkgs-"))
+            temp.setdefault("tops", []).append(top)
+            shutil.copytree(ledger, top / "ledger", symlinks=True, ignore=shutil.ignore_patterns(".venv"))
+            uv = grader.find_uv()
+            env = grader.child_env()
+            subprocess.run([uv, "add", "--offline", "--quiet", *packages], cwd=top / "ledger", check=True, env=env, capture_output=True)
+            temp[key] = top / "ledger"
+        return temp[key]
     if "pytest_ledger" not in temp:
         top = Path(tempfile.mkdtemp(prefix="plusform-validate-pytest-"))
         temp.setdefault("tops", []).append(top)
@@ -270,6 +283,14 @@ def pytest_ledger(temp: dict) -> Path:
         subprocess.run([uv, "add", "--dev", "--offline", "--quiet", "pytest"], cwd=ledger, check=True, env=env, capture_output=True)
         temp["pytest_ledger"] = ledger
     return temp["pytest_ledger"]
+
+
+def _validate_packages(lesson: grader.Lesson) -> list[str]:
+    """2-6 起：lesson.json 的 validate_packages（只對寫了它的課生效）＝正確版要用的第三方套件（例如 httpx），臨時帳本會 uv add --offline 裝上。"""
+    try:
+        return list(json.loads((lesson.dir / "lesson.json").read_text(encoding="utf-8")).get("validate_packages") or [])
+    except (OSError, ValueError):
+        return []
 
 
 def validate_pytest_chaff(rep: Report, lesson: grader.Lesson, spec: dict, use_env: bool, temp: dict) -> None:
@@ -299,9 +320,9 @@ def validate_pytest_chaff(rep: Report, lesson: grader.Lesson, spec: dict, use_en
         rep.skip(f"{spec['id']}（pytest）要臨時帳本，這次用 --no-env 跳過")
         return
     try:
-        ledger = pytest_ledger(temp)
+        ledger = pytest_ledger(temp, _validate_packages(lesson))
     except (RuntimeError, subprocess.CalledProcessError) as exc:
-        rep.bad(f"建不起裝了 pytest 的臨時帳本（uv 的快取裡要有 pytest），沒辦法驗證 {spec['id']}：{exc}")
+        rep.bad(f"建不起裝了 pytest 的臨時帳本（uv 的快取裡要有 pytest{'、' + '、'.join(_validate_packages(lesson)) if _validate_packages(lesson) else ''}），沒辦法驗證 {spec['id']}：{exc}")
         return
     env = grader.Env(ledger)
     _ctx, checkers = grader.build(lesson, ledger, env=env, overrides={spec["file"]: d / spec["teacher_file"]}, only=[spec])
@@ -404,13 +425,20 @@ def validate_lesson(lid: str, root: Path, use_env: bool, temp: dict) -> Report:
     check_concepts(rep, lesson, order)
 
     # ---- 3. 正確版通過官方測試；4. 起點程式不能一開始就全過 ----
+    run_env = local
+    pkgs = _validate_packages(lesson)   # 2-6 起：寫了 validate_packages 的課，官方測試改用裝了這些套件的臨時帳本跑（沒寫的課照舊用 local）
+    if pkgs and use_env:
+        try:
+            run_env = grader.Env(pytest_ledger(temp, pkgs))
+        except (RuntimeError, subprocess.CalledProcessError) as exc:
+            rep.bad(f"建不起裝了 {'、'.join(pkgs)} 的臨時帳本（uv 的快取裡要有），官方測試用 local 跑：{exc}")
     official = [s for s in flat_checks(lesson.checks) if s["type"] in ("call", "run", "parsons", "func_shape")]   # parsons（1-11 起）：正確版要排得對、起點檔不能一開始就過；func_shape（1-18 起）：正確版的函式長得對（docstring、return）、起點檔不能一開始就過
     covered = 0
     for spec in official:
         ref = d / "reference" / Path(spec["file"]).name
         if not ref.is_file():
             continue
-        out = grader.evaluate(lesson, None, env=local, overrides={spec["file"]: ref}, only=[spec])
+        out = grader.evaluate(lesson, None, env=run_env, overrides={spec["file"]: ref}, only=[spec])
         for r in out.results:
             if not r.ok:
                 rep.bad(f"正確版 reference/{ref.name} 沒通過官方測試「{r.desc}」：{r.detail}")
@@ -426,7 +454,7 @@ def validate_lesson(lid: str, root: Path, use_env: bool, temp: dict) -> Report:
             start = d / "start_timed" / Path(rel).name   # 1-7 的計時題
         if not start.is_file():
             continue
-        out = grader.evaluate(lesson, None, env=local, overrides={rel: start}, only=specs)
+        out = grader.evaluate(lesson, None, env=run_env, overrides={rel: start}, only=specs)
         if out.results and all(r.ok for r in out.results):
             rep.bad(f"起點檔 {start.relative_to(d).as_posix()} 一開始就通過全部 {len(specs)} 項官方測試：學員什麼都不用做")
         else:

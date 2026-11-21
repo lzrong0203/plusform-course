@@ -1,0 +1,26 @@
+{
+ "note": "回顧題：學員通過這課以後，往後第 2 課和第 5 課的 check 會各帶一題。",
+ "questions": [
+  {
+   "id": "r1",
+   "q": "r = httpx.get(...) 拿到 404。下一行該寫什麼，才會當場知道出錯？\nA. r.raise_for_status()\nB. r.json()\nC. print(r)\n（寫 A、B 或 C）",
+   "accept": ["A"],
+   "explain": "httpx 拿到 404 不會自己報錯。r.raise_for_status() 遇到不是 2 開頭的狀態碼，當場丟出 HTTPStatusError，錯誤訊息寫著狀態碼和網址。",
+   "choices": {"A": "r.raise_for_status()", "B": "r.json()", "C": "print(r)"}
+  },
+  {
+   "id": "r2",
+   "q": "httpx.get(url, timeout=5) 的 timeout=5 是什麼意思？\nA. 最多重試 5 次\nB. 五秒沒有動靜就放棄，丟出 TimeoutException\nC. 每五秒自動查一次\n（寫 A、B 或 C）",
+   "accept": ["B"],
+   "explain": "timeout 是最多等多久。五秒等不到動靜，httpx 就放棄、丟出 TimeoutException（沒寫的話，httpx 預設也是 5 秒）。",
+   "choices": {"A": "最多重試 5 次", "B": "五秒沒有動靜就放棄，丟出 TimeoutException", "C": "每五秒自動查一次"}
+  },
+  {
+   "id": "r3",
+   "q": "API 沒回應（ConnectTimeout）和回了 503，要一起接住，except 後面寫哪一個？\nA. httpx.HTTPStatusError\nB. httpx.TimeoutException\nC. httpx.HTTPError\n（寫 A、B 或 C）",
+   "accept": ["C"],
+   "explain": "HTTPStatusError 只管狀態碼不對（raise_for_status 丟的），TimeoutException 只管沒回應；HTTPError 是兩種的上一層，兩種都接得住（httpx 官方文件：a base class HTTPError that includes both of these categories）。",
+   "choices": {"A": "httpx.HTTPStatusError", "B": "httpx.TimeoutException", "C": "httpx.HTTPError"}
+  }
+ ]
+}

@@ -1,0 +1,8 @@
+{
+  "target": "rates.py",
+  "note": "2-6 第①圈：fetch_rate 的兩個壞版本。學員補的 test_429（假回應回 429，要丟出 httpx.HTTPStatusError）要兩個都抓到、正確版全部通過。",
+  "mutants": [
+    {"id": "m1", "file": "rates_m1.py", "hint": "沒有 raise_for_status()：429 也照樣去讀資料，錯在別的地方", "what": "沒看狀態碼"},
+    {"id": "m2", "file": "rates_m2.py", "hint": "狀態碼不對就悄悄交回 None，不報錯", "what": "悄悄交回 None"}
+  ]
+}
