@@ -4,7 +4,7 @@
 要會的：dict 與 list（1-13、1-15）、def 與 return（1-18）、import 與 `if __name__ == "__main__":`（1-21）、try／except（1-22）、with 與 Path（1-23）、uv add（2-2）、pytest（2-3：pytest.raises、tmp_path、monkeypatch）、JSON（2-4）、2-1 的交辦與核准（先存檔、指令看懂才按同意）。
 
 帳本要支援外幣，就得知道今天的匯率。這一課用 **httpx**（一個幫 Python 上網拿資料的套件）去問一個匯率 **API**（給程式用的服務窗口：程式送出請求，它回一段資料）。
-示範用的是 **Frankfurter**（frankfurter.dev）：不用金鑰、開放原始碼（MIT 授權），官方寫它的匯率可以免費用、會限流（rate-limited to prevent abuse）、也鼓勵把查到的結果存起來用。匯率每天會變，影片裡的數字是錄影那天的。
+示範用的是 **Frankfurter**（frankfurter.dev）：不用金鑰、開放原始碼（MIT 授權），官方寫它預設的混合匯率（blended rates）可以免費用、會限流（rate-limited to prevent abuse）、也鼓勵把查到的結果存起來用。匯率每天會變，影片裡的數字是錄影那天的。
 **測試和 check 都不打真網路**：用假回應（httpx 的 MockTransport）。
 
 ## 1. 題目
