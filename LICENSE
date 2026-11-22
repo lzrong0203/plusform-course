@@ -19,9 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-本授權（MIT）只適用於這個資料夾裡的程式碼：所有副檔名 .py 的檔案（包含 check.py、
-concept_map.py，以及 engine、tools、tests、showcase 資料夾與各課 start、reference、
-mutants、answers 裡的程式）。其他教材文字與圖片另以 CC BY-NC-SA 4.0 授權，見 LICENSE-CONTENT.md。
