@@ -149,3 +149,10 @@ uv run --no-project --python 3.13 python -B -m unittest discover -s tests -v   #
 自動測試會建一個假的家目錄和假的帳本來跑完整流程。幾個只給測試用的環境變數：`PLUSFORM_CONFIG_DIR` 把設定檔換到假的家目錄、`PLUSFORM_NOW` 假裝是不同天、`PLUSFORM_PREDICT` 不用一題一題問預測、`PLUSFORM_TEST_WS` 指定測試檔要建在哪裡（沒設的話用系統的暫存資料夾）、`PLUSFORM_DEBUG=1` 讓 check.py 出意外時印出完整的錯誤訊息。測試也會檢查跑完之後課程資料夾裡一個檔案都沒多。
 
 設計依據：每課 README 的六段照 CS50P 的作業格式；第③圈的抓壞版本是 Brown 大學 Examplar 的 wheat／chaff 做法（wheat 是正確版，chaff 是壞版本）。check.py 用 subprocess 把輸入餵給學員程式，不靠 shell 的 `<`；跑學員程式有時間上限和輸出上限，時間到會連子程序一起收掉；帳本的 uv 一律加 `--offline`，不讓它連網。
+
+## 授權
+
+- 程式碼（所有 .py 檔：check.py、engine、tools、tests、showcase，以及各課 start、reference、mutants、answers 裡的程式）：[MIT](LICENSE)。可以自由複製、修改，放進你自己的帳本或 repo，保留版權聲明就好。
+- 教材文字與圖片（README、補充、題目、回顧題）：[CC BY-NC-SA 4.0](LICENSE-CONTENT.md)。可以分享、改編，要註明出處「不會寫程式 plusForm《AI 時代的 Python 零基礎課》」、不得商用、改編後用同樣的授權。
+
+© 2026 不會寫程式 plusForm
