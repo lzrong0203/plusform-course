@@ -3,7 +3,37 @@
 這是 YouTube 頻道「不會寫程式 plusForm」的「AI 時代的 Python 零基礎課」課程資料夾，給完全沒寫過程式的人。
 每一課都練三圈：第①圈自己寫、第②圈跟 AI 學、第③圈把事情交出去再驗收。這個資料夾放的是每一課的作業，和幫你檢查作業的程式。
 
-> 目前做好第 0 級（新手村）：0-1～0-8、0-W（Windows 同學先看）、0-C（Lv0 關卡），還有 1-9 的作業骨架。其他課會陸續加進來。
+> 影片已上架：第 0 級（新手村）0-1～0-8、0-W（Windows 同學先看）、0-C（Lv0 關卡），以及 1-1。資料夾裡第 1、2 級各課的作業已經先放上來，影片陸續上架（[課程播放清單](https://www.youtube.com/playlist?list=PLfD9vlo8h2ME)）。
+
+
+## 依目標選路線
+
+![依目標選路線：所有人先看入口長片和第 0 級，再看第 1 級核心 12 課，然後分成做小工具、讓 agent 替你做事、完整學三條路線](docs/route_map.png)
+
+不用每個人都當工程師。學到看得懂、驗得了 AI 交回來的東西，就可以開始用在自己的事情上；要再往下學多深，看你要做什麼。
+
+**所有人先看**
+- 入口長片：[AI 都會寫程式了，還要學程式嗎？](https://youtu.be/WXXZDcxTIgI)
+- 第 0 級 新手村（10 課）：[0-1](https://youtu.be/4aDDVkl0Zr4)、[0-2](https://youtu.be/Vt0DSXizPKc)、[0-3](https://youtu.be/u3l03IOH6IQ)、[0-W（Windows）](https://youtu.be/5184yWpzn9Q)、[0-4](https://youtu.be/Y5aSvXwbIms)、[0-5](https://youtu.be/a8SAHyk5fVo)、[0-6](https://youtu.be/maTK6YcPNA4)、[0-7](https://youtu.be/6PC3Zff38FA)、[0-8](https://youtu.be/KjIHYiwRzws)、[0-C 闖關](https://youtu.be/v4vXoI2UtGU)。裝好工具、把 AI 設成家教、關掉 AI 自己闖關一次；後面每一課都在這套環境裡做。
+
+**第 1 級核心 12 課**（三條路線都要看）：[1-1 print](https://youtu.be/kpQ9QYrG7Ao)、1-2 變數、1-3 資料型別、1-4 數字與運算、1-6 input 與型別轉換、1-7 讀懂錯誤訊息、1-8 比較與 assert、1-9 if、1-11 for 迴圈、1-13 list、1-15 dict、1-18 函式（上）
+
+### 路線一：做小工具
+讓 AI 幫你做自己用的小工具（記帳、整理表格、批次改檔名），結果你自己對得出來、做錯了能重來。
+- 看完核心 12 課就能開始。停在哪：能用自己的例子（像 1-8 的 assert）驗收 AI 寫的程式。
+- 需要時再回來查：1-5 字串、1-22 錯誤處理、1-23 檔案讀寫。
+
+### 路線二：讓 agent 替你做事
+把每週的報表、資料整理交給 AI agent，或要管 AI 改專案。重點是限制它能改哪些檔、看懂重要的改動、訂好驗收條件、出錯能還原。
+- 核心 12 課，再加 5 課：1-20 看懂 AI 常用的寫法（下）、1-22 錯誤處理、1-23 檔案讀寫、1-24 類別與物件（看得懂就好）、1-26 讀別人的程式。
+- 然後直接進第 2 級（陸續上架），最關鍵的是 2-1 第一次讓 AI 碰你的專案、2-3 測試先行、2-7 金鑰與環境變數、2-8 需求單、2-10 讓機器先把關。
+- 搭配長片：[交給 AI 做事，怎麼知道它沒有亂來](https://youtu.be/deojSSeaTdo)、[agent 還需要先規劃嗎](https://youtu.be/8WnF_Lt63Ng)、[一句抱怨怎麼變成一道檢查](https://youtu.be/z0tfOSjuH7E)。
+
+### 路線三：完整學（想轉職當工程師）
+- 全部照課號，包括檢核站 1-C1～1-C4 和兩個關卡 1-12、1-27；練到能一行一行講出 172 行的記帳程式在做什麼，再往第 2、3 級。
+- 搭配長片：[AI 做的交易系統](https://youtu.be/QSQgNwpjyXo)、[它靠什麼擋住錯的程式](https://youtu.be/UK4RTy2qJNQ)。
+
+檢核站（1-C1～1-C4）是關掉 AI、限時自己做的小考。路線一、二不用全做，想確認自己真的會了，就做一次。
 
 ## 你的電腦上會有兩個資料夾
 
@@ -153,6 +183,6 @@ uv run --no-project --python 3.13 python -B -m unittest discover -s tests -v   #
 ## 授權
 
 - 程式碼（所有 .py 檔：check.py、engine、tools、tests、showcase，以及各課 start、reference、mutants、answers 裡的程式）：[MIT](LICENSE)。可以自由複製、修改，放進你自己的帳本或 repo，保留版權聲明就好。
-- 教材文字與圖片（README、補充、題目、回顧題）：[CC BY-NC-SA 4.0](LICENSE-CONTENT.md)。可以分享、改編，要註明出處「不會寫程式 plusForm《AI 時代的 Python 零基礎課》」、不得商用、改編後用同樣的授權。
+- 教材文字與圖片（README、補充、題目、回顧題；課程吉祥物的角色設計除外，保留所有權利）：[CC BY-NC-SA 4.0](LICENSE-CONTENT.md)。可以分享、改編，要註明出處「不會寫程式 plusForm《AI 時代的 Python 零基礎課》」、不得商用、改編後用同樣的授權。
 
 © 2026 不會寫程式 plusForm
